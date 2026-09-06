@@ -65,12 +65,102 @@ Item {
         if (aspectRatio === "") return;
         const parts = aspectRatio.split(":");
         const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
-        cropH = cropW / ar;
-        // Re-clamp height
-        if (cropY + cropH > imageY + imageH) {
-            cropH = imageY + imageH - cropY;
-            cropW = cropH * ar;
+        if (!ar || ar <= 0) return;
+
+        const centerX = cropX + cropW / 2;
+        const centerY = cropY + cropH / 2;
+
+        let w = cropW;
+        let h = w / ar;
+        if (h > imageH) {
+            h = imageH;
+            w = h * ar;
         }
+        if (w > imageW) {
+            w = imageW;
+            h = w / ar;
+        }
+
+        cropW = Math.max(20, w);
+        cropH = Math.max(20, h);
+        cropX = centerX - cropW / 2;
+        cropY = centerY - cropH / 2;
+        _clampMove();
+    }
+
+    function resizeFromCorner(corner, mouseX, mouseY, origX, origY, origW, origH, offX, offY) {
+        let anchorX = 0;
+        let anchorY = 0;
+        let sx = 1;
+        let sy = 1;
+
+        if (corner === "nw") {
+            anchorX = origX + origW;
+            anchorY = origY + origH;
+            sx = -1;
+            sy = -1;
+        } else if (corner === "ne") {
+            anchorX = origX;
+            anchorY = origY + origH;
+            sx = 1;
+            sy = -1;
+        } else if (corner === "sw") {
+            anchorX = origX + origW;
+            anchorY = origY;
+            sx = -1;
+            sy = 1;
+        } else if (corner === "se") {
+            anchorX = origX;
+            anchorY = origY;
+            sx = 1;
+            sy = 1;
+        }
+
+        let targetX = mouseX - offX;
+        let targetY = mouseY - offY;
+
+        targetX = Math.max(imageX, Math.min(targetX, imageX + imageW));
+        targetY = Math.max(imageY, Math.min(targetY, imageY + imageH));
+
+        let rawW = sx * (targetX - anchorX);
+        let rawH = sy * (targetY - anchorY);
+
+        const minSize = 20;
+
+        const maxW = sx < 0 ? (anchorX - imageX) : (imageX + imageW - anchorX);
+        const maxH = sy < 0 ? (anchorY - imageY) : (imageY + imageH - anchorY);
+
+        let w = Math.max(minSize, Math.min(rawW, maxW));
+        let h = Math.max(minSize, Math.min(rawH, maxH));
+
+        if (aspectRatio !== "") {
+            const parts = aspectRatio.split(":");
+            const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
+            if (ar > 0) {
+                if (w / h > ar) {
+                    h = w / ar;
+                } else {
+                    w = h * ar;
+                }
+
+                if (w > maxW) {
+                    w = maxW;
+                    h = w / ar;
+                }
+                if (h > maxH) {
+                    h = maxH;
+                    w = h * ar;
+                }
+
+                w = Math.max(minSize, w);
+                h = Math.max(minSize / ar, h);
+            }
+        }
+
+        cropX = sx < 0 ? (anchorX - w) : anchorX;
+        cropY = sy < 0 ? (anchorY - h) : anchorY;
+        cropW = w;
+        cropH = h;
     }
 
     function applyCrop() {
@@ -173,20 +263,18 @@ Item {
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.SizeFDiagCursor
-            property real startX: 0; property real startY: 0
+            property real offX: 0; property real offY: 0
             property real origX: 0; property real origY: 0
             property real origW: 0; property real origH: 0
             onPressed: mouse => {
-                startX = mapToItem(root, mouse.x, mouse.y).x;
-                startY = mapToItem(root, mouse.x, mouse.y).y;
+                const p = mapToItem(root, mouse.x, mouse.y);
                 origX = cropX; origY = cropY; origW = cropW; origH = cropH;
+                offX = p.x - origX;
+                offY = p.y - origY;
             }
             onPositionChanged: mouse => {
                 const p = mapToItem(root, mouse.x, mouse.y);
-                const dx = p.x - startX; const dy = p.y - startY;
-                cropX = origX + dx; cropW = origW - dx;
-                cropY = origY + dy; cropH = origH - dy;
-                root._clamp(); root._applyAspect();
+                root.resizeFromCorner("nw", p.x, p.y, origX, origY, origW, origH, offX, offY);
             }
         }
     }
@@ -197,18 +285,18 @@ Item {
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.SizeBDiagCursor
-            property real startX: 0; property real startY: 0
-            property real origY: 0; property real origW: 0; property real origH: 0
+            property real offX: 0; property real offY: 0
+            property real origX: 0; property real origY: 0
+            property real origW: 0; property real origH: 0
             onPressed: mouse => {
-                startX = mapToItem(root, mouse.x, mouse.y).x;
-                startY = mapToItem(root, mouse.x, mouse.y).y;
-                origY = cropY; origW = cropW; origH = cropH;
+                const p = mapToItem(root, mouse.x, mouse.y);
+                origX = cropX; origY = cropY; origW = cropW; origH = cropH;
+                offX = p.x - (origX + origW);
+                offY = p.y - origY;
             }
             onPositionChanged: mouse => {
                 const p = mapToItem(root, mouse.x, mouse.y);
-                cropW = origW + (p.x - startX);
-                cropY = origY + (p.y - startY); cropH = origH - (p.y - startY);
-                root._clamp(); root._applyAspect();
+                root.resizeFromCorner("ne", p.x, p.y, origX, origY, origW, origH, offX, offY);
             }
         }
     }
@@ -219,18 +307,18 @@ Item {
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.SizeBDiagCursor
-            property real startX: 0; property real startY: 0
-            property real origX: 0; property real origW: 0; property real origH: 0
+            property real offX: 0; property real offY: 0
+            property real origX: 0; property real origY: 0
+            property real origW: 0; property real origH: 0
             onPressed: mouse => {
-                startX = mapToItem(root, mouse.x, mouse.y).x;
-                startY = mapToItem(root, mouse.x, mouse.y).y;
-                origX = cropX; origW = cropW; origH = cropH;
+                const p = mapToItem(root, mouse.x, mouse.y);
+                origX = cropX; origY = cropY; origW = cropW; origH = cropH;
+                offX = p.x - origX;
+                offY = p.y - (origY + origH);
             }
             onPositionChanged: mouse => {
                 const p = mapToItem(root, mouse.x, mouse.y);
-                cropX = origX + (p.x - startX); cropW = origW - (p.x - startX);
-                cropH = origH + (p.y - startY);
-                root._clamp(); root._applyAspect();
+                root.resizeFromCorner("sw", p.x, p.y, origX, origY, origW, origH, offX, offY);
             }
         }
     }
@@ -241,18 +329,18 @@ Item {
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.SizeFDiagCursor
-            property real startX: 0; property real startY: 0
+            property real offX: 0; property real offY: 0
+            property real origX: 0; property real origY: 0
             property real origW: 0; property real origH: 0
             onPressed: mouse => {
-                startX = mapToItem(root, mouse.x, mouse.y).x;
-                startY = mapToItem(root, mouse.x, mouse.y).y;
-                origW = cropW; origH = cropH;
+                const p = mapToItem(root, mouse.x, mouse.y);
+                origX = cropX; origY = cropY; origW = cropW; origH = cropH;
+                offX = p.x - (origX + origW);
+                offY = p.y - (origY + origH);
             }
             onPositionChanged: mouse => {
                 const p = mapToItem(root, mouse.x, mouse.y);
-                cropW = origW + (p.x - startX);
-                cropH = origH + (p.y - startY);
-                root._clamp(); root._applyAspect();
+                root.resizeFromCorner("se", p.x, p.y, origX, origY, origW, origH, offX, offY);
             }
         }
     }
