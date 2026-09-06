@@ -1025,7 +1025,7 @@ Item {
                     Layout.fillWidth: true
                     implicitHeight: 34
                     radius: 8
-                    color: cancelMouse.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+                    color: promptCancelMouse.containsMouse ? Theme.surfaceContainerHighest : "transparent"
 
                     Text {
                         anchors.centerIn: parent
@@ -1037,7 +1037,7 @@ Item {
                     }
 
                     MouseArea {
-                        id: cancelMouse
+                        id: promptCancelMouse
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
