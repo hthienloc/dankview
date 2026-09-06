@@ -167,6 +167,21 @@ Singleton {
         flipV = !flipV;
     }
 
+    function zoomAt(factor, cursorX, cursorY, vpWidth, vpHeight) {
+        const oldZoom = zoom;
+        const newZoom = Math.max(0.05, Math.min(30.0, oldZoom * factor));
+        if (Math.abs(newZoom - oldZoom) < 0.0001) return;
+
+        // Center of viewport relative to cursor
+        const cx = cursorX - vpWidth / 2;
+        const cy = cursorY - vpHeight / 2;
+
+        // Shift pan so that the image pixel under cursor stays under cursor
+        panX = (panX - cx) * (newZoom / oldZoom) + cx;
+        panY = (panY - cy) * (newZoom / oldZoom) + cy;
+        zoom = newZoom;
+    }
+
     function zoomIn() {
         zoom = Math.min(zoom * 1.25, 30.0);
     }

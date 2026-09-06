@@ -123,11 +123,8 @@ Item {
             hoverEnabled: false
 
             onWheel: wheel => {
-                if (wheel.angleDelta.y > 0) {
-                    ImageService.zoomIn();
-                } else if (wheel.angleDelta.y < 0) {
-                    ImageService.zoomOut();
-                }
+                const factor = wheel.angleDelta.y > 0 ? 1.25 : (1.0 / 1.25);
+                ImageService.zoomAt(factor, wheel.x, wheel.y, viewport.width, viewport.height);
                 wheel.accepted = true;
             }
 
