@@ -27,38 +27,7 @@ Rectangle {
         anchors.centerIn: parent
         spacing: 5
 
-        DankActionButton {
-            iconName: "rotate_left"
-            iconSize: 20
-            iconColor: Theme.surfaceText
-            buttonSize: 38
-            tooltipText: "Rotate Counter-Clockwise (Shift+R)"
-            tooltipSide: "top"
-            onClicked: ImageService.rotateCounterClockwise()
-        }
-
-        DankActionButton {
-            iconName: "rotate_right"
-            iconSize: 20
-            iconColor: Theme.surfaceText
-            buttonSize: 38
-            tooltipText: "Rotate Clockwise (R)"
-            tooltipSide: "top"
-            onClicked: ImageService.rotateClockwise()
-        }
-
-        DankActionButton {
-            iconName: "flip"
-            iconSize: 20
-            iconColor: Theme.surfaceText
-            buttonSize: 38
-            tooltipText: "Flip Horizontally (Ctrl+M / H)"
-            tooltipSide: "top"
-            onClicked: ImageService.toggleFlipHorizontal()
-        }
-
-        BarSeparator {}
-
+        // View & Zoom controls
         DankActionButton {
             iconName: "zoom_out"
             iconSize: 20
@@ -101,27 +70,36 @@ Rectangle {
 
         BarSeparator {}
 
+        // Transform & Editing tools
         DankActionButton {
-            iconName: "content_copy"
+            iconName: "rotate_left"
             iconSize: 20
             iconColor: Theme.surfaceText
             buttonSize: 38
-            tooltipText: "Copy to Clipboard (Ctrl+C)"
+            tooltipText: "Rotate Counter-Clockwise (Shift+R)"
             tooltipSide: "top"
-            onClicked: ImageService.copyToClipboard()
+            onClicked: ImageService.rotateCounterClockwise()
         }
 
         DankActionButton {
-            iconName: "delete"
+            iconName: "rotate_right"
             iconSize: 20
-            iconColor: Theme.error
+            iconColor: Theme.surfaceText
             buttonSize: 38
-            tooltipText: "Move to Trash (Delete)"
+            tooltipText: "Rotate Clockwise (R)"
             tooltipSide: "top"
-            onClicked: ImageService.moveToTrash()
+            onClicked: ImageService.rotateClockwise()
         }
 
-        BarSeparator {}
+        DankActionButton {
+            iconName: "flip"
+            iconSize: 20
+            iconColor: Theme.surfaceText
+            buttonSize: 38
+            tooltipText: "Flip Horizontally (Ctrl+M / H)"
+            tooltipSide: "top"
+            onClicked: ImageService.toggleFlipHorizontal()
+        }
 
         DankActionButton {
             iconName: "crop"
@@ -133,6 +111,19 @@ Rectangle {
             onClicked: ImageService.toggleCropMode()
         }
 
+        BarSeparator {}
+
+        // Export & Clipboard actions
+        DankActionButton {
+            iconName: "content_copy"
+            iconSize: 20
+            iconColor: Theme.surfaceText
+            buttonSize: 38
+            tooltipText: "Copy to Clipboard (Ctrl+C)"
+            tooltipSide: "top"
+            onClicked: ImageService.copyToClipboard()
+        }
+
         DankActionButton {
             iconName: "save"
             iconSize: 20
@@ -141,6 +132,19 @@ Rectangle {
             tooltipText: "Save As / Export (Ctrl+S)"
             tooltipSide: "top"
             onClicked: ImageService.openSaveDialog()
+        }
+
+        BarSeparator {}
+
+        // Destructive action (Trash)
+        DankActionButton {
+            iconName: "delete"
+            iconSize: 20
+            iconColor: Theme.error
+            buttonSize: 38
+            tooltipText: "Move to Trash (Delete)"
+            tooltipSide: "top"
+            onClicked: ImageService.moveToTrash()
         }
     }
 }
