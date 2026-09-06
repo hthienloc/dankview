@@ -17,7 +17,7 @@ ShellRoot {
     Component.onCompleted: {
         DC.Style.theme = Theme;
         DC.Style.settings = SettingsData;
-        console.log("DankView Theme.fontFamily:", Theme.fontFamily, "fontScale:", Theme.fontScale);
+        DC.Paths.backend = Paths;
     }
 
     ImageViewerWindow {

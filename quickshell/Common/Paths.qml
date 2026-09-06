@@ -13,21 +13,27 @@ Singleton {
     readonly property url cache: `${xdgCache}/dankcal`
     readonly property url imagecache: `${cache}/imagecache`
 
-    function stringify(path: url): string {
+    function stringify(path): string {
+        if (!path)
+            return "";
         return path.toString().replace(/%20/g, " ");
     }
 
     function expandTilde(path: string): string {
-        if (!path.startsWith("~"))
-            return path;
+        if (!path || !path.startsWith("~"))
+            return path || "";
         return strip(root.home) + path.substring(1);
     }
 
     function shortenHome(path: string): string {
+        if (!path)
+            return "";
         return path.replace(strip(root.home), "~");
     }
 
-    function strip(path: url): string {
+    function strip(path): string {
+        if (!path)
+            return "";
         return stringify(path).replace("file://", "");
     }
 

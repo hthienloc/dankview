@@ -83,7 +83,7 @@ Rectangle {
         implicitHeight: 32
         implicitWidth: chipRow.implicitWidth + 20
         radius: 8
-        color: chipMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerLow
+        color: chipMouse.containsMouse ? Theme.surfaceContainerHighest : (Theme.surfaceContainerLow || Theme.surfaceContainerHigh)
         border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.3)
         border.width: 1
 
@@ -131,7 +131,7 @@ Rectangle {
             anchors.centerIn: parent
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSmall - 1
-            font.weight: Font.SemiBold
+            font.weight: Font.DemiBold
             color: textColor
         }
     }
@@ -395,20 +395,20 @@ Rectangle {
                                     Layout.fillWidth: true
                                     implicitHeight: 48
                                     radius: 8
-                                    color: Theme.surfaceContainerLow
+                                    color: Theme.surfaceContainerLow || Theme.surfaceContainerHigh
                                     border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.15)
                                     ColumnLayout {
                                         anchors.centerIn: parent
                                         spacing: 2
                                         Text {
-                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            Layout.alignment: Qt.AlignHCenter
                                             text: "Aperture"
                                             font.family: Theme.fontFamily
                                             font.pixelSize: Theme.fontSizeSmall - 2
                                             color: Theme.surfaceVariantText
                                         }
                                         Text {
-                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            Layout.alignment: Qt.AlignHCenter
                                             text: ImageService.currentMeta.fNumber || "—"
                                             font.family: Theme.fontFamily
                                             font.pixelSize: Theme.fontSizeSmall
@@ -423,20 +423,20 @@ Rectangle {
                                     Layout.fillWidth: true
                                     implicitHeight: 48
                                     radius: 8
-                                    color: Theme.surfaceContainerLow
+                                    color: Theme.surfaceContainerLow || Theme.surfaceContainerHigh
                                     border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.15)
                                     ColumnLayout {
                                         anchors.centerIn: parent
                                         spacing: 2
                                         Text {
-                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            Layout.alignment: Qt.AlignHCenter
                                             text: "Shutter"
                                             font.family: Theme.fontFamily
                                             font.pixelSize: Theme.fontSizeSmall - 2
                                             color: Theme.surfaceVariantText
                                         }
                                         Text {
-                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            Layout.alignment: Qt.AlignHCenter
                                             text: ImageService.currentMeta.exposureTime || "—"
                                             font.family: Theme.fontFamily
                                             font.pixelSize: Theme.fontSizeSmall
@@ -451,20 +451,20 @@ Rectangle {
                                     Layout.fillWidth: true
                                     implicitHeight: 48
                                     radius: 8
-                                    color: Theme.surfaceContainerLow
+                                    color: Theme.surfaceContainerLow || Theme.surfaceContainerHigh
                                     border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.15)
                                     ColumnLayout {
                                         anchors.centerIn: parent
                                         spacing: 2
                                         Text {
-                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            Layout.alignment: Qt.AlignHCenter
                                             text: "Focal"
                                             font.family: Theme.fontFamily
                                             font.pixelSize: Theme.fontSizeSmall - 2
                                             color: Theme.surfaceVariantText
                                         }
                                         Text {
-                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            Layout.alignment: Qt.AlignHCenter
                                             text: ImageService.currentMeta.focalLength || "—"
                                             font.family: Theme.fontFamily
                                             font.pixelSize: Theme.fontSizeSmall
@@ -479,20 +479,20 @@ Rectangle {
                                     Layout.fillWidth: true
                                     implicitHeight: 48
                                     radius: 8
-                                    color: Theme.surfaceContainerLow
+                                    color: Theme.surfaceContainerLow || Theme.surfaceContainerHigh
                                     border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.15)
                                     ColumnLayout {
                                         anchors.centerIn: parent
                                         spacing: 2
                                         Text {
-                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            Layout.alignment: Qt.AlignHCenter
                                             text: "ISO"
                                             font.family: Theme.fontFamily
                                             font.pixelSize: Theme.fontSizeSmall - 2
                                             color: Theme.surfaceVariantText
                                         }
                                         Text {
-                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            Layout.alignment: Qt.AlignHCenter
                                             text: ImageService.currentMeta.iso || "—"
                                             font.family: Theme.fontFamily
                                             font.pixelSize: Theme.fontSizeSmall

@@ -22,7 +22,7 @@ Singleton {
         case "dark":
             return false;
         default:
-            return PortalService.systemPrefersLight;
+            return (typeof PortalService !== "undefined" && PortalService) ? PortalService.systemPrefersLight : false;
         }
     }
 
@@ -150,6 +150,8 @@ Singleton {
     property color surfaceContainer: currentThemeData.surfaceContainer
     property color surfaceContainerHigh: currentThemeData.surfaceContainerHigh
     property color surfaceContainerHighest: currentThemeData.surfaceContainerHighest
+    property color surfaceContainerLow: currentThemeData.surfaceContainerLow || Qt.darker(surfaceContainer, 1.05)
+    property color surfaceContainerLowest: currentThemeData.surfaceContainerLowest || Qt.darker(surfaceContainer, 1.15)
 
     property color onSurface: surfaceText
     property color onSurfaceVariant: surfaceVariantText
