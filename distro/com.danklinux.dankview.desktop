@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=DankView
+Comment=Modern and fast image viewer for the Dank desktop
+GenericName=Image Viewer
+Exec=dview %F
+Icon=image-viewer
+Terminal=false
+Type=Application
+Categories=Graphics;2DGraphics;Viewer;RasterGraphics;
+MimeType=image/bmp;image/gif;image/jpeg;image/jpg;image/pjpeg;image/png;image/tiff;image/x-bmp;image/x-gray;image/x-icb;image/x-ico;image/x-png;image/x-portable-anymap;image/x-portable-bitmap;image/x-portable-graymap;image/x-portable-pixmap;image/x-xbitmap;image/x-xpixmap;image/x-pcx;image/svg+xml;image/svg+xml-compressed;image/vnd.wap.wbmp;image/x-icns;image/webp;image/avif;image/heif;image/jxl;
+Keywords=image;photo;picture;viewer;graphics;
+StartupNotify=true
+StartupWMClass=com.danklinux.dankview

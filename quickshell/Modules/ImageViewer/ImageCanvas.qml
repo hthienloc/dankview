@@ -1,0 +1,183 @@
+import QtQuick
+import Quickshell
+import qs.Common
+import qs.Services
+
+Item {
+    id: root
+
+    clip: true
+
+    readonly property string source: ImageService.currentFilePath ? "file://" + ImageService.currentFilePath : ""
+    readonly property bool hasImage: ImageService.currentFilePath !== ""
+
+    // Checkerboard background for transparent images
+    Rectangle {
+        anchors.fill: parent
+        color: Theme.surfaceContainerLowest || "#111111"
+    }
+
+    Item {
+        id: viewport
+        anchors.fill: parent
+
+        Item {
+            id: container
+            width: imageElement.paintedWidth > 0 ? imageElement.paintedWidth : imageElement.implicitWidth
+            height: imageElement.paintedHeight > 0 ? imageElement.paintedHeight : imageElement.implicitHeight
+            x: (viewport.width - width) / 2 + ImageService.panX
+            y: (viewport.height - height) / 2 + ImageService.panY
+            scale: ImageService.zoom
+            rotation: ImageService.rotation
+
+            transform: [
+                Scale {
+                    origin.x: container.width / 2
+                    origin.y: container.height / 2
+                    xScale: ImageService.flipH ? -1 : 1
+                    yScale: ImageService.flipV ? -1 : 1
+                }
+            ]
+
+            Behavior on rotation {
+                NumberAnimation {
+                    duration: 180
+                    easing.type: Easing.OutCubic
+                }
+            }
+
+            AnimatedImage {
+                id: imageElement
+                anchors.centerIn: parent
+                source: root.source
+                asynchronous: true
+                fillMode: Image.PreserveAspectFit
+                smooth: true
+                mipmap: true
+                cache: true
+
+                // Scale up or down to fit viewport initially if needed
+                property real fitScale: {
+                    if (implicitWidth <= 0 || implicitHeight <= 0 || viewport.width <= 0 || viewport.height <= 0)
+                        return 1.0;
+                    const scaleX = (viewport.width - 64) / implicitWidth;
+                    const scaleY = (viewport.height - 128) / implicitHeight;
+                    return Math.min(1.0, Math.min(scaleX, scaleY));
+                }
+
+                width: implicitWidth > 0 ? implicitWidth * fitScale : 400
+                height: implicitHeight > 0 ? implicitHeight * fitScale : 300
+            }
+        }
+
+        // Mouse wheel for zooming
+        WheelHandler {
+            target: null
+            onWheel: event => {
+                if (event.angleDelta.y > 0) {
+                    ImageService.zoomIn();
+                } else if (event.angleDelta.y < 0) {
+                    ImageService.zoomOut();
+                }
+            }
+        }
+
+        // Pinch handler for trackpad gestures
+        PinchHandler {
+            target: null
+            onScaleChanged: delta => {
+                ImageService.zoom = Math.max(0.05, Math.min(30.0, ImageService.zoom * delta));
+            }
+        }
+
+        // Drag handler to pan when zoomed
+        DragHandler {
+            target: null
+            onTranslationChanged: delta => {
+                ImageService.panX += delta.x;
+                ImageService.panY += delta.y;
+            }
+        }
+
+        // MouseArea for double-click and drag fallback
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+
+            onDoubleClicked: {
+                if (Math.abs(ImageService.zoom - 1.0) < 0.1) {
+                    ImageService.zoom = 2.0;
+                } else {
+                    ImageService.resetZoom();
+                }
+            }
+        }
+    }
+
+    // Previous / Next overlay edge buttons (hovering edges reveals subtle arrows)
+    MouseArea {
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        width: 80
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        visible: ImageService.fileList.length > 1
+        onClicked: ImageService.prevImage()
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.leftMargin: 12
+            anchors.verticalCenter: parent.verticalCenter
+            width: 44
+            height: 44
+            radius: 22
+            color: parent.containsMouse ? (Theme.surfaceContainerHigh || "#2a2a2a") : "transparent"
+            opacity: parent.containsMouse ? 0.9 : 0.0
+
+            Behavior on opacity {
+                NumberAnimation { duration: 150 }
+            }
+
+            Text {
+                anchors.centerIn: parent
+                text: "‹"
+                font.pixelSize: 28
+                color: Theme.onSurface || "#ffffff"
+            }
+        }
+    }
+
+    MouseArea {
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        width: 80
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        visible: ImageService.fileList.length > 1
+        onClicked: ImageService.nextImage()
+
+        Rectangle {
+            anchors.right: parent.right
+            anchors.rightMargin: 12
+            anchors.verticalCenter: parent.verticalCenter
+            width: 44
+            height: 44
+            radius: 22
+            color: parent.containsMouse ? (Theme.surfaceContainerHigh || "#2a2a2a") : "transparent"
+            opacity: parent.containsMouse ? 0.9 : 0.0
+
+            Behavior on opacity {
+                NumberAnimation { duration: 150 }
+            }
+
+            Text {
+                anchors.centerIn: parent
+                text: "›"
+                font.pixelSize: 28
+                color: Theme.onSurface || "#ffffff"
+            }
+        }
+    }
+}

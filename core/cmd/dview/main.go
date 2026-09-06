@@ -1,0 +1,158 @@
+package main
+
+import (
+	"encoding/json"
+	"flag"
+	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strconv"
+
+	"github.com/AvengeMedia/dankview/core/internal/exif"
+	"github.com/AvengeMedia/dankview/core/internal/fs"
+)
+
+var (
+	Version   = "0.1.0"
+	BuildTime = "unknown"
+	Commit    = "unknown"
+)
+
+func findQuickshellDir(specified string) (string, error) {
+	if specified != "" {
+		abs, err := filepath.Abs(specified)
+		if err == nil {
+			if _, err := os.Stat(filepath.Join(abs, "shell.qml")); err == nil {
+				return abs, nil
+			}
+		}
+	}
+
+	candidates := []string{
+		"quickshell",
+		"../quickshell",
+		"../../quickshell",
+		"/usr/local/share/quickshell/dankview",
+		"/usr/share/quickshell/dankview",
+	}
+
+	execPath, err := os.Executable()
+	if err == nil {
+		execDir := filepath.Dir(execPath)
+		candidates = append([]string{
+			filepath.Join(execDir, "../quickshell"),
+			filepath.Join(execDir, "quickshell"),
+			filepath.Join(execDir, "../share/quickshell/dankview"),
+		}, candidates...)
+	}
+
+	for _, cand := range candidates {
+		abs, err := filepath.Abs(cand)
+		if err == nil {
+			if _, err := os.Stat(filepath.Join(abs, "shell.qml")); err == nil {
+				return abs, nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("could not locate quickshell configuration (shell.qml)")
+}
+
+func main() {
+	configDir := flag.String("c", "", "path to quickshell configuration directory")
+	fullscreen := flag.Bool("f", false, "open in fullscreen mode")
+	showVersion := flag.Bool("v", false, "show version")
+	printInfo := flag.Bool("info", false, "print image metadata as JSON and exit")
+	printList := flag.Bool("list", false, "print directory image list as JSON and exit")
+
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: dview [options] [image-path]\n\n")
+		fmt.Fprintf(os.Stderr, "DankView - Standalone Material 3 Image Viewer\n\nOptions:\n")
+		flag.PrintDefaults()
+	}
+
+	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("dview version %s (built %s, commit %s)\n", Version, BuildTime, Commit)
+		return
+	}
+
+	targetPath := "."
+	if flag.NArg() > 0 {
+		targetPath = flag.Arg(0)
+	}
+
+	absPath, err := filepath.Abs(targetPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error resolving path: %v\n", err)
+		os.Exit(1)
+	}
+
+	if *printInfo {
+		meta, err := exif.GetMetadata(absPath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error reading metadata: %v\n", err)
+			os.Exit(1)
+		}
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		enc.Encode(meta)
+		return
+	}
+
+	if *printList {
+		list, err := fs.ScanDirectory(absPath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error scanning directory: %v\n", err)
+			os.Exit(1)
+		}
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		enc.Encode(list)
+		return
+	}
+
+	imgList, err := fs.ScanDirectory(absPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Warning: unable to scan directory: %v\n", err)
+		imgList = &fs.ImageList{
+			Directory:    filepath.Dir(absPath),
+			Files:        []string{absPath},
+			CurrentIndex: 0,
+		}
+	}
+
+	qsDir, err := findQuickshellDir(*configDir)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+
+	initialImage := absPath
+	if len(imgList.Files) > 0 && imgList.CurrentIndex < len(imgList.Files) {
+		initialImage = imgList.Files[imgList.CurrentIndex]
+	}
+
+	env := os.Environ()
+	env = append(env,
+		"DVIEW_INITIAL_IMAGE="+initialImage,
+		"DVIEW_DIR="+imgList.Directory,
+		"DVIEW_INDEX="+strconv.Itoa(imgList.CurrentIndex),
+	)
+	if *fullscreen {
+		env = append(env, "DVIEW_FULLSCREEN=1")
+	}
+
+	cmd := exec.Command("quickshell", "-p", qsDir)
+	cmd.Env = env
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+
+	if err := cmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error running quickshell: %v\n", err)
+		os.Exit(1)
+	}
+}
