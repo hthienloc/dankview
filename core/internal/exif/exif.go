@@ -16,13 +16,16 @@ import (
 type Metadata struct {
 	FilePath     string    `json:"filePath"`
 	FileName     string    `json:"fileName"`
+	Directory    string    `json:"directory"`
 	FileSize     int64     `json:"fileSize"`
 	FileSizeText string    `json:"fileSizeText"`
 	Format       string    `json:"format"`
 	Width        int       `json:"width"`
 	Height       int       `json:"height"`
 	AspectRatio  string    `json:"aspectRatio"`
+	Megapixels   string    `json:"megapixels,omitempty"`
 	ModTime      time.Time `json:"modTime"`
+	ModTimeText  string    `json:"modTimeText"`
 	CameraMake   string    `json:"cameraMake,omitempty"`
 	CameraModel  string    `json:"cameraModel,omitempty"`
 	ExposureTime string    `json:"exposureTime,omitempty"`
@@ -66,6 +69,7 @@ func GetMetadata(filePath string) (*Metadata, error) {
 	}
 
 	aspectRatio := ""
+	mp := ""
 	if cfg.Width > 0 && cfg.Height > 0 {
 		gcd := func(a, b int) int {
 			for b != 0 {
@@ -75,18 +79,27 @@ func GetMetadata(filePath string) (*Metadata, error) {
 		}
 		g := gcd(cfg.Width, cfg.Height)
 		aspectRatio = fmt.Sprintf("%d:%d", cfg.Width/g, cfg.Height/g)
+		pixels := float64(cfg.Width * cfg.Height)
+		if pixels >= 1000000 {
+			mp = fmt.Sprintf("%.1f MP", pixels/1000000.0)
+		} else {
+			mp = fmt.Sprintf("%.0f kP", pixels/1000.0)
+		}
 	}
 
 	meta := &Metadata{
 		FilePath:     filePath,
 		FileName:     filepath.Base(filePath),
+		Directory:    filepath.Dir(filePath),
 		FileSize:     stat.Size(),
 		FileSizeText: formatBytes(stat.Size()),
 		Format:       strings.ToUpper(format),
 		Width:        cfg.Width,
 		Height:       cfg.Height,
 		AspectRatio:  aspectRatio,
+		Megapixels:   mp,
 		ModTime:      stat.ModTime(),
+		ModTimeText:  stat.ModTime().Format("Jan 02, 2006 15:04"),
 	}
 
 	return meta, nil

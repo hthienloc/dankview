@@ -101,7 +101,10 @@ Singleton {
         command: []
         onExited: exitCode => {
             if (exitCode === 0) {
+                root.showToast("Moved image to trash");
                 removeCurrentFromList();
+            } else {
+                root.showToast("Failed to move image to trash", true);
             }
         }
     }
@@ -110,6 +113,26 @@ Singleton {
         id: copyProc
         running: false
         command: []
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                root.showToast("Image copied to clipboard");
+            } else {
+                root.showToast("Failed to copy image to clipboard", true);
+            }
+        }
+    }
+
+    Process {
+        id: copyPathProc
+        running: false
+        command: []
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                root.showToast("File path copied to clipboard");
+            } else {
+                root.showToast("Failed to copy path", true);
+            }
+        }
     }
 
     function nextImage() {
@@ -179,9 +202,36 @@ Singleton {
 
     function copyToClipboard() {
         if (!currentFilePath) return;
-        // Copies image data or file path to wayland clipboard via wl-copy
-        copyProc.command = ["wl-copy", "--type", "text/uri-list", "file://" + currentFilePath];
+        const ext = currentFilePath.split('.').pop().toLowerCase();
+        const mime = (ext === "jpg" || ext === "jpeg") ? "image/jpeg" : ("image/" + ext);
+        copyProc.command = [
+            "sh", "-c",
+            "dms cl copy -t " + mime + " < " + JSON.stringify(currentFilePath) + " 2>/dev/null || wl-copy -t " + mime + " < " + JSON.stringify(currentFilePath) + " 2>/dev/null || wl-copy < " + JSON.stringify(currentFilePath)
+        ];
         copyProc.running = true;
+    }
+
+    function copyPathToClipboard() {
+        if (!currentFilePath) return;
+        copyPathProc.command = [
+            "sh", "-c",
+            "dms cl copy " + JSON.stringify(currentFilePath) + " 2>/dev/null || wl-copy " + JSON.stringify(currentFilePath)
+        ];
+        copyPathProc.running = true;
+    }
+
+    function openContainingFolder() {
+        if (!currentFilePath) return;
+        const dir = currentMeta.directory || currentFilePath.substring(0, currentFilePath.lastIndexOf("/"));
+        Quickshell.execDetached(["xdg-open", dir]);
+    }
+
+    function showToast(message, isError) {
+        const method = isError ? "error" : "info";
+        Quickshell.execDetached([
+            "sh", "-c",
+            "dms ipc call toast " + method + " " + JSON.stringify(message) + " 2>/dev/null || notify-send " + (isError ? "-u critical " : "") + JSON.stringify("DankView") + " " + JSON.stringify(message)
+        ]);
     }
 
     function moveToTrash() {

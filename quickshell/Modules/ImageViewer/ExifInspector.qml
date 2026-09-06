@@ -8,10 +8,18 @@ import qs.DankCommon.Widgets
 Rectangle {
     id: root
 
-    width: 360
+    width: 380
     color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.96)
-    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.3)
+    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.25)
     border.width: 1
+
+    component M3Card: Rectangle {
+        Layout.fillWidth: true
+        radius: 12
+        color: Theme.surfaceContainerHigh
+        border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.18)
+        border.width: 1
+    }
 
     component SectionHeader: RowLayout {
         property string title: ""
@@ -36,9 +44,10 @@ Rectangle {
         }
     }
 
-    component InfoRow: RowLayout {
+    component DetailRow: RowLayout {
         property string label: ""
         property string value: ""
+        property bool isMono: false
         visible: value !== ""
 
         Layout.fillWidth: true
@@ -50,13 +59,14 @@ Rectangle {
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceVariantText
+            elide: Text.ElideRight
         }
 
         Text {
             Layout.fillWidth: true
             text: value
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSizeMedium
+            font.family: isMono ? Theme.monoFontFamily : Theme.fontFamily
+            font.pixelSize: Theme.fontSizeSmall
             font.weight: Font.Medium
             color: Theme.surfaceText
             wrapMode: Text.WrapAnywhere
@@ -64,14 +74,77 @@ Rectangle {
         }
     }
 
+    component ActionChip: Rectangle {
+        id: chip
+        property string iconName: ""
+        property string label: ""
+        signal clicked()
+
+        implicitHeight: 32
+        implicitWidth: chipRow.implicitWidth + 20
+        radius: 8
+        color: chipMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerLow
+        border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.3)
+        border.width: 1
+
+        RowLayout {
+            id: chipRow
+            anchors.centerIn: parent
+            spacing: 6
+
+            DankIcon {
+                name: chip.iconName
+                size: 16
+                color: Theme.primary
+            }
+
+            Text {
+                text: chip.label
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSizeSmall
+                font.weight: Font.Medium
+                color: Theme.surfaceText
+            }
+        }
+
+        MouseArea {
+            id: chipMouse
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: chip.clicked()
+        }
+    }
+
+    component PillBadge: Rectangle {
+        property alias text: badgeText.text
+        property color textColor: Theme.surfaceText
+        property color bgColor: Theme.surfaceContainerHighest
+
+        implicitHeight: 24
+        implicitWidth: badgeText.implicitWidth + 14
+        radius: 12
+        color: bgColor
+
+        Text {
+            id: badgeText
+            anchors.centerIn: parent
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeSmall - 1
+            font.weight: Font.SemiBold
+            color: textColor
+        }
+    }
+
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 18
-        spacing: 14
+        spacing: 0
 
-        // Top Drawer Header
+        // Header
         RowLayout {
             Layout.fillWidth: true
+            Layout.margins: 14
+            spacing: 10
 
             DankIcon {
                 name: "info"
@@ -81,7 +154,7 @@ Rectangle {
 
             Text {
                 Layout.fillWidth: true
-                text: "Image Properties"
+                text: "Details"
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeLarge
                 font.weight: Font.DemiBold
@@ -90,9 +163,10 @@ Rectangle {
 
             DankActionButton {
                 iconName: "close"
-                iconSize: 20
+                iconSize: 18
+                buttonSize: 32
                 iconColor: Theme.surfaceText
-                tooltipText: "Close Inspector (I)"
+                tooltipText: "Close (I)"
                 tooltipSide: "left"
                 onClicked: ImageService.inspectorOpen = false
             }
@@ -102,137 +176,373 @@ Rectangle {
             Layout.fillWidth: true
             height: 1
             color: Theme.outlineVariant
-            opacity: 0.35
+            opacity: 0.25
         }
 
-        // Section: File Details
-        SectionHeader {
-            title: "File Details"
-            iconName: "image"
-        }
-
-        Rectangle {
+        DankFlickable {
             Layout.fillWidth: true
-            implicitHeight: fileCol.implicitHeight + 18
-            radius: 12
-            color: Theme.surfaceContainerHigh
-
-            ColumnLayout {
-                id: fileCol
-                anchors.fill: parent
-                anchors.margins: 12
-                spacing: 10
-
-                InfoRow {
-                    label: "Name"
-                    value: ImageService.currentMeta.fileName || ImageService.currentFileName
-                }
-                InfoRow {
-                    label: "Format"
-                    value: ImageService.currentMeta.format || ""
-                }
-                InfoRow {
-                    label: "File Size"
-                    value: ImageService.currentMeta.fileSizeText || ""
-                }
-                InfoRow {
-                    label: "Resolution"
-                    value: ImageService.currentMeta.width > 0 ? (ImageService.currentMeta.width + " × " + ImageService.currentMeta.height + " px") : ""
-                }
-                InfoRow {
-                    label: "Aspect Ratio"
-                    value: ImageService.currentMeta.aspectRatio || ""
-                }
-            }
-        }
-
-        // Section: Camera & EXIF (if available)
-        SectionHeader {
-            visible: ImageService.currentMeta.cameraModel !== undefined && ImageService.currentMeta.cameraModel !== ""
-            title: "Camera & Optics"
-            iconName: "photo_camera"
-        }
-
-        Rectangle {
-            visible: ImageService.currentMeta.cameraModel !== undefined && ImageService.currentMeta.cameraModel !== ""
-            Layout.fillWidth: true
-            implicitHeight: exifCol.implicitHeight + 18
-            radius: 12
-            color: Theme.surfaceContainerHigh
-
-            ColumnLayout {
-                id: exifCol
-                anchors.fill: parent
-                anchors.margins: 12
-                spacing: 10
-
-                InfoRow {
-                    label: "Camera"
-                    value: (ImageService.currentMeta.cameraMake || "") + " " + (ImageService.currentMeta.cameraModel || "")
-                }
-                InfoRow {
-                    label: "Aperture"
-                    value: ImageService.currentMeta.fNumber || ""
-                }
-                InfoRow {
-                    label: "Exposure"
-                    value: ImageService.currentMeta.exposureTime || ""
-                }
-                InfoRow {
-                    label: "ISO"
-                    value: ImageService.currentMeta.iso || ""
-                }
-                InfoRow {
-                    label: "Focal Length"
-                    value: ImageService.currentMeta.focalLength || ""
-                }
-                InfoRow {
-                    label: "Date Taken"
-                    value: ImageService.currentMeta.dateTaken || ""
-                }
-            }
-        }
-
-        Item {
             Layout.fillHeight: true
-        }
-
-        // Location path card
-        Rectangle {
-            Layout.fillWidth: true
-            implicitHeight: pathCol.implicitHeight + 18
-            radius: 12
-            color: Theme.surfaceContainerLowest
+            contentHeight: contentCol.implicitHeight + 28
+            clip: true
 
             ColumnLayout {
-                id: pathCol
-                anchors.fill: parent
-                anchors.margins: 12
-                spacing: 6
+                id: contentCol
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: 14
+                spacing: 14
 
-                RowLayout {
-                    spacing: 6
-                    DankIcon {
-                        name: "folder"
-                        size: 16
-                        color: Theme.surfaceVariantText
-                    }
-                    Text {
-                        text: "File Path"
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
-                        color: Theme.surfaceVariantText
+                // Hero File Card
+                M3Card {
+                    implicitHeight: heroCol.implicitHeight + 24
+
+                    ColumnLayout {
+                        id: heroCol
+                        anchors.fill: parent
+                        anchors.margins: 12
+                        spacing: 10
+
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: 10
+
+                            Rectangle {
+                                width: 40
+                                height: 40
+                                radius: 10
+                                color: Theme.primaryContainer
+
+                                DankIcon {
+                                    anchors.centerIn: parent
+                                    name: "image"
+                                    size: 22
+                                    color: Theme.primaryText
+                                }
+                            }
+
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 2
+
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: ImageService.currentFileName || "Image"
+                                    font.family: Theme.fontFamily
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    font.weight: Font.DemiBold
+                                    color: Theme.surfaceText
+                                    elide: Text.ElideMiddle
+                                    wrapMode: Text.WrapAnywhere
+                                }
+
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: ImageService.currentMeta.fileSizeText || ""
+                                    font.family: Theme.fontFamily
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                }
+                            }
+                        }
+
+                        // Badges Row
+                        Flow {
+                            Layout.fillWidth: true
+                            spacing: 6
+
+                            PillBadge {
+                                visible: ImageService.currentMeta.format !== undefined && ImageService.currentMeta.format !== ""
+                                text: ImageService.currentMeta.format || ""
+                                bgColor: Theme.primaryContainer
+                                textColor: Theme.primaryText
+                            }
+
+                            PillBadge {
+                                visible: ImageService.currentMeta.megapixels !== undefined && ImageService.currentMeta.megapixels !== ""
+                                text: ImageService.currentMeta.megapixels || ""
+                            }
+
+                            PillBadge {
+                                visible: ImageService.currentMeta.width > 0
+                                text: ImageService.currentMeta.width + " × " + ImageService.currentMeta.height
+                            }
+
+                            PillBadge {
+                                visible: ImageService.currentMeta.aspectRatio !== undefined && ImageService.currentMeta.aspectRatio !== ""
+                                text: ImageService.currentMeta.aspectRatio || ""
+                            }
+                        }
+
+                        Rectangle {
+                            Layout.fillWidth: true
+                            height: 1
+                            color: Theme.outlineVariant
+                            opacity: 0.2
+                        }
+
+                        // Quick Action Buttons
+                        Flow {
+                            Layout.fillWidth: true
+                            spacing: 8
+
+                            ActionChip {
+                                iconName: "content_copy"
+                                label: "Copy Image"
+                                onClicked: ImageService.copyToClipboard()
+                            }
+
+                            ActionChip {
+                                iconName: "link"
+                                label: "Copy Path"
+                                onClicked: ImageService.copyPathToClipboard()
+                            }
+
+                            ActionChip {
+                                iconName: "folder_open"
+                                label: "Open Folder"
+                                onClicked: ImageService.openContainingFolder()
+                            }
+                        }
                     }
                 }
 
-                Text {
+                // Section 1: Image Attributes
+                ColumnLayout {
                     Layout.fillWidth: true
-                    text: ImageService.currentFilePath
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceText
-                    wrapMode: Text.WrapAnywhere
+                    spacing: 8
+
+                    SectionHeader {
+                        title: "Attributes"
+                        iconName: "photo_size_select_actual"
+                    }
+
+                    M3Card {
+                        implicitHeight: attrCol.implicitHeight + 24
+
+                        ColumnLayout {
+                            id: attrCol
+                            anchors.fill: parent
+                            anchors.margins: 12
+                            spacing: 10
+
+                            DetailRow {
+                                label: "Dimensions"
+                                value: ImageService.currentMeta.width > 0 ? (ImageService.currentMeta.width + " × " + ImageService.currentMeta.height + " px") : ""
+                            }
+                            DetailRow {
+                                label: "Megapixels"
+                                value: ImageService.currentMeta.megapixels || ""
+                            }
+                            DetailRow {
+                                label: "Aspect Ratio"
+                                value: ImageService.currentMeta.aspectRatio || ""
+                            }
+                            DetailRow {
+                                label: "File Size"
+                                value: ImageService.currentMeta.fileSizeText ? (ImageService.currentMeta.fileSizeText + (ImageService.currentMeta.fileSize ? " (" + ImageService.currentMeta.fileSize.toLocaleString() + " B)" : "")) : ""
+                            }
+                            DetailRow {
+                                label: "Format"
+                                value: ImageService.currentMeta.format || ""
+                            }
+                            DetailRow {
+                                label: "Modified"
+                                value: ImageService.currentMeta.modTimeText || ""
+                            }
+                        }
+                    }
+                }
+
+                // Section 2: Camera & Optics (EXIF)
+                ColumnLayout {
+                    visible: (ImageService.currentMeta.cameraModel !== undefined && ImageService.currentMeta.cameraModel !== "") ||
+                             (ImageService.currentMeta.fNumber !== undefined && ImageService.currentMeta.fNumber !== "")
+                    Layout.fillWidth: true
+                    spacing: 8
+
+                    SectionHeader {
+                        title: "Camera & Optics"
+                        iconName: "photo_camera"
+                    }
+
+                    M3Card {
+                        implicitHeight: cameraCol.implicitHeight + 24
+
+                        ColumnLayout {
+                            id: cameraCol
+                            anchors.fill: parent
+                            anchors.margins: 12
+                            spacing: 12
+
+                            Text {
+                                Layout.fillWidth: true
+                                visible: text !== ""
+                                text: (ImageService.currentMeta.cameraMake ? ImageService.currentMeta.cameraMake + " " : "") + (ImageService.currentMeta.cameraModel || "")
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.fontSizeMedium
+                                font.weight: Font.DemiBold
+                                color: Theme.surfaceText
+                            }
+
+                            // 4-cell Photography Quick Spec Grid (Loupe style)
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: 6
+
+                                // Aperture
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    implicitHeight: 48
+                                    radius: 8
+                                    color: Theme.surfaceContainerLow
+                                    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.15)
+                                    ColumnLayout {
+                                        anchors.centerIn: parent
+                                        spacing: 2
+                                        Text {
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            text: "Aperture"
+                                            font.family: Theme.fontFamily
+                                            font.pixelSize: Theme.fontSizeSmall - 2
+                                            color: Theme.surfaceVariantText
+                                        }
+                                        Text {
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            text: ImageService.currentMeta.fNumber || "—"
+                                            font.family: Theme.fontFamily
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            font.weight: Font.DemiBold
+                                            color: Theme.surfaceText
+                                        }
+                                    }
+                                }
+
+                                // Shutter
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    implicitHeight: 48
+                                    radius: 8
+                                    color: Theme.surfaceContainerLow
+                                    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.15)
+                                    ColumnLayout {
+                                        anchors.centerIn: parent
+                                        spacing: 2
+                                        Text {
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            text: "Shutter"
+                                            font.family: Theme.fontFamily
+                                            font.pixelSize: Theme.fontSizeSmall - 2
+                                            color: Theme.surfaceVariantText
+                                        }
+                                        Text {
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            text: ImageService.currentMeta.exposureTime || "—"
+                                            font.family: Theme.fontFamily
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            font.weight: Font.DemiBold
+                                            color: Theme.surfaceText
+                                        }
+                                    }
+                                }
+
+                                // Focal Length
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    implicitHeight: 48
+                                    radius: 8
+                                    color: Theme.surfaceContainerLow
+                                    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.15)
+                                    ColumnLayout {
+                                        anchors.centerIn: parent
+                                        spacing: 2
+                                        Text {
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            text: "Focal"
+                                            font.family: Theme.fontFamily
+                                            font.pixelSize: Theme.fontSizeSmall - 2
+                                            color: Theme.surfaceVariantText
+                                        }
+                                        Text {
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            text: ImageService.currentMeta.focalLength || "—"
+                                            font.family: Theme.fontFamily
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            font.weight: Font.DemiBold
+                                            color: Theme.surfaceText
+                                        }
+                                    }
+                                }
+
+                                // ISO
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    implicitHeight: 48
+                                    radius: 8
+                                    color: Theme.surfaceContainerLow
+                                    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.15)
+                                    ColumnLayout {
+                                        anchors.centerIn: parent
+                                        spacing: 2
+                                        Text {
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            text: "ISO"
+                                            font.family: Theme.fontFamily
+                                            font.pixelSize: Theme.fontSizeSmall - 2
+                                            color: Theme.surfaceVariantText
+                                        }
+                                        Text {
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            text: ImageService.currentMeta.iso || "—"
+                                            font.family: Theme.fontFamily
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            font.weight: Font.DemiBold
+                                            color: Theme.surfaceText
+                                        }
+                                    }
+                                }
+                            }
+
+                            DetailRow {
+                                label: "Date Taken"
+                                value: ImageService.currentMeta.dateTaken || ""
+                            }
+                        }
+                    }
+                }
+
+                // Section 3: Location
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 8
+
+                    SectionHeader {
+                        title: "Location"
+                        iconName: "folder"
+                    }
+
+                    M3Card {
+                        implicitHeight: locCol.implicitHeight + 24
+
+                        ColumnLayout {
+                            id: locCol
+                            anchors.fill: parent
+                            anchors.margins: 12
+                            spacing: 10
+
+                            DetailRow {
+                                label: "Folder"
+                                value: ImageService.currentMeta.directory || ""
+                                isMono: true
+                            }
+
+                            DetailRow {
+                                label: "Full Path"
+                                value: ImageService.currentFilePath
+                                isMono: true
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -160,10 +160,10 @@ FloatingWindow {
             anchors.top: headerBar.bottom
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            x: ImageService.inspectorOpen ? (parent.width - width) : parent.width
-            visible: ImageService.inspectorOpen
+            anchors.rightMargin: ImageService.inspectorOpen ? 0 : -width
+            visible: anchors.rightMargin > -width || ImageService.inspectorOpen
 
-            Behavior on x {
+            Behavior on anchors.rightMargin {
                 NumberAnimation {
                     duration: 220
                     easing.type: Easing.OutCubic
