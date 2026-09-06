@@ -120,6 +120,12 @@ FloatingWindow {
                 ImageService.moveToTrash();
                 event.accepted = true;
                 break;
+            case Qt.Key_W:
+                if (event.modifiers & Qt.ControlModifier) {
+                    ImageService.setAsWallpaper();
+                    event.accepted = true;
+                }
+                break;
             case Qt.Key_Escape:
                 if (ImageService.inspectorOpen) {
                     ImageService.inspectorOpen = false;

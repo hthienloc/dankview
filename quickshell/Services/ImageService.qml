@@ -161,6 +161,19 @@ Singleton {
         }
     }
 
+    Process {
+        id: wallpaperProc
+        running: false
+        command: []
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                root.showToast("Wallpaper set");
+            } else {
+                root.showToast("Failed to set wallpaper", true);
+            }
+        }
+    }
+
     function nextImage() {
         if (fileList.length <= 1) return;
         currentIndex = (currentIndex + 1) % fileList.length;
@@ -300,6 +313,19 @@ Singleton {
         if (!currentFilePath) return;
         const dir = currentMeta.directory || currentFilePath.substring(0, currentFilePath.lastIndexOf("/"));
         Quickshell.execDetached(["xdg-open", dir]);
+    }
+
+    function setAsWallpaper() {
+        if (!currentFilePath) return;
+        const path = currentFilePath;
+        // Try DMS IPC first; fall back to swww, then swaybg
+        wallpaperProc.command = [
+            "sh", "-c",
+            "dms ipc call wallpaper set " + JSON.stringify(path) +
+            " 2>/dev/null || swww img " + JSON.stringify(path) +
+            " 2>/dev/null || swaybg -i " + JSON.stringify(path) + " 2>/dev/null"
+        ];
+        wallpaperProc.running = true;
     }
 
     function showToast(message, isError) {
