@@ -10,7 +10,7 @@ Singleton {
 
     readonly property url home: StandardPaths.standardLocations(StandardPaths.HomeLocation)[0]
     readonly property url xdgCache: StandardPaths.standardLocations(StandardPaths.GenericCacheLocation)[0]
-    readonly property url cache: `${xdgCache}/dankcal`
+    readonly property url cache: `${xdgCache}/dankview`
     readonly property url imagecache: `${cache}/imagecache`
 
     function stringify(path): string {
