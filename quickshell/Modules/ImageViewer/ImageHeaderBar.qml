@@ -45,8 +45,8 @@ Rectangle {
         Text {
             Layout.fillWidth: true
             text: ImageService.currentFileName || "DankView"
-            font.family: Theme.fontFamily || "Google Sans Flex"
-            font.pixelSize: 15
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeLarge
             font.weight: Font.DemiBold
             color: Theme.surfaceText
             elide: Text.ElideMiddle
@@ -64,8 +64,8 @@ Rectangle {
                 id: counterText
                 anchors.centerIn: parent
                 text: (ImageService.currentIndex + 1) + " / " + ImageService.fileList.length
-                font.family: Theme.fontFamily || "Google Sans Flex"
-                font.pixelSize: 13
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.Medium
                 color: Theme.surfaceVariantText
             }
@@ -91,8 +91,8 @@ Rectangle {
 
                 Text {
                     text: Math.round(ImageService.zoom * 100) + "%"
-                    font.family: Theme.fontFamily || "Google Sans Flex"
-                    font.pixelSize: 13
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontSizeSmall
                     font.weight: Font.Medium
                     color: Theme.surfaceText
                 }

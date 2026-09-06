@@ -29,8 +29,8 @@ Rectangle {
         Text {
             Layout.fillWidth: true
             text: title
-            font.family: Theme.fontFamily || "Google Sans Flex"
-            font.pixelSize: 13
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeMedium
             font.weight: Font.DemiBold
             color: Theme.primary
         }
@@ -47,16 +47,16 @@ Rectangle {
         Text {
             Layout.preferredWidth: 105
             text: label
-            font.family: Theme.fontFamily || "Google Sans Flex"
-            font.pixelSize: 13
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceVariantText
         }
 
         Text {
             Layout.fillWidth: true
             text: value
-            font.family: Theme.fontFamily || "Google Sans Flex"
-            font.pixelSize: 13
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeMedium
             font.weight: Font.Medium
             color: Theme.surfaceText
             wrapMode: Text.WrapAnywhere
@@ -82,8 +82,8 @@ Rectangle {
             Text {
                 Layout.fillWidth: true
                 text: "Image Properties"
-                font.family: Theme.fontFamily || "Google Sans Flex"
-                font.pixelSize: 16
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSizeLarge
                 font.weight: Font.DemiBold
                 color: Theme.surfaceText
             }
@@ -219,8 +219,8 @@ Rectangle {
                     }
                     Text {
                         text: "File Path"
-                        font.family: Theme.fontFamily || "Google Sans Flex"
-                        font.pixelSize: 12
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
                     }
@@ -229,8 +229,8 @@ Rectangle {
                 Text {
                     Layout.fillWidth: true
                     text: ImageService.currentFilePath
-                    font.family: Theme.fontFamily || "Google Sans Flex"
-                    font.pixelSize: 12
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceText
                     wrapMode: Text.WrapAnywhere
                 }
