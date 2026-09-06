@@ -465,43 +465,7 @@ Singleton {
     }
 
     function undoTrash() {
-        restoreProc.command = [
-            "python3", "-c",
-            `
-import os, glob, urllib.parse, shutil
-
-target = ${JSON.stringify(lastTrashedPath)}
-trash_dir = os.path.expanduser("~/.local/share/Trash")
-info_files = glob.glob(os.path.join(trash_dir, "info", "*.trashinfo"))
-if not info_files:
-    exit(0)
-
-info_files.sort(key=os.path.getmtime, reverse=True)
-for info in info_files:
-    base = os.path.basename(info)[:-10]
-    file_entry = os.path.join(trash_dir, "files", base)
-    orig_path = None
-    try:
-        with open(info, "r", encoding="utf-8") as f:
-            for line in f:
-                if line.startswith("Path="):
-                    orig_path = urllib.parse.unquote(line.strip()[5:])
-                    break
-    except Exception:
-        continue
-
-    if orig_path and os.path.exists(file_entry):
-        if not target or orig_path == target:
-            os.makedirs(os.path.dirname(orig_path), exist_ok=True)
-            shutil.move(file_entry, orig_path)
-            try:
-                os.remove(info)
-            except Exception:
-                pass
-            print(orig_path)
-            break
-`
-        ];
+        restoreProc.command = lastTrashedPath ? [dviewBin, "-restore", lastTrashedPath] : [dviewBin, "-restore"];
         restoreProc.running = true;
     }
 

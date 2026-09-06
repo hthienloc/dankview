@@ -66,6 +66,7 @@ func main() {
 	showVersion := flag.Bool("v", false, "show version")
 	printInfo := flag.Bool("info", false, "print image metadata as JSON and exit")
 	printList := flag.Bool("list", false, "print directory image list as JSON and exit")
+	restoreFlag := flag.Bool("restore", false, "restore trashed image and exit")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: dview [options] [image-path]\n\n")
@@ -77,6 +78,22 @@ func main() {
 
 	if *showVersion {
 		fmt.Printf("dview version %s (built %s, commit %s)\n", Version, BuildTime, Commit)
+		return
+	}
+
+	if *restoreFlag {
+		target := ""
+		if flag.NArg() > 0 {
+			target = flag.Arg(0)
+		}
+		restored, err := fs.RestoreLastTrashed(target)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error restoring file: %v\n", err)
+			os.Exit(1)
+		}
+		if restored != "" {
+			fmt.Println(restored)
+		}
 		return
 	}
 
