@@ -310,17 +310,14 @@ Singleton {
         const mime = (ext === "jpg" || ext === "jpeg") ? "image/jpeg" : ("image/" + ext);
         copyProc.command = [
             "sh", "-c",
-            "dms cl copy -t " + mime + " < " + JSON.stringify(currentFilePath) + " 2>/dev/null || wl-copy -t " + mime + " < " + JSON.stringify(currentFilePath) + " 2>/dev/null || wl-copy < " + JSON.stringify(currentFilePath)
+            "dms cl copy -t " + mime + " < " + JSON.stringify(currentFilePath)
         ];
         copyProc.running = true;
     }
 
     function copyPathToClipboard() {
         if (!currentFilePath) return;
-        copyPathProc.command = [
-            "sh", "-c",
-            "dms cl copy " + JSON.stringify(currentFilePath) + " 2>/dev/null || wl-copy " + JSON.stringify(currentFilePath)
-        ];
+        copyPathProc.command = ["dms", "cl", "copy", currentFilePath];
         copyPathProc.running = true;
     }
 
@@ -418,7 +415,7 @@ Singleton {
 
         copyCropProc.command = [
             "sh", "-c",
-            "magick " + JSON.stringify(currentFilePath) + " -crop " + w + "x" + h + "+" + x + "+" + y + " +repage png:- | (dms cl copy -t image/png 2>/dev/null || wl-copy -t image/png)"
+            "magick " + JSON.stringify(currentFilePath) + " -crop " + w + "x" + h + "+" + x + "+" + y + " +repage png:- | dms cl copy -t image/png"
         ];
         copyCropProc.running = true;
     }
@@ -454,8 +451,7 @@ Singleton {
     function showToast(message, isError) {
         const method = isError ? "error" : "info";
         Quickshell.execDetached([
-            "sh", "-c",
-            "dms ipc call toast " + method + " " + JSON.stringify(message) + " 2>/dev/null || notify-send " + (isError ? "-u critical " : "") + JSON.stringify("DankView") + " " + JSON.stringify(message)
+            "dms", "ipc", "call", "toast", method, message
         ]);
     }
 

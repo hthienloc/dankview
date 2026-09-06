@@ -619,8 +619,7 @@ Rectangle {
                                     onClicked: {
                                         if (ImageService.currentMeta.gpsPosition) {
                                             Quickshell.execDetached([
-                                                "sh", "-c",
-                                                "dms cl copy " + JSON.stringify(ImageService.currentMeta.gpsPosition) + " 2>/dev/null || wl-copy " + JSON.stringify(ImageService.currentMeta.gpsPosition)
+                                                "dms", "cl", "copy", ImageService.currentMeta.gpsPosition
                                             ]);
                                             ImageService.showToast("Coordinates copied to clipboard");
                                         }

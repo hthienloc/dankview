@@ -10,7 +10,7 @@ Frontend: **Quickshell (QtQuick/QML)**. Backend: **Go**.
 - **Navigation**: Directory cycling via arrow keys, page keys, and edge click zones.
 - **Transformations**: 90° rotation and horizontal/vertical flip.
 - **EXIF Inspector**: Metadata side sheet (dimensions, format, optics/exposure, camera model, file path).
-- **DMS Integration**: Matugen palette sync (`dms-colors.json`), DMS font config, clipboard (`dms cl copy` / `wl-copy`), and notifications (`dms ipc call toast` / `notify-send`).
+- **DMS Integration**: Matugen palette sync (`dms-colors.json`), DMS font config, clipboard (`dms cl copy`), and notifications (`dms ipc call toast`).
 - **Transient UI**: Auto-hiding header and toolbar with hover protection.
 - **Semantic Theming**: Dynamic M3 tokens adapting to light and dark modes.
 
@@ -52,7 +52,7 @@ dview -v                         # Print version
 
 - Go 1.21+
 - [Quickshell](https://quickshell.outfoxxed.me/)
-- Optional: `dms`, `wl-clipboard`, `gio`
+- Optional: `dms`, `gio`
 
 ### Commands
 
