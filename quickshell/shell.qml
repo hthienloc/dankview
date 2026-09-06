@@ -9,9 +9,16 @@ import Quickshell
 import qs.Common
 import qs.Services
 import qs.Modules.ImageViewer
+import qs.DankCommon.Common as DC
 
 ShellRoot {
     id: root
+
+    Component.onCompleted: {
+        DC.Style.theme = Theme;
+        DC.Style.settings = SettingsData;
+        console.log("DankView Theme.fontFamily:", Theme.fontFamily, "fontScale:", Theme.fontScale);
+    }
 
     ImageViewerWindow {
         id: viewerWindow

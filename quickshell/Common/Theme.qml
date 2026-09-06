@@ -209,7 +209,13 @@ Singleton {
     property var dmsSettings: ({})
     property bool dmsSettingsLoaded: false
 
-    property real fontScale: (dmsSettings && dmsSettings.fontScale) ? dmsSettings.fontScale : 1.0
+    readonly property string systemFontFamily: Quickshell.env("DVIEW_FONT_FAMILY") || ""
+    readonly property real systemFontScale: {
+        const s = parseFloat(Quickshell.env("DVIEW_FONT_SCALE"));
+        return (!isNaN(s) && s > 0) ? s : 1.0;
+    }
+
+    property real fontScale: (dmsSettings && dmsSettings.fontScale) ? dmsSettings.fontScale : systemFontScale
     property real fontSizeSmall: Math.round(fontScale * 12)
     property real fontSizeMedium: Math.round(fontScale * 14)
     property real fontSizeLarge: Math.round(fontScale * 16)
@@ -224,8 +230,8 @@ Singleton {
     property real cornerRadiusSmall: 8
     property real cornerRadiusLarge: 16
 
-    property string fontFamily: (dmsSettings && dmsSettings.fontFamily) ? dmsSettings.fontFamily : defaultFontFamily
-    property string monoFontFamily: (dmsSettings && dmsSettings.monoFontFamily) ? dmsSettings.monoFontFamily : defaultMonoFontFamily
+    property string fontFamily: systemFontFamily !== "" ? systemFontFamily : ((dmsSettings && dmsSettings.fontFamily) ? dmsSettings.fontFamily : defaultFontFamily)
+    property string monoFontFamily: Quickshell.env("DVIEW_MONO_FONT") || ((dmsSettings && dmsSettings.monoFontFamily) ? dmsSettings.monoFontFamily : defaultMonoFontFamily)
     property int fontWeight: Font.Normal
 
     property real popupTransparency: 1.0
@@ -367,7 +373,7 @@ Singleton {
     FileView {
         id: dmsSettingsView
         path: root.dmsSettingsPath
-        blockLoading: false
+        blockLoading: true
         watchChanges: true
         printErrors: false
 

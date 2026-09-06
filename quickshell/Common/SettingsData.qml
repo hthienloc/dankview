@@ -40,7 +40,7 @@ Singleton {
     readonly property string configDir: {
         const xdg = Quickshell.env("XDG_CONFIG_HOME");
         const base = (xdg && xdg !== "") ? xdg : Quickshell.env("HOME") + "/.config";
-        return base + "/dankcal";
+        return base + "/dankview";
     }
     readonly property string settingsPath: configDir + "/ui-settings.json"
 
