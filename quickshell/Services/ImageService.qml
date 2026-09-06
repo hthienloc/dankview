@@ -43,14 +43,16 @@ Singleton {
         }
     }
 
+    readonly property string dviewBin: Quickshell.env("DVIEW_BIN") || "dview"
+
     function loadDirectoryFor(filePath) {
-        listProc.command = ["dview", "-list", filePath];
+        listProc.command = [dviewBin, "-list", filePath];
         listProc.running = true;
     }
 
     function fetchMetadata() {
         if (!currentFilePath) return;
-        infoProc.command = ["dview", "-info", currentFilePath];
+        infoProc.command = [dviewBin, "-info", currentFilePath];
         infoProc.running = true;
     }
 

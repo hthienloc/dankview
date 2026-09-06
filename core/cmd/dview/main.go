@@ -136,6 +136,10 @@ func main() {
 	}
 
 	env := os.Environ()
+	execPath, err := os.Executable()
+	if err == nil {
+		env = append(env, "DVIEW_BIN="+execPath)
+	}
 	env = append(env,
 		"DVIEW_INITIAL_IMAGE="+initialImage,
 		"DVIEW_DIR="+imgList.Directory,

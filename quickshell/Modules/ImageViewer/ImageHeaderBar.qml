@@ -51,7 +51,6 @@ Rectangle {
             width: zoomText.implicitWidth + 20
             radius: 16
             color: zoomMouse.containsMouse ? (Theme.surfaceContainerHighest || "#444444") : (Theme.surfaceContainerHigh || "#333333")
-            cursorShape: Qt.PointingHandCursor
 
             Text {
                 id: zoomText
@@ -66,6 +65,7 @@ Rectangle {
                 id: zoomMouse
                 anchors.fill: parent
                 hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
                 onClicked: ImageService.resetZoom()
             }
         }
