@@ -124,6 +124,7 @@ Item {
         // Pinch handler for trackpad gestures
         PinchHandler {
             target: null
+            enabled: !ImageService.cropMode
             onScaleChanged: delta => {
                 ImageService.zoom = Math.max(0.05, Math.min(30.0, ImageService.zoom * delta));
             }
@@ -132,6 +133,7 @@ Item {
         // Drag handler to pan when zoomed
         DragHandler {
             target: null
+            enabled: !ImageService.cropMode
             onTranslationChanged: delta => {
                 ImageService.panX += delta.x;
                 ImageService.panY += delta.y;
@@ -143,6 +145,7 @@ Item {
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.MiddleButton
             hoverEnabled: false
+            enabled: !ImageService.cropMode
 
             onWheel: wheel => {
                 const factor = wheel.angleDelta.y > 0 ? 1.25 : (1.0 / 1.25);
