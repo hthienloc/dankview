@@ -1,18 +1,12 @@
 # DankView (`dview`)
 
-Fast Material 3 image viewer for Linux and DankMaterialShell, inspired by GNOME Loupe.
+Image viewer for DankMaterialShell, inspired by GNOME Loupe.
 
-Frontend: **Quickshell (QtQuick/QML)**. Backend: **Go**.
+<p align="center">
+  <img src="assets/preview.png" alt="DankView Preview" width="49%">
+  <img src="assets/preview_1.png" alt="DankView Inspector" width="49%">
+</p>
 
-## Features
-
-- **Fluid Canvas**: Mouse wheel zoom (cursor-anchored), pinch gestures, pan, auto-fit, and checkerboard transparency.
-- **Navigation**: Directory cycling via arrow keys, page keys, and edge click zones.
-- **Transformations**: 90° rotation and horizontal/vertical flip.
-- **EXIF Inspector**: Metadata side sheet (dimensions, format, optics/exposure, camera model, file path).
-- **DMS Integration**: Matugen palette sync (`dms-colors.json`), DMS font config, clipboard (`dms cl copy`), and notifications (`dms ipc call toast`).
-- **Transient UI**: Auto-hiding header and toolbar with hover protection.
-- **Semantic Theming**: Dynamic M3 tokens adapting to light and dark modes.
 
 ## Keyboard Shortcuts
 
@@ -52,7 +46,6 @@ dview -v                         # Print version
 
 - Go 1.21+
 - [Quickshell](https://quickshell.outfoxxed.me/)
-- Optional: `dms`, `gio`
 
 ### Commands
 
