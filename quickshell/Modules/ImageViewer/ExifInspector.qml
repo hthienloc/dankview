@@ -139,6 +139,39 @@ Rectangle {
         }
     }
 
+    component SpecCell: Rectangle {
+        property string label: ""
+        property string value: "—"
+
+        Layout.fillWidth: true
+        implicitHeight: 48
+        radius: 8
+        color: Theme.surfaceContainerLow || Theme.surfaceContainerHigh
+        border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.15)
+
+        ColumnLayout {
+            anchors.centerIn: parent
+            spacing: 2
+
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                text: label
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSizeSmall - 2
+                color: Theme.surfaceVariantText
+            }
+
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                text: value
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSizeSmall
+                font.weight: Font.DemiBold
+                color: Theme.surfaceText
+            }
+        }
+    }
+
     // Prevent mouse clicks and drags from falling through to the canvas underneath
     MouseArea {
         anchors.fill: parent
@@ -418,117 +451,10 @@ Rectangle {
                                 Layout.fillWidth: true
                                 spacing: 6
 
-                                // Aperture
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    implicitHeight: 48
-                                    radius: 8
-                                    color: Theme.surfaceContainerLow || Theme.surfaceContainerHigh
-                                    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.15)
-                                    ColumnLayout {
-                                        anchors.centerIn: parent
-                                        spacing: 2
-                                        Text {
-                                            Layout.alignment: Qt.AlignHCenter
-                                            text: "Aperture"
-                                            font.family: Theme.fontFamily
-                                            font.pixelSize: Theme.fontSizeSmall - 2
-                                            color: Theme.surfaceVariantText
-                                        }
-                                        Text {
-                                            Layout.alignment: Qt.AlignHCenter
-                                            text: ImageService.currentMeta.fNumber || "—"
-                                            font.family: Theme.fontFamily
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            font.weight: Font.DemiBold
-                                            color: Theme.surfaceText
-                                        }
-                                    }
-                                }
-
-                                // Shutter
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    implicitHeight: 48
-                                    radius: 8
-                                    color: Theme.surfaceContainerLow || Theme.surfaceContainerHigh
-                                    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.15)
-                                    ColumnLayout {
-                                        anchors.centerIn: parent
-                                        spacing: 2
-                                        Text {
-                                            Layout.alignment: Qt.AlignHCenter
-                                            text: "Shutter"
-                                            font.family: Theme.fontFamily
-                                            font.pixelSize: Theme.fontSizeSmall - 2
-                                            color: Theme.surfaceVariantText
-                                        }
-                                        Text {
-                                            Layout.alignment: Qt.AlignHCenter
-                                            text: ImageService.currentMeta.exposureTime || "—"
-                                            font.family: Theme.fontFamily
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            font.weight: Font.DemiBold
-                                            color: Theme.surfaceText
-                                        }
-                                    }
-                                }
-
-                                // Focal Length
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    implicitHeight: 48
-                                    radius: 8
-                                    color: Theme.surfaceContainerLow || Theme.surfaceContainerHigh
-                                    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.15)
-                                    ColumnLayout {
-                                        anchors.centerIn: parent
-                                        spacing: 2
-                                        Text {
-                                            Layout.alignment: Qt.AlignHCenter
-                                            text: "Focal"
-                                            font.family: Theme.fontFamily
-                                            font.pixelSize: Theme.fontSizeSmall - 2
-                                            color: Theme.surfaceVariantText
-                                        }
-                                        Text {
-                                            Layout.alignment: Qt.AlignHCenter
-                                            text: ImageService.currentMeta.focalLength || "—"
-                                            font.family: Theme.fontFamily
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            font.weight: Font.DemiBold
-                                            color: Theme.surfaceText
-                                        }
-                                    }
-                                }
-
-                                // ISO
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    implicitHeight: 48
-                                    radius: 8
-                                    color: Theme.surfaceContainerLow || Theme.surfaceContainerHigh
-                                    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.15)
-                                    ColumnLayout {
-                                        anchors.centerIn: parent
-                                        spacing: 2
-                                        Text {
-                                            Layout.alignment: Qt.AlignHCenter
-                                            text: "ISO"
-                                            font.family: Theme.fontFamily
-                                            font.pixelSize: Theme.fontSizeSmall - 2
-                                            color: Theme.surfaceVariantText
-                                        }
-                                        Text {
-                                            Layout.alignment: Qt.AlignHCenter
-                                            text: ImageService.currentMeta.iso || "—"
-                                            font.family: Theme.fontFamily
-                                            font.pixelSize: Theme.fontSizeSmall
-                                            font.weight: Font.DemiBold
-                                            color: Theme.surfaceText
-                                        }
-                                    }
-                                }
+                                SpecCell { label: "Aperture"; value: ImageService.currentMeta.fNumber || "—" }
+                                SpecCell { label: "Shutter"; value: ImageService.currentMeta.exposureTime || "—" }
+                                SpecCell { label: "Focal"; value: ImageService.currentMeta.focalLength || "—" }
+                                SpecCell { label: "ISO"; value: ImageService.currentMeta.iso || "—" }
                             }
 
                             DetailRow {

@@ -14,7 +14,7 @@ Singleton {
     readonly property string defaultFontFamily: Fonts.sans
     readonly property string defaultMonoFontFamily: Fonts.mono
 
-    // "auto" follows the desktop portal color-scheme; no preference falls back to dark
+    // "auto" follows DMS dynamic colors mode; no preference falls back to dark
     readonly property bool isLightMode: {
         switch (SettingsData.themeMode) {
         case "light":
@@ -22,7 +22,7 @@ Singleton {
         case "dark":
             return false;
         default:
-            return (typeof PortalService !== "undefined" && PortalService) ? PortalService.systemPrefersLight : false;
+            return Boolean(matugenColors && matugenColors.mode === "light");
         }
     }
 

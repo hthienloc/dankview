@@ -370,8 +370,11 @@ Item {
         }
     }
 
-    // Corner handles — NW, NE, SW, SE
-    component Handle: Rectangle {
+    // Corner handle component
+    component CornerHandle: Rectangle {
+        id: ch
+        property string corner: "nw"
+        property int cursorShape: Qt.SizeFDiagCursor
         width: handleSize * 2; height: handleSize * 2
         color: "transparent"
 
@@ -383,220 +386,75 @@ Item {
             border.color: Qt.rgba(0, 0, 0, 0.4)
             border.width: 1
         }
-    }
 
-    // NW
-    Handle {
-        x: cropX - handleSize; y: cropY - handleSize
         MouseArea {
             anchors.fill: parent
-            cursorShape: Qt.SizeFDiagCursor
+            cursorShape: ch.cursorShape
             property real offX: 0; property real offY: 0
             property real origX: 0; property real origY: 0
             property real origW: 0; property real origH: 0
             onPressed: mouse => {
                 const p = mapToItem(root, mouse.x, mouse.y);
                 origX = cropX; origY = cropY; origW = cropW; origH = cropH;
-                offX = p.x - origX;
-                offY = p.y - origY;
+                const anchorX = (ch.corner === "ne" || ch.corner === "se") ? (origX + origW) : origX;
+                const anchorY = (ch.corner === "sw" || ch.corner === "se") ? (origY + origH) : origY;
+                offX = p.x - anchorX;
+                offY = p.y - anchorY;
             }
             onPositionChanged: mouse => {
                 const p = mapToItem(root, mouse.x, mouse.y);
-                root.resizeFromCorner("nw", p.x, p.y, origX, origY, origW, origH, offX, offY);
+                root.resizeFromCorner(ch.corner, p.x, p.y, origX, origY, origW, origH, offX, offY);
             }
         }
     }
 
-    // NE
-    Handle {
-        x: cropX + cropW - handleSize; y: cropY - handleSize
+    CornerHandle { corner: "nw"; cursorShape: Qt.SizeFDiagCursor; x: cropX - handleSize; y: cropY - handleSize }
+    CornerHandle { corner: "ne"; cursorShape: Qt.SizeBDiagCursor; x: cropX + cropW - handleSize; y: cropY - handleSize }
+    CornerHandle { corner: "sw"; cursorShape: Qt.SizeBDiagCursor; x: cropX - handleSize; y: cropY + cropH - handleSize }
+    CornerHandle { corner: "se"; cursorShape: Qt.SizeFDiagCursor; x: cropX + cropW - handleSize; y: cropY + cropH - handleSize }
+
+    // Edge handle component
+    component EdgeHandle: Rectangle {
+        id: eh
+        property string edge: "n"
+        property bool isVertical: edge === "n" || edge === "s"
+        width: isVertical ? 40 : 12
+        height: isVertical ? 12 : 40
+        color: "transparent"
+
+        Rectangle {
+            anchors.centerIn: parent
+            width: eh.isVertical ? 24 : 5
+            height: eh.isVertical ? 5 : 24
+            radius: 2.5
+            color: "white"
+            border.color: Qt.rgba(0, 0, 0, 0.45)
+            border.width: 1
+        }
+
         MouseArea {
             anchors.fill: parent
-            cursorShape: Qt.SizeBDiagCursor
+            cursorShape: eh.isVertical ? Qt.SizeVerCursor : Qt.SizeHorCursor
             property real offX: 0; property real offY: 0
             property real origX: 0; property real origY: 0
             property real origW: 0; property real origH: 0
             onPressed: mouse => {
                 const p = mapToItem(root, mouse.x, mouse.y);
                 origX = cropX; origY = cropY; origW = cropW; origH = cropH;
-                offX = p.x - (origX + origW);
-                offY = p.y - origY;
+                offX = eh.edge === "e" ? p.x - (origX + origW) : (eh.edge === "w" ? p.x - origX : 0);
+                offY = eh.edge === "s" ? p.y - (origY + origH) : (eh.edge === "n" ? p.y - origY : 0);
             }
             onPositionChanged: mouse => {
                 const p = mapToItem(root, mouse.x, mouse.y);
-                root.resizeFromCorner("ne", p.x, p.y, origX, origY, origW, origH, offX, offY);
+                root.resizeFromEdge(eh.edge, p.x, p.y, origX, origY, origW, origH, offX, offY);
             }
         }
     }
 
-    // SW
-    Handle {
-        x: cropX - handleSize; y: cropY + cropH - handleSize
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.SizeBDiagCursor
-            property real offX: 0; property real offY: 0
-            property real origX: 0; property real origY: 0
-            property real origW: 0; property real origH: 0
-            onPressed: mouse => {
-                const p = mapToItem(root, mouse.x, mouse.y);
-                origX = cropX; origY = cropY; origW = cropW; origH = cropH;
-                offX = p.x - origX;
-                offY = p.y - (origY + origH);
-            }
-            onPositionChanged: mouse => {
-                const p = mapToItem(root, mouse.x, mouse.y);
-                root.resizeFromCorner("sw", p.x, p.y, origX, origY, origW, origH, offX, offY);
-            }
-        }
-    }
-
-    // SE
-    Handle {
-        x: cropX + cropW - handleSize; y: cropY + cropH - handleSize
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.SizeFDiagCursor
-            property real offX: 0; property real offY: 0
-            property real origX: 0; property real origY: 0
-            property real origW: 0; property real origH: 0
-            onPressed: mouse => {
-                const p = mapToItem(root, mouse.x, mouse.y);
-                origX = cropX; origY = cropY; origW = cropW; origH = cropH;
-                offX = p.x - (origX + origW);
-                offY = p.y - (origY + origH);
-            }
-            onPositionChanged: mouse => {
-                const p = mapToItem(root, mouse.x, mouse.y);
-                root.resizeFromCorner("se", p.x, p.y, origX, origY, origW, origH, offX, offY);
-            }
-        }
-    }
-
-    // Edge Handles (Top/N, Bottom/S, Left/W, Right/E)
-    // Top (N)
-    Rectangle {
-        x: cropX + cropW / 2 - 20; y: cropY - 6
-        width: 40; height: 12
-        color: "transparent"
-        Rectangle {
-            anchors.centerIn: parent
-            width: 24; height: 5
-            radius: 2.5
-            color: "white"
-            border.color: Qt.rgba(0, 0, 0, 0.45)
-            border.width: 1
-        }
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.SizeVerCursor
-            property real offY: 0
-            property real origX: 0; property real origY: 0
-            property real origW: 0; property real origH: 0
-            onPressed: mouse => {
-                const p = mapToItem(root, mouse.x, mouse.y);
-                origX = cropX; origY = cropY; origW = cropW; origH = cropH;
-                offY = p.y - origY;
-            }
-            onPositionChanged: mouse => {
-                const p = mapToItem(root, mouse.x, mouse.y);
-                root.resizeFromEdge("n", p.x, p.y, origX, origY, origW, origH, 0, offY);
-            }
-        }
-    }
-
-    // Bottom (S)
-    Rectangle {
-        x: cropX + cropW / 2 - 20; y: cropY + cropH - 6
-        width: 40; height: 12
-        color: "transparent"
-        Rectangle {
-            anchors.centerIn: parent
-            width: 24; height: 5
-            radius: 2.5
-            color: "white"
-            border.color: Qt.rgba(0, 0, 0, 0.45)
-            border.width: 1
-        }
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.SizeVerCursor
-            property real offY: 0
-            property real origX: 0; property real origY: 0
-            property real origW: 0; property real origH: 0
-            onPressed: mouse => {
-                const p = mapToItem(root, mouse.x, mouse.y);
-                origX = cropX; origY = cropY; origW = cropW; origH = cropH;
-                offY = p.y - (origY + origH);
-            }
-            onPositionChanged: mouse => {
-                const p = mapToItem(root, mouse.x, mouse.y);
-                root.resizeFromEdge("s", p.x, p.y, origX, origY, origW, origH, 0, offY);
-            }
-        }
-    }
-
-    // Left (W)
-    Rectangle {
-        x: cropX - 6; y: cropY + cropH / 2 - 20
-        width: 12; height: 40
-        color: "transparent"
-        Rectangle {
-            anchors.centerIn: parent
-            width: 5; height: 24
-            radius: 2.5
-            color: "white"
-            border.color: Qt.rgba(0, 0, 0, 0.45)
-            border.width: 1
-        }
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.SizeHorCursor
-            property real offX: 0
-            property real origX: 0; property real origY: 0
-            property real origW: 0; property real origH: 0
-            onPressed: mouse => {
-                const p = mapToItem(root, mouse.x, mouse.y);
-                origX = cropX; origY = cropY; origW = cropW; origH = cropH;
-                offX = p.x - origX;
-            }
-            onPositionChanged: mouse => {
-                const p = mapToItem(root, mouse.x, mouse.y);
-                root.resizeFromEdge("w", p.x, p.y, origX, origY, origW, origH, offX, 0);
-            }
-        }
-    }
-
-    // Right (E)
-    Rectangle {
-        x: cropX + cropW - 6; y: cropY + cropH / 2 - 20
-        width: 12; height: 40
-        color: "transparent"
-        Rectangle {
-            anchors.centerIn: parent
-            width: 5; height: 24
-            radius: 2.5
-            color: "white"
-            border.color: Qt.rgba(0, 0, 0, 0.45)
-            border.width: 1
-        }
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.SizeHorCursor
-            property real offX: 0
-            property real origX: 0; property real origY: 0
-            property real origW: 0; property real origH: 0
-            onPressed: mouse => {
-                const p = mapToItem(root, mouse.x, mouse.y);
-                origX = cropX; origY = cropY; origW = cropW; origH = cropH;
-                offX = p.x - (origX + origW);
-            }
-            onPositionChanged: mouse => {
-                const p = mapToItem(root, mouse.x, mouse.y);
-                root.resizeFromEdge("e", p.x, p.y, origX, origY, origW, origH, offX, 0);
-            }
-        }
-    }
+    EdgeHandle { edge: "n"; x: cropX + cropW / 2 - 20; y: cropY - 6 }
+    EdgeHandle { edge: "s"; x: cropX + cropW / 2 - 20; y: cropY + cropH - 6 }
+    EdgeHandle { edge: "w"; x: cropX - 6; y: cropY + cropH / 2 - 20 }
+    EdgeHandle { edge: "e"; x: cropX + cropW - 6; y: cropY + cropH / 2 - 20 }
 
     // Live dimension badge floating near the crop rect
     Rectangle {
@@ -824,12 +682,19 @@ Item {
                 anchors.margins: 12
                 spacing: 6
 
-                // Item 1: Save Copy (_crop) - Recommended
-                Rectangle {
+                component ActionRow: Rectangle {
+                    id: actionItem
+                    property string iconName: ""
+                    property string label: ""
+                    property bool isRecommended: false
+                    signal actionTriggered()
+
                     Layout.fillWidth: true
                     implicitHeight: 40
                     radius: 8
-                    color: item1Mouse.containsMouse ? Theme.surfaceContainerHighest : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
+                    color: itemMouse.containsMouse
+                        ? Theme.surfaceContainerHighest
+                        : (isRecommended ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent")
 
                     RowLayout {
                         anchors.fill: parent
@@ -838,21 +703,22 @@ Item {
                         spacing: 12
 
                         DankIcon {
-                            name: "copy_all"
+                            name: actionItem.iconName
                             size: 20
-                            color: Theme.primary
+                            color: actionItem.isRecommended ? Theme.primary : Theme.surfaceText
                         }
 
                         Text {
                             Layout.fillWidth: true
-                            text: "Save Copy (_crop)"
+                            text: actionItem.label
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSizeSmall
-                            font.weight: Font.DemiBold
+                            font.weight: actionItem.isRecommended ? Font.DemiBold : Font.Medium
                             color: Theme.surfaceText
                         }
 
                         Rectangle {
+                            visible: actionItem.isRecommended
                             implicitHeight: 18
                             implicitWidth: recText.implicitWidth + 8
                             radius: 4
@@ -870,106 +736,38 @@ Item {
                     }
 
                     MouseArea {
-                        id: item1Mouse
+                        id: itemMouse
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             root.promptVisible = false;
                             if (root.pendingCrop) {
-                                root.saveCopyRequested(root.pendingCrop.x, root.pendingCrop.y, root.pendingCrop.w, root.pendingCrop.h);
+                                actionItem.actionTriggered();
                             }
                         }
                     }
                 }
 
-                // Item 2: Copy to Clipboard
-                Rectangle {
-                    Layout.fillWidth: true
-                    implicitHeight: 40
-                    radius: 8
-                    color: item2Mouse.containsMouse ? Theme.surfaceContainerHighest : "transparent"
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 12
-                        anchors.rightMargin: 12
-                        spacing: 12
-
-                        DankIcon {
-                            name: "content_copy"
-                            size: 20
-                            color: Theme.surfaceText
-                        }
-
-                        Text {
-                            Layout.fillWidth: true
-                            text: "Copy to Clipboard"
-                            font.family: Theme.fontFamily
-                            font.pixelSize: Theme.fontSizeSmall
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                        }
-                    }
-
-                    MouseArea {
-                        id: item2Mouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            root.promptVisible = false;
-                            if (root.pendingCrop) {
-                                root.copyRequested(root.pendingCrop.x, root.pendingCrop.y, root.pendingCrop.w, root.pendingCrop.h);
-                            }
-                        }
-                    }
+                ActionRow {
+                    iconName: "copy_all"
+                    label: "Save Copy (_crop)"
+                    isRecommended: true
+                    onActionTriggered: root.saveCopyRequested(root.pendingCrop.x, root.pendingCrop.y, root.pendingCrop.w, root.pendingCrop.h)
                 }
 
-                // Item 3: Save As...
-                Rectangle {
-                    Layout.fillWidth: true
-                    implicitHeight: 40
-                    radius: 8
-                    color: item3Mouse.containsMouse ? Theme.surfaceContainerHighest : "transparent"
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 12
-                        anchors.rightMargin: 12
-                        spacing: 12
-
-                        DankIcon {
-                            name: "folder_open"
-                            size: 20
-                            color: Theme.surfaceText
-                        }
-
-                        Text {
-                            Layout.fillWidth: true
-                            text: "Save As..."
-                            font.family: Theme.fontFamily
-                            font.pixelSize: Theme.fontSizeSmall
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                        }
-                    }
-
-                    MouseArea {
-                        id: item3Mouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            root.promptVisible = false;
-                            if (root.pendingCrop) {
-                                root.saveAsRequested(root.pendingCrop.x, root.pendingCrop.y, root.pendingCrop.w, root.pendingCrop.h);
-                            }
-                        }
-                    }
+                ActionRow {
+                    iconName: "content_copy"
+                    label: "Copy to Clipboard"
+                    onActionTriggered: root.copyRequested(root.pendingCrop.x, root.pendingCrop.y, root.pendingCrop.w, root.pendingCrop.h)
                 }
 
-                // Divider before overwrite
+                ActionRow {
+                    iconName: "folder_open"
+                    label: "Save As..."
+                    onActionTriggered: root.saveAsRequested(root.pendingCrop.x, root.pendingCrop.y, root.pendingCrop.w, root.pendingCrop.h)
+                }
+
                 Rectangle {
                     Layout.fillWidth: true
                     height: 1
@@ -977,47 +775,10 @@ Item {
                     opacity: 0.25
                 }
 
-                // Item 4: Overwrite Original
-                Rectangle {
-                    Layout.fillWidth: true
-                    implicitHeight: 40
-                    radius: 8
-                    color: item4Mouse.containsMouse ? Theme.surfaceContainerHighest : "transparent"
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 12
-                        anchors.rightMargin: 12
-                        spacing: 12
-
-                        DankIcon {
-                            name: "save"
-                            size: 20
-                            color: Theme.surfaceText
-                        }
-
-                        Text {
-                            Layout.fillWidth: true
-                            text: "Overwrite Original"
-                            font.family: Theme.fontFamily
-                            font.pixelSize: Theme.fontSizeSmall
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                        }
-                    }
-
-                    MouseArea {
-                        id: item4Mouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            root.promptVisible = false;
-                            if (root.pendingCrop) {
-                                root.cropped(root.pendingCrop.x, root.pendingCrop.y, root.pendingCrop.w, root.pendingCrop.h);
-                            }
-                        }
-                    }
+                ActionRow {
+                    iconName: "save"
+                    label: "Overwrite Original"
+                    onActionTriggered: root.cropped(root.pendingCrop.x, root.pendingCrop.y, root.pendingCrop.w, root.pendingCrop.h)
                 }
 
                 // Cancel button

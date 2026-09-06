@@ -275,7 +275,6 @@ FloatingWindow {
             visible: ImageService.cropMode
             imageX: {
                 if (!visible) return 0;
-                const canvas = rootContent.children[0]; // ImageCanvas
                 return (parent.width - imageW) / 2 + ImageService.panX;
             }
             imageY: {
