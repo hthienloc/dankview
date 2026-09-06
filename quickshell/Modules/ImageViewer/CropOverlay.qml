@@ -780,31 +780,34 @@ Item {
         }
     }
 
-    // Action popover menu anchored directly above the Done button
+    // Action modal dialog centered on screen
     Item {
         id: doneMenuContainer
         visible: root.promptVisible
         anchors.fill: parent
         z: 100
 
-        // Click outside to dismiss
-        MouseArea {
+        // Scrim backdrop (click outside to dismiss)
+        Rectangle {
             anchors.fill: parent
-            acceptedButtons: Qt.AllButtons
-            onClicked: root.promptVisible = false
+            color: Qt.rgba(0, 0, 0, 0.45)
+
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.AllButtons
+                onClicked: root.promptVisible = false
+            }
         }
 
         Rectangle {
             id: doneMenuCard
-            anchors.bottom: bottomToolbar.top
-            anchors.bottomMargin: 10
-            anchors.right: bottomToolbar.right
-            width: 240
-            radius: 14
+            anchors.centerIn: parent
+            width: 300
+            height: doneMenuCol.implicitHeight + 24
+            radius: 16
             color: Theme.surfaceContainerHigh
             border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.35)
             border.width: 1
-            height: doneMenuCol.implicitHeight + 12
 
             // Swallow clicks inside the card
             MouseArea {
@@ -818,25 +821,25 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
-                anchors.margins: 6
-                spacing: 2
+                anchors.margins: 12
+                spacing: 6
 
                 // Item 1: Save Copy (_crop) - Recommended
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: 36
+                    implicitHeight: 40
                     radius: 8
                     color: item1Mouse.containsMouse ? Theme.surfaceContainerHighest : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.leftMargin: 10
-                        anchors.rightMargin: 10
-                        spacing: 10
+                        anchors.leftMargin: 12
+                        anchors.rightMargin: 12
+                        spacing: 12
 
                         DankIcon {
                             name: "copy_all"
-                            size: 18
+                            size: 20
                             color: Theme.primary
                         }
 
@@ -850,7 +853,7 @@ Item {
                         }
 
                         Rectangle {
-                            implicitHeight: 16
+                            implicitHeight: 18
                             implicitWidth: recText.implicitWidth + 8
                             radius: 4
                             color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.25)
@@ -883,19 +886,19 @@ Item {
                 // Item 2: Copy to Clipboard
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: 36
+                    implicitHeight: 40
                     radius: 8
                     color: item2Mouse.containsMouse ? Theme.surfaceContainerHighest : "transparent"
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.leftMargin: 10
-                        anchors.rightMargin: 10
-                        spacing: 10
+                        anchors.leftMargin: 12
+                        anchors.rightMargin: 12
+                        spacing: 12
 
                         DankIcon {
                             name: "content_copy"
-                            size: 18
+                            size: 20
                             color: Theme.surfaceText
                         }
 
@@ -926,19 +929,19 @@ Item {
                 // Item 3: Save As...
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: 36
+                    implicitHeight: 40
                     radius: 8
                     color: item3Mouse.containsMouse ? Theme.surfaceContainerHighest : "transparent"
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.leftMargin: 10
-                        anchors.rightMargin: 10
-                        spacing: 10
+                        anchors.leftMargin: 12
+                        anchors.rightMargin: 12
+                        spacing: 12
 
                         DankIcon {
                             name: "folder_open"
-                            size: 18
+                            size: 20
                             color: Theme.surfaceText
                         }
 
@@ -977,19 +980,19 @@ Item {
                 // Item 4: Overwrite Original
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: 36
+                    implicitHeight: 40
                     radius: 8
                     color: item4Mouse.containsMouse ? Theme.surfaceContainerHighest : "transparent"
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.leftMargin: 10
-                        anchors.rightMargin: 10
-                        spacing: 10
+                        anchors.leftMargin: 12
+                        anchors.rightMargin: 12
+                        spacing: 12
 
                         DankIcon {
                             name: "save"
-                            size: 18
+                            size: 20
                             color: Theme.surfaceText
                         }
 
@@ -1014,6 +1017,31 @@ Item {
                                 root.cropped(root.pendingCrop.x, root.pendingCrop.y, root.pendingCrop.w, root.pendingCrop.h);
                             }
                         }
+                    }
+                }
+
+                // Cancel button
+                Rectangle {
+                    Layout.fillWidth: true
+                    implicitHeight: 34
+                    radius: 8
+                    color: cancelMouse.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Cancel"
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Medium
+                        color: Theme.surfaceVariantText
+                    }
+
+                    MouseArea {
+                        id: cancelMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.promptVisible = false
                     }
                 }
             }
