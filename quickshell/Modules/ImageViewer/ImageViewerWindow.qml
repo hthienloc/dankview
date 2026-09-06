@@ -110,6 +110,12 @@ FloatingWindow {
                     event.accepted = true;
                 }
                 break;
+            case Qt.Key_Z:
+                if (event.modifiers & Qt.ControlModifier) {
+                    ImageService.undoTrash();
+                    event.accepted = true;
+                }
+                break;
             case Qt.Key_Delete:
                 ImageService.moveToTrash();
                 event.accepted = true;

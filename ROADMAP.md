@@ -45,7 +45,7 @@ Feature parity and tracking against [GNOME Loupe](https://gitlab.gnome.org/GNOME
 
 - [ ] **Desktop Wallpaper Integration**: Set current image as wallpaper via DMS IPC or `swww` / `hyprpaper`.
 - [ ] **Print Support (`Ctrl+P`)**: Launch system print portal (`org.freedesktop.portal.Print`).
-- [ ] **Trash & Undo**:
+- [x] **Trash & Undo**:
   - Send to trash (`Delete`).
   - Undo trash action (`Ctrl+Z`).
 

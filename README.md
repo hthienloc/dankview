@@ -33,6 +33,7 @@ Frontend: **Quickshell (QtQuick/QML)**. Backend: **Go**.
 | `i` | Toggle EXIF inspector |
 | `Ctrl + C` | Copy image to clipboard |
 | `Delete` | Move image to trash (`gio trash`) |
+| `Ctrl + Z` | Undo trash (restore last trashed image) |
 | `Esc` | Close inspector / restore window / quit |
 
 ## CLI Usage
