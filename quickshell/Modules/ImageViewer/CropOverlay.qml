@@ -176,6 +176,118 @@ Item {
         cropH = h;
     }
 
+    function resizeFromEdge(edge, mouseX, mouseY, origX, origY, origW, origH, offX, offY) {
+        const minSize = 20;
+
+        if (edge === "n") {
+            const anchorY = origY + origH;
+            let targetY = mouseY - offY;
+            targetY = Math.max(imageY, Math.min(targetY, anchorY - minSize));
+            let newH = anchorY - targetY;
+            let newW = origW;
+            let newX = origX;
+
+            if (aspectRatio !== "") {
+                const parts = aspectRatio.split(":");
+                const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
+                if (ar > 0) {
+                    newW = newH * ar;
+                    if (newW > imageW) {
+                        newW = imageW;
+                        newH = newW / ar;
+                        targetY = anchorY - newH;
+                    }
+                    const centerX = origX + origW / 2;
+                    newX = Math.max(imageX, Math.min(centerX - newW / 2, imageX + imageW - newW));
+                }
+            }
+
+            cropX = newX;
+            cropY = targetY;
+            cropW = newW;
+            cropH = newH;
+        } else if (edge === "s") {
+            const anchorY = origY;
+            let targetY = mouseY - offY;
+            targetY = Math.min(imageY + imageH, Math.max(targetY, anchorY + minSize));
+            let newH = targetY - anchorY;
+            let newW = origW;
+            let newX = origX;
+
+            if (aspectRatio !== "") {
+                const parts = aspectRatio.split(":");
+                const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
+                if (ar > 0) {
+                    newW = newH * ar;
+                    if (newW > imageW) {
+                        newW = imageW;
+                        newH = newW / ar;
+                    }
+                    const centerX = origX + origW / 2;
+                    newX = Math.max(imageX, Math.min(centerX - newW / 2, imageX + imageW - newW));
+                }
+            }
+
+            cropX = newX;
+            cropY = origY;
+            cropW = newW;
+            cropH = newH;
+        } else if (edge === "w") {
+            const anchorX = origX + origW;
+            let targetX = mouseX - offX;
+            targetX = Math.max(imageX, Math.min(targetX, anchorX - minSize));
+            let newW = anchorX - targetX;
+            let newH = origH;
+            let newY = origY;
+
+            if (aspectRatio !== "") {
+                const parts = aspectRatio.split(":");
+                const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
+                if (ar > 0) {
+                    newH = newW / ar;
+                    if (newH > imageH) {
+                        newH = imageH;
+                        newW = newH * ar;
+                        targetX = anchorX - newW;
+                    }
+                    const centerY = origY + origH / 2;
+                    newY = Math.max(imageY, Math.min(centerY - newH / 2, imageY + imageH - newH));
+                }
+            }
+
+            cropX = targetX;
+            cropY = newY;
+            cropW = newW;
+            cropH = newH;
+        } else if (edge === "e") {
+            const anchorX = origX;
+            let targetX = mouseX - offX;
+            targetX = Math.min(imageX + imageW, Math.max(targetX, anchorX + minSize));
+            let newW = targetX - anchorX;
+            let newH = origH;
+            let newY = origY;
+
+            if (aspectRatio !== "") {
+                const parts = aspectRatio.split(":");
+                const ar = parseFloat(parts[0]) / parseFloat(parts[1]);
+                if (ar > 0) {
+                    newH = newW / ar;
+                    if (newH > imageH) {
+                        newH = imageH;
+                        newW = newH * ar;
+                    }
+                    const centerY = origY + origH / 2;
+                    newY = Math.max(imageY, Math.min(centerY - newH / 2, imageY + imageH - newH));
+                }
+            }
+
+            cropX = origX;
+            cropY = newY;
+            cropW = newW;
+            cropH = newH;
+        }
+    }
+
     function applyCrop() {
         const scaleX = srcW / imageW;
         const scaleY = srcH / imageH;
@@ -361,6 +473,161 @@ Item {
         }
     }
 
+    // Edge Handles (Top/N, Bottom/S, Left/W, Right/E)
+    // Top (N)
+    Rectangle {
+        x: cropX + cropW / 2 - 20; y: cropY - 6
+        width: 40; height: 12
+        color: "transparent"
+        Rectangle {
+            anchors.centerIn: parent
+            width: 24; height: 5
+            radius: 2.5
+            color: "white"
+            border.color: Qt.rgba(0, 0, 0, 0.45)
+            border.width: 1
+        }
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.SizeVerCursor
+            property real offY: 0
+            property real origX: 0; property real origY: 0
+            property real origW: 0; property real origH: 0
+            onPressed: mouse => {
+                const p = mapToItem(root, mouse.x, mouse.y);
+                origX = cropX; origY = cropY; origW = cropW; origH = cropH;
+                offY = p.y - origY;
+            }
+            onPositionChanged: mouse => {
+                const p = mapToItem(root, mouse.x, mouse.y);
+                root.resizeFromEdge("n", p.x, p.y, origX, origY, origW, origH, 0, offY);
+            }
+        }
+    }
+
+    // Bottom (S)
+    Rectangle {
+        x: cropX + cropW / 2 - 20; y: cropY + cropH - 6
+        width: 40; height: 12
+        color: "transparent"
+        Rectangle {
+            anchors.centerIn: parent
+            width: 24; height: 5
+            radius: 2.5
+            color: "white"
+            border.color: Qt.rgba(0, 0, 0, 0.45)
+            border.width: 1
+        }
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.SizeVerCursor
+            property real offY: 0
+            property real origX: 0; property real origY: 0
+            property real origW: 0; property real origH: 0
+            onPressed: mouse => {
+                const p = mapToItem(root, mouse.x, mouse.y);
+                origX = cropX; origY = cropY; origW = cropW; origH = cropH;
+                offY = p.y - (origY + origH);
+            }
+            onPositionChanged: mouse => {
+                const p = mapToItem(root, mouse.x, mouse.y);
+                root.resizeFromEdge("s", p.x, p.y, origX, origY, origW, origH, 0, offY);
+            }
+        }
+    }
+
+    // Left (W)
+    Rectangle {
+        x: cropX - 6; y: cropY + cropH / 2 - 20
+        width: 12; height: 40
+        color: "transparent"
+        Rectangle {
+            anchors.centerIn: parent
+            width: 5; height: 24
+            radius: 2.5
+            color: "white"
+            border.color: Qt.rgba(0, 0, 0, 0.45)
+            border.width: 1
+        }
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.SizeHorCursor
+            property real offX: 0
+            property real origX: 0; property real origY: 0
+            property real origW: 0; property real origH: 0
+            onPressed: mouse => {
+                const p = mapToItem(root, mouse.x, mouse.y);
+                origX = cropX; origY = cropY; origW = cropW; origH = cropH;
+                offX = p.x - origX;
+            }
+            onPositionChanged: mouse => {
+                const p = mapToItem(root, mouse.x, mouse.y);
+                root.resizeFromEdge("w", p.x, p.y, origX, origY, origW, origH, offX, 0);
+            }
+        }
+    }
+
+    // Right (E)
+    Rectangle {
+        x: cropX + cropW - 6; y: cropY + cropH / 2 - 20
+        width: 12; height: 40
+        color: "transparent"
+        Rectangle {
+            anchors.centerIn: parent
+            width: 5; height: 24
+            radius: 2.5
+            color: "white"
+            border.color: Qt.rgba(0, 0, 0, 0.45)
+            border.width: 1
+        }
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.SizeHorCursor
+            property real offX: 0
+            property real origX: 0; property real origY: 0
+            property real origW: 0; property real origH: 0
+            onPressed: mouse => {
+                const p = mapToItem(root, mouse.x, mouse.y);
+                origX = cropX; origY = cropY; origW = cropW; origH = cropH;
+                offX = p.x - (origX + origW);
+            }
+            onPositionChanged: mouse => {
+                const p = mapToItem(root, mouse.x, mouse.y);
+                root.resizeFromEdge("e", p.x, p.y, origX, origY, origW, origH, offX, 0);
+            }
+        }
+    }
+
+    // Live dimension badge floating near the crop rect
+    Rectangle {
+        id: dimBadge
+        x: Math.max(8, Math.min(parent.width - width - 8, cropX + cropW / 2 - width / 2))
+        y: cropY - height - 10 >= 10 ? (cropY - height - 10) : (cropY + 10)
+        implicitWidth: dimText.implicitWidth + 16
+        implicitHeight: 24
+        radius: 12
+        color: Qt.rgba(0, 0, 0, 0.75)
+        border.color: Qt.rgba(1, 1, 1, 0.25)
+        border.width: 1
+        z: 20
+
+        Text {
+            id: dimText
+            anchors.centerIn: parent
+            text: {
+                const scaleX = srcW / imageW;
+                const scaleY = srcH / imageH;
+                const w = Math.round(cropW * scaleX);
+                const h = Math.round(cropH * scaleY);
+                return w + " × " + h + " px" + (aspectRatio !== "" ? (" • " + aspectRatio) : "");
+            }
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeSmall - 1
+            font.weight: Font.DemiBold
+            color: "white"
+        }
+    }
+
     // Bottom toolbar: aspect ratio pills + Apply/Cancel
     Rectangle {
         anchors.bottom: parent.bottom
@@ -422,6 +689,23 @@ Item {
                 }
             }
 
+            // Reset button to revert to full image
+            DankActionButton {
+                iconName: "restart_alt"
+                iconSize: 18
+                buttonSize: 32
+                iconColor: Theme.surfaceText
+                tooltipText: "Reset to Full Image"
+                tooltipSide: "top"
+                onClicked: {
+                    root.aspectRatio = "";
+                    root.cropX = root.imageX;
+                    root.cropY = root.imageY;
+                    root.cropW = root.imageW;
+                    root.cropH = root.imageH;
+                }
+            }
+
             // Separator
             Rectangle {
                 width: 1; height: 22
@@ -430,38 +714,53 @@ Item {
             }
 
             // Cancel
-            DankActionButton {
-                iconName: "close"
-                iconSize: 18
-                buttonSize: 36
-                iconColor: Theme.surfaceText
-                tooltipText: "Cancel (Esc)"
-                tooltipSide: "top"
-                onClicked: root.cancelled()
-            }
-
-            // Apply / Crop
             Rectangle {
-                implicitWidth: applyRow.implicitWidth + 20
+                implicitWidth: cancelRow.implicitWidth + 24
                 implicitHeight: 36
                 radius: 18
-                color: applyMouse.containsMouse
+                color: cancelMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerLow
+                border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.35)
+                border.width: 1
+
+                RowLayout {
+                    id: cancelRow
+                    anchors.centerIn: parent
+                    spacing: 6
+                    DankIcon { name: "close"; size: 16; color: Theme.surfaceText }
+                    Text {
+                        text: "Cancel"
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
+                    }
+                }
+
+                MouseArea {
+                    id: cancelMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.cancelled()
+                }
+            }
+
+            // Done / Apply
+            Rectangle {
+                implicitWidth: doneRow.implicitWidth + 24
+                implicitHeight: 36
+                radius: 18
+                color: doneMouse.containsMouse
                     ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.85)
                     : Theme.primary
 
                 RowLayout {
-                    id: applyRow
+                    id: doneRow
                     anchors.centerIn: parent
                     spacing: 6
-
-                    DankIcon {
-                        name: "crop"
-                        size: 16
-                        color: Theme.primaryText
-                    }
-
+                    DankIcon { name: "check"; size: 16; color: Theme.primaryText }
                     Text {
-                        text: "Crop"
+                        text: "Done"
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.DemiBold
@@ -470,7 +769,7 @@ Item {
                 }
 
                 MouseArea {
-                    id: applyMouse
+                    id: doneMouse
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
