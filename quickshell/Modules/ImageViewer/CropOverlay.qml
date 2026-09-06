@@ -139,10 +139,15 @@ Item {
         cursorShape: Qt.SizeAllCursor
         property real startX: 0; property real startY: 0
         property real origCropX: 0; property real origCropY: 0
-        onPressed: mouse => { startX = mouse.x; startY = mouse.y; origCropX = cropX; origCropY = cropY; }
+        onPressed: mouse => {
+            const p = mapToItem(root, mouse.x, mouse.y);
+            startX = p.x; startY = p.y;
+            origCropX = cropX; origCropY = cropY;
+        }
         onPositionChanged: mouse => {
-            cropX = origCropX + (mouse.x - startX);
-            cropY = origCropY + (mouse.y - startY);
+            const p = mapToItem(root, mouse.x, mouse.y);
+            cropX = origCropX + (p.x - startX);
+            cropY = origCropY + (p.y - startY);
             root._clampMove();
         }
     }
