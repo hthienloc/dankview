@@ -18,6 +18,9 @@ Rectangle {
     // Input path to convert from (may be a cropped temp file)
     property string sourcePath: ImageService.currentFilePath
 
+    // Optional crop region { x: int, y: int, w: int, h: int }
+    property var cropRegion: null
+
     color: Qt.rgba(0, 0, 0, 0.55)
 
     // Block input to canvas behind
@@ -56,12 +59,12 @@ Rectangle {
             RowLayout {
                 Layout.fillWidth: true
 
-                DankIcon { name: "save"; size: 20; color: Theme.primary }
+                DankIcon { name: root.cropRegion ? "crop" : "save"; size: 20; color: Theme.primary }
 
                 Text {
                     Layout.fillWidth: true
                     leftPadding: 8
-                    text: "Save As / Export"
+                    text: root.cropRegion ? "Save Cropped Image" : "Save As / Export"
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeLarge
                     font.weight: Font.DemiBold
@@ -269,16 +272,18 @@ Rectangle {
 
         root.saved(dest);
 
-        let cmd;
-        if (stripToggle.checked) {
-            cmd = quality !== ""
-                ? ["magick", src, "-quality", quality, "-strip", dest]
-                : ["magick", src, "-strip", dest];
-        } else {
-            cmd = quality !== ""
-                ? ["magick", src, "-quality", quality, dest]
-                : ["magick", src, dest];
+        let cmd = ["magick", src];
+        if (root.cropRegion && root.cropRegion.w > 0 && root.cropRegion.h > 0) {
+            cmd.push("-crop", root.cropRegion.w + "x" + root.cropRegion.h + "+" + root.cropRegion.x + "+" + root.cropRegion.y);
+            cmd.push("+repage");
         }
+        if (quality !== "") {
+            cmd.push("-quality", quality);
+        }
+        if (stripToggle.checked) {
+            cmd.push("-strip");
+        }
+        cmd.push(dest);
         saveProc.command = cmd;
         saveProc.running = true;
     }

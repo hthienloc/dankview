@@ -12,7 +12,18 @@ Item {
     id: root
 
     signal cropped(int x, int y, int w, int h)
+    signal saveAsRequested(int x, int y, int w, int h)
     signal cancelled()
+
+    property bool promptVisible: false
+    property var pendingCrop: null
+
+    onVisibleChanged: {
+        if (!visible) {
+            promptVisible = false;
+            pendingCrop = null;
+        }
+    }
 
     property real imageX: 0
     property real imageY: 0
@@ -170,10 +181,13 @@ Item {
         const py = Math.round((cropY - imageY) * scaleY);
         const pw = Math.round(cropW * scaleX);
         const ph = Math.round(cropH * scaleY);
-        root.cropped(
-            Math.max(0, px), Math.max(0, py),
-            Math.min(pw, srcW - px), Math.min(ph, srcH - py)
-        );
+        pendingCrop = {
+            x: Math.max(0, px),
+            y: Math.max(0, py),
+            w: Math.min(pw, srcW - px),
+            h: Math.min(ph, srcH - py)
+        };
+        promptVisible = true;
     }
 
     // Dark scrim outside the crop rect (4 rectangles)
@@ -459,6 +473,204 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: root.applyCrop()
+                }
+            }
+        }
+    }
+
+    // Modal dialog prompting user to Save or Save As after cropping
+    Rectangle {
+        id: promptModal
+        visible: root.promptVisible
+        anchors.fill: parent
+        color: Qt.rgba(0, 0, 0, 0.6)
+        z: 100
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.AllButtons
+            onClicked: root.promptVisible = false
+        }
+
+        Rectangle {
+            anchors.centerIn: parent
+            width: 380
+            radius: 16
+            color: Theme.surfaceContainerHigh
+            border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.25)
+            border.width: 1
+            implicitHeight: promptCol.implicitHeight + 36
+
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.AllButtons
+                onClicked: {}
+            }
+
+            ColumnLayout {
+                id: promptCol
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: 20
+                spacing: 16
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 10
+
+                    DankIcon {
+                        name: "crop"
+                        size: 22
+                        color: Theme.primary
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: "Save Cropped Image"
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeLarge
+                        font.weight: Font.DemiBold
+                        color: Theme.surfaceText
+                    }
+
+                    DankActionButton {
+                        iconName: "close"
+                        iconSize: 18
+                        buttonSize: 32
+                        iconColor: Theme.surfaceText
+                        onClicked: root.promptVisible = false
+                    }
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    text: "Would you like to overwrite the original image or save as a new file?"
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontSizeMedium
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.WordWrap
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 10
+
+                    // Cancel
+                    Rectangle {
+                        implicitWidth: cancelPromptText.implicitWidth + 24
+                        implicitHeight: 38
+                        radius: 19
+                        color: cancelPromptMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerLow
+                        border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.35)
+                        border.width: 1
+
+                        Text {
+                            id: cancelPromptText
+                            anchors.centerIn: parent
+                            text: "Cancel"
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                        }
+
+                        MouseArea {
+                            id: cancelPromptMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.promptVisible = false
+                        }
+                    }
+
+                    Item { Layout.fillWidth: true }
+
+                    // Save As... (New File / Export)
+                    Rectangle {
+                        implicitWidth: saveAsPromptRow.implicitWidth + 24
+                        implicitHeight: 38
+                        radius: 19
+                        color: saveAsPromptMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerLow
+                        border.color: Theme.primary
+                        border.width: 1
+
+                        RowLayout {
+                            id: saveAsPromptRow
+                            anchors.centerIn: parent
+                            spacing: 6
+
+                            DankIcon {
+                                name: "save_as"
+                                size: 16
+                                color: Theme.primary
+                            }
+
+                            Text {
+                                text: "Save As..."
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.fontSizeSmall
+                                font.weight: Font.Medium
+                                color: Theme.primary
+                            }
+                        }
+
+                        MouseArea {
+                            id: saveAsPromptMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.promptVisible = false;
+                                if (root.pendingCrop) {
+                                    root.saveAsRequested(root.pendingCrop.x, root.pendingCrop.y, root.pendingCrop.w, root.pendingCrop.h);
+                                }
+                            }
+                        }
+                    }
+
+                    // Save (Overwrite)
+                    Rectangle {
+                        implicitWidth: savePromptRow.implicitWidth + 24
+                        implicitHeight: 38
+                        radius: 19
+                        color: savePromptMouse.containsMouse
+                            ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.85)
+                            : Theme.primary
+
+                        RowLayout {
+                            id: savePromptRow
+                            anchors.centerIn: parent
+                            spacing: 6
+
+                            DankIcon {
+                                name: "save"
+                                size: 16
+                                color: Theme.primaryText
+                            }
+
+                            Text {
+                                text: "Save"
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.fontSizeSmall
+                                font.weight: Font.DemiBold
+                                color: Theme.primaryText
+                            }
+                        }
+
+                        MouseArea {
+                            id: savePromptMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.promptVisible = false;
+                                if (root.pendingCrop) {
+                                    root.cropped(root.pendingCrop.x, root.pendingCrop.y, root.pendingCrop.w, root.pendingCrop.h);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

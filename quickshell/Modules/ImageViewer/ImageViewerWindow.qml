@@ -140,16 +140,28 @@ FloatingWindow {
                 break;
             case Qt.Key_S:
                 if (event.modifiers & Qt.ControlModifier) {
+                    saveDialog.cropRegion = null;
                     ImageService.openSaveDialog();
                     event.accepted = true;
                 }
                 break;
+            case Qt.Key_Return:
+            case Qt.Key_Enter:
+                if (ImageService.cropMode && !cropOverlay.promptVisible) {
+                    cropOverlay.applyCrop();
+                    event.accepted = true;
+                }
+                break;
             case Qt.Key_Escape:
-                if (ImageService.cropMode) {
+                if (cropOverlay.promptVisible) {
+                    cropOverlay.promptVisible = false;
+                    event.accepted = true;
+                } else if (ImageService.cropMode) {
                     ImageService.cropMode = false;
                     event.accepted = true;
                 } else if (ImageService.saveMode) {
                     ImageService.saveMode = false;
+                    saveDialog.cropRegion = null;
                     event.accepted = true;
                 } else if (ImageService.inspectorOpen) {
                     ImageService.inspectorOpen = false;
@@ -284,15 +296,27 @@ FloatingWindow {
             srcH: ImageService.currentMeta.height || 1
 
             onCropped: (x, y, w, h) => ImageService.executeCrop(x, y, w, h)
+            onSaveAsRequested: (x, y, w, h) => {
+                ImageService.cropMode = false;
+                saveDialog.cropRegion = { x: x, y: y, w: w, h: h };
+                ImageService.saveMode = true;
+            }
             onCancelled: ImageService.cropMode = false
         }
 
         // Save As / Export Dialog
         SaveDialog {
+            id: saveDialog
             anchors.fill: parent
             visible: ImageService.saveMode
-            onCancelled: ImageService.saveMode = false
-            onSaved: ImageService.saveMode = false
+            onCancelled: {
+                ImageService.saveMode = false;
+                saveDialog.cropRegion = null;
+            }
+            onSaved: {
+                ImageService.saveMode = false;
+                saveDialog.cropRegion = null;
+            }
         }
     }
 }
