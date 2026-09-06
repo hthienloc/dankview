@@ -12,10 +12,36 @@ Item {
     readonly property string source: ImageService.currentFilePath ? "file://" + ImageService.currentFilePath : ""
     readonly property bool hasImage: ImageService.currentFilePath !== ""
 
-    // Checkerboard background for transparent images
+    // Contrast background + checkerboard for transparent images
     Rectangle {
         anchors.fill: parent
-        color: Theme.surfaceContainerLowest || "#111111"
+        color: Theme.surfaceContainerLowest
+
+        Canvas {
+            id: checkerCanvas
+            anchors.fill: parent
+            opacity: 0.5
+            onPaint: {
+                const ctx = getContext("2d");
+                const s = 16;
+                ctx.fillStyle = Theme.surfaceContainerLowest;
+                ctx.fillRect(0, 0, width, height);
+                ctx.fillStyle = Theme.surfaceContainerLow;
+                for (let y = 0; y < height; y += s) {
+                    const rowEven = Math.floor(y / s) % 2 === 0;
+                    for (let x = (rowEven ? 0 : s); x < width; x += s * 2) {
+                        ctx.fillRect(x, y, s, s);
+                    }
+                }
+            }
+            Connections {
+                target: Theme
+                function onSurfaceContainerLowestChanged() { checkerCanvas.requestPaint(); }
+                function onSurfaceContainerLowChanged() { checkerCanvas.requestPaint(); }
+            }
+            onWidthChanged: requestPaint()
+            onHeightChanged: requestPaint()
+        }
     }
 
     Item {
@@ -134,7 +160,7 @@ Item {
             width: 44
             height: 44
             radius: 22
-            color: parent.containsMouse ? (Theme.surfaceContainerHigh || "#2a2a2a") : "transparent"
+            color: parent.containsMouse ? Theme.surfaceContainerHigh : "transparent"
             opacity: parent.containsMouse ? 0.9 : 0.0
 
             Behavior on opacity {
@@ -157,7 +183,7 @@ Item {
         width: 80
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        visible: ImageService.fileList.length > 1
+        visible: ImageService.fileList.length > 1 && !ImageService.inspectorOpen
         onClicked: ImageService.nextImage()
 
         Rectangle {
@@ -167,7 +193,7 @@ Item {
             width: 44
             height: 44
             radius: 22
-            color: parent.containsMouse ? (Theme.surfaceContainerHigh || "#2a2a2a") : "transparent"
+            color: parent.containsMouse ? Theme.surfaceContainerHigh : "transparent"
             opacity: parent.containsMouse ? 0.9 : 0.0
 
             Behavior on opacity {

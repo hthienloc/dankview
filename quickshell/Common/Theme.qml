@@ -102,6 +102,9 @@ Singleton {
             "surfaceContainer": getMatugenColor("surface_container", fallback.surfaceContainer),
             "surfaceContainerHigh": getMatugenColor("surface_container_high", fallback.surfaceContainerHigh),
             "surfaceContainerHighest": getMatugenColor("surface_container_highest", fallback.surfaceContainerHighest),
+            "surfaceContainerLow": getMatugenColor("surface_container_low", fallback.surfaceContainer),
+            "surfaceContainerLowest": getMatugenColor("surface_container_lowest", fallback.background),
+            "onPrimaryContainer": getMatugenColor("on_primary_container", fallback.primaryText),
             "error": fallback.error,
             "warning": fallback.warning,
             "info": fallback.info,
@@ -156,6 +159,7 @@ Singleton {
     property color onSurface: surfaceText
     property color onSurfaceVariant: surfaceVariantText
     property color onPrimary: primaryText
+    property color onPrimaryContainer: currentThemeData.onPrimaryContainer || primaryText
 
     property color error: currentThemeData.error
     property color warning: currentThemeData.warning

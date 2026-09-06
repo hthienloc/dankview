@@ -12,7 +12,7 @@ FloatingWindow {
     minimumSize: Qt.size(480, 360)
     implicitWidth: 1050
     implicitHeight: 720
-    color: Theme.surfaceContainerLowest || "#121212"
+    color: Theme.surfaceContainerLowest
     visible: true
 
     property bool showOverlays: true

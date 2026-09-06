@@ -120,11 +120,14 @@ Rectangle {
         property alias text: badgeText.text
         property color textColor: Theme.surfaceText
         property color bgColor: Theme.surfaceContainerHighest
+        property color borderColor: "transparent"
 
         implicitHeight: 24
         implicitWidth: badgeText.implicitWidth + 14
         radius: 12
         color: bgColor
+        border.color: borderColor
+        border.width: borderColor !== "transparent" ? 1 : 0
 
         Text {
             id: badgeText
@@ -134,6 +137,18 @@ Rectangle {
             font.weight: Font.DemiBold
             color: textColor
         }
+    }
+
+    // Prevent mouse clicks and drags from falling through to the canvas underneath
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.AllButtons
+        hoverEnabled: true
+        preventStealing: true
+        onPressed: mouse => mouse.accepted = true
+        onReleased: mouse => mouse.accepted = true
+        onClicked: mouse => mouse.accepted = true
+        onDoubleClicked: mouse => mouse.accepted = true
     }
 
     ColumnLayout {
@@ -254,8 +269,9 @@ Rectangle {
                             PillBadge {
                                 visible: ImageService.currentMeta.format !== undefined && ImageService.currentMeta.format !== ""
                                 text: ImageService.currentMeta.format || ""
-                                bgColor: Theme.primaryContainer
-                                textColor: Theme.primaryText
+                                bgColor: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.22)
+                                textColor: Theme.primary
+                                borderColor: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.6)
                             }
 
                             PillBadge {
