@@ -30,7 +30,7 @@ Item {
     property real cropW: imageW * 0.8
     property real cropH: imageH * 0.8
 
-    readonly property int HANDLE: 14
+    readonly property int handleSize: 14
 
     // Reset crop rect whenever the image position/size changes
     onImageXChanged: _reset()
@@ -128,8 +128,8 @@ Item {
 
     // Move crop rect by dragging its center
     MouseArea {
-        x: cropX + HANDLE; y: cropY + HANDLE
-        width: cropW - HANDLE * 2; height: cropH - HANDLE * 2
+        x: cropX + handleSize; y: cropY + handleSize
+        width: cropW - handleSize * 2; height: cropH - handleSize * 2
         cursorShape: Qt.SizeAllCursor
         property real startX: 0; property real startY: 0
         property real origCropX: 0; property real origCropY: 0
@@ -143,12 +143,12 @@ Item {
 
     // Corner handles — NW, NE, SW, SE
     component Handle: Rectangle {
-        width: HANDLE * 2; height: HANDLE * 2
+        width: handleSize * 2; height: handleSize * 2
         color: "transparent"
 
         Rectangle {
             anchors.centerIn: parent
-            width: HANDLE; height: HANDLE
+            width: handleSize; height: handleSize
             radius: 3
             color: "white"
             border.color: Qt.rgba(0, 0, 0, 0.4)
@@ -158,7 +158,7 @@ Item {
 
     // NW
     Handle {
-        x: cropX - HANDLE; y: cropY - HANDLE
+        x: cropX - handleSize; y: cropY - handleSize
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.SizeFDiagCursor
@@ -182,7 +182,7 @@ Item {
 
     // NE
     Handle {
-        x: cropX + cropW - HANDLE; y: cropY - HANDLE
+        x: cropX + cropW - handleSize; y: cropY - handleSize
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.SizeBDiagCursor
@@ -204,7 +204,7 @@ Item {
 
     // SW
     Handle {
-        x: cropX - HANDLE; y: cropY + cropH - HANDLE
+        x: cropX - handleSize; y: cropY + cropH - handleSize
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.SizeBDiagCursor
@@ -226,7 +226,7 @@ Item {
 
     // SE
     Handle {
-        x: cropX + cropW - HANDLE; y: cropY + cropH - HANDLE
+        x: cropX + cropW - handleSize; y: cropY + cropH - handleSize
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.SizeFDiagCursor
