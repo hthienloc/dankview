@@ -317,14 +317,7 @@ Singleton {
 
     function setAsWallpaper() {
         if (!currentFilePath) return;
-        const path = currentFilePath;
-        // Try DMS IPC first; fall back to swww, then swaybg
-        wallpaperProc.command = [
-            "sh", "-c",
-            "dms ipc call wallpaper set " + JSON.stringify(path) +
-            " 2>/dev/null || swww img " + JSON.stringify(path) +
-            " 2>/dev/null || swaybg -i " + JSON.stringify(path) + " 2>/dev/null"
-        ];
+        wallpaperProc.command = ["dms", "ipc", "call", "wallpaper", "set", currentFilePath];
         wallpaperProc.running = true;
     }
 
