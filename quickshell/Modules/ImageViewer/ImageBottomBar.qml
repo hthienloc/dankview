@@ -52,7 +52,7 @@ Rectangle {
             iconSize: 20
             iconColor: Theme.surfaceText
             buttonSize: 38
-            tooltipText: "Flip Horizontally"
+            tooltipText: "Flip Horizontally (Ctrl+M / H)"
             tooltipSide: "top"
             onClicked: ImageService.toggleFlipHorizontal()
         }
