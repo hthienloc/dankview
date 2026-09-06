@@ -356,7 +356,15 @@ Rectangle {
                             }
                             DetailRow {
                                 label: "File Size"
-                                value: ImageService.currentMeta.fileSizeText ? (ImageService.currentMeta.fileSizeText + (ImageService.currentMeta.fileSize ? " (" + ImageService.currentMeta.fileSize.toLocaleString() + " B)" : "")) : ""
+                                value: {
+                                    if (!ImageService.currentMeta.fileSizeText) return "";
+                                    const raw = ImageService.currentMeta.fileSize;
+                                    if (typeof raw === "number" && raw > 0) {
+                                        const formatted = Math.floor(raw).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        return ImageService.currentMeta.fileSizeText + " (" + formatted + " B)";
+                                    }
+                                    return ImageService.currentMeta.fileSizeText;
+                                }
                             }
                             DetailRow {
                                 label: "Format"
