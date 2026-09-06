@@ -17,9 +17,17 @@ var supportedExtensions = map[string]bool{
 	".bmp":  true,
 	".ico":  true,
 	".avif": true,
+	".heic": true,
+	".heif": true,
 	".jxl":  true,
 	".tif":  true,
 	".tiff": true,
+	".exr":  true,
+	".hdr":  true,
+	".tga":  true,
+	".qoi":  true,
+	".psd":  true,
+	".dds":  true,
 }
 
 // IsSupportedImage checks if the file has a supported image extension.

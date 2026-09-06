@@ -35,9 +35,9 @@ Feature parity and tracking against [GNOME Loupe](https://gitlab.gnome.org/GNOME
 
 - [x] **Animated Image Playback Controls**:
   - Play/Pause toggle badge on header (`Play` / `Pause`) for animated GIF / WebP.
-- [ ] Frame scrubber / seek slider for multi-frame animations.
-- [ ] **Extended Format Decoding**:
-  - Native AVIF / HEIC / JXL support verification via Qt image plugins.
+- [ ] ~~Frame scrubber / seek slider for multi-frame animations.~~ *(skipped)*
+- [x] **Extended Format Decoding**:
+  - Native AVIF / HEIC / JXL / EXR / HDR / TGA / QOI / PSD / DDS via Qt6 image plugins (`kimg_avif`, `kimg_heif`, `kimg_jxl`, `kimg_exr`, `kimg_hdr`).
 
 ---
 

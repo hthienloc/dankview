@@ -198,7 +198,7 @@ Singleton {
         running: false
         command: [
             "sh", "-c",
-            "zenity --file-selection --title=\"Open Image\" --file-filter=\"Images | *.jpg *.jpeg *.png *.webp *.svg *.gif *.bmp *.avif *.heic *.tiff\" 2>/dev/null || kdialog --getopenfilename . \"*.jpg *.jpeg *.png *.webp *.svg *.gif *.bmp *.avif *.heic *.tiff\" 2>/dev/null"
+            "zenity --file-selection --title=\"Open Image\" --file-filter=\"Images | *.jpg *.jpeg *.png *.webp *.svg *.gif *.bmp *.avif *.heic *.heif *.jxl *.tif *.tiff *.exr *.hdr *.tga *.qoi *.psd *.dds\" 2>/dev/null || kdialog --getopenfilename . \"*.jpg *.jpeg *.png *.webp *.svg *.gif *.bmp *.avif *.heic *.heif *.jxl *.tif *.tiff *.exr *.hdr *.tga *.qoi *.psd *.dds\" 2>/dev/null"
         ]
         stdout: StdioCollector {
             onStreamFinished: {
