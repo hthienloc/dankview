@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
+import qs.DankCommon.Widgets
 import "."
 
 FloatingWindow {
@@ -112,6 +113,12 @@ FloatingWindow {
             }
         }
 
+        // Floating Window Controls (resizing, moving, maximizing)
+        FloatingWindowControls {
+            id: windowControls
+            targetWindow: window
+        }
+
         // Main Image Canvas
         ImageCanvas {
             anchors.fill: parent
@@ -120,6 +127,7 @@ FloatingWindow {
         // Top Header Bar
         ImageHeaderBar {
             id: headerBar
+            windowControls: windowControls
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right

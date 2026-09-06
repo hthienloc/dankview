@@ -3,14 +3,38 @@ import QtQuick.Layouts
 import Quickshell
 import qs.Common
 import qs.Services
+import qs.DankCommon.Widgets
 
 Rectangle {
     id: root
 
-    width: 320
-    color: Theme.surfaceContainer ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : "#f01c1c1c"
-    border.color: Theme.outlineVariant ? Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.25) : "#33ffffff"
+    width: 340
+    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.96)
+    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.3)
     border.width: 1
+
+    component SectionHeader: RowLayout {
+        property string title: ""
+        property string iconName: ""
+
+        Layout.fillWidth: true
+        spacing: 8
+
+        DankIcon {
+            name: iconName
+            size: 16
+            color: Theme.primary
+        }
+
+        Text {
+            Layout.fillWidth: true
+            text: title
+            font.family: Theme.fontFamily || "Google Sans Flex"
+            font.pixelSize: 12
+            font.weight: Font.DemiBold
+            color: Theme.primary
+        }
+    }
 
     component InfoRow: RowLayout {
         property string label: ""
@@ -18,21 +42,23 @@ Rectangle {
         visible: value !== ""
 
         Layout.fillWidth: true
-        spacing: 8
+        spacing: 12
 
         Text {
             Layout.preferredWidth: 100
             text: label
+            font.family: Theme.fontFamily || "Google Sans Flex"
             font.pixelSize: 12
-            color: Theme.onSurfaceVariant || "#aaaaaa"
+            color: Theme.surfaceVariantText
         }
 
         Text {
             Layout.fillWidth: true
             text: value
+            font.family: Theme.fontFamily || "Google Sans Flex"
             font.pixelSize: 12
             font.weight: Font.Medium
-            color: Theme.onSurface || "#ffffff"
+            color: Theme.surfaceText
             wrapMode: Text.WrapAnywhere
             elide: Text.ElideRight
         }
@@ -40,151 +66,174 @@ Rectangle {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 16
-        spacing: 16
+        anchors.margins: 18
+        spacing: 14
 
-        // Header
+        // Top Drawer Header
         RowLayout {
             Layout.fillWidth: true
+
+            DankIcon {
+                name: "info"
+                size: 20
+                color: Theme.primary
+            }
 
             Text {
                 Layout.fillWidth: true
                 text: "Image Properties"
+                font.family: Theme.fontFamily || "Google Sans Flex"
                 font.pixelSize: 15
                 font.weight: Font.DemiBold
-                color: Theme.onSurface || "#ffffff"
+                color: Theme.surfaceText
             }
 
-            Rectangle {
-                width: 28
-                height: 28
-                radius: 14
-                color: closeMouse.containsMouse ? (Theme.surfaceContainerHighest || "#444444") : "transparent"
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "✕"
-                    font.pixelSize: 13
-                    color: Theme.onSurface || "#ffffff"
-                }
-
-                MouseArea {
-                    id: closeMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: ImageService.inspectorOpen = false
-                }
+            DankActionButton {
+                iconName: "close"
+                iconSize: 18
+                iconColor: Theme.surfaceText
+                tooltipText: "Close Inspector (I)"
+                tooltipSide: "left"
+                onClicked: ImageService.inspectorOpen = false
             }
         }
 
         Rectangle {
             Layout.fillWidth: true
             height: 1
-            color: Theme.outlineVariant || "#33ffffff"
-            opacity: 0.3
+            color: Theme.outlineVariant
+            opacity: 0.35
         }
 
-        // General Details
-        Text {
-            text: "Details"
-            font.pixelSize: 12
-            font.weight: Font.Bold
-            color: Theme.primary || "#3b82f6"
-        }
-
-        InfoRow {
-            label: "File Name"
-            value: ImageService.currentMeta.fileName || ImageService.currentFileName
-        }
-
-        InfoRow {
-            label: "Format"
-            value: ImageService.currentMeta.format || ""
-        }
-
-        InfoRow {
-            label: "File Size"
-            value: ImageService.currentMeta.fileSizeText || ""
-        }
-
-        InfoRow {
-            label: "Dimensions"
-            value: ImageService.currentMeta.width > 0 ? (ImageService.currentMeta.width + " × " + ImageService.currentMeta.height + " px") : ""
-        }
-
-        InfoRow {
-            label: "Aspect Ratio"
-            value: ImageService.currentMeta.aspectRatio || ""
+        // Section: File Details
+        SectionHeader {
+            title: "File Details"
+            iconName: "image"
         }
 
         Rectangle {
             Layout.fillWidth: true
-            height: 1
-            color: Theme.outlineVariant || "#33ffffff"
-            opacity: 0.3
+            implicitHeight: fileCol.implicitHeight + 16
+            radius: 12
+            color: Theme.surfaceContainerHigh
+
+            ColumnLayout {
+                id: fileCol
+                anchors.fill: parent
+                anchors.margins: 10
+                spacing: 8
+
+                InfoRow {
+                    label: "Name"
+                    value: ImageService.currentMeta.fileName || ImageService.currentFileName
+                }
+                InfoRow {
+                    label: "Format"
+                    value: ImageService.currentMeta.format || ""
+                }
+                InfoRow {
+                    label: "File Size"
+                    value: ImageService.currentMeta.fileSizeText || ""
+                }
+                InfoRow {
+                    label: "Resolution"
+                    value: ImageService.currentMeta.width > 0 ? (ImageService.currentMeta.width + " × " + ImageService.currentMeta.height + " px") : ""
+                }
+                InfoRow {
+                    label: "Aspect Ratio"
+                    value: ImageService.currentMeta.aspectRatio || ""
+                }
+            }
         }
 
-        // Camera Details (if EXIF exists)
-        Text {
+        // Section: Camera & EXIF (if available)
+        SectionHeader {
             visible: ImageService.currentMeta.cameraModel !== undefined && ImageService.currentMeta.cameraModel !== ""
-            text: "Camera & Exposure"
-            font.pixelSize: 12
-            font.weight: Font.Bold
-            color: Theme.primary || "#3b82f6"
+            title: "Camera & Optics"
+            iconName: "photo_camera"
         }
 
-        InfoRow {
-            label: "Camera"
-            value: (ImageService.currentMeta.cameraMake || "") + " " + (ImageService.currentMeta.cameraModel || "")
-        }
+        Rectangle {
+            visible: ImageService.currentMeta.cameraModel !== undefined && ImageService.currentMeta.cameraModel !== ""
+            Layout.fillWidth: true
+            implicitHeight: exifCol.implicitHeight + 16
+            radius: 12
+            color: Theme.surfaceContainerHigh
 
-        InfoRow {
-            label: "Aperture"
-            value: ImageService.currentMeta.fNumber || ""
-        }
+            ColumnLayout {
+                id: exifCol
+                anchors.fill: parent
+                anchors.margins: 10
+                spacing: 8
 
-        InfoRow {
-            label: "Exposure"
-            value: ImageService.currentMeta.exposureTime || ""
-        }
-
-        InfoRow {
-            label: "ISO"
-            value: ImageService.currentMeta.iso || ""
-        }
-
-        InfoRow {
-            label: "Focal Length"
-            value: ImageService.currentMeta.focalLength || ""
-        }
-
-        InfoRow {
-            label: "Date Taken"
-            value: ImageService.currentMeta.dateTaken || ""
+                InfoRow {
+                    label: "Camera"
+                    value: (ImageService.currentMeta.cameraMake || "") + " " + (ImageService.currentMeta.cameraModel || "")
+                }
+                InfoRow {
+                    label: "Aperture"
+                    value: ImageService.currentMeta.fNumber || ""
+                }
+                InfoRow {
+                    label: "Exposure"
+                    value: ImageService.currentMeta.exposureTime || ""
+                }
+                InfoRow {
+                    label: "ISO"
+                    value: ImageService.currentMeta.iso || ""
+                }
+                InfoRow {
+                    label: "Focal Length"
+                    value: ImageService.currentMeta.focalLength || ""
+                }
+                InfoRow {
+                    label: "Date Taken"
+                    value: ImageService.currentMeta.dateTaken || ""
+                }
+            }
         }
 
         Item {
             Layout.fillHeight: true
         }
 
-        // File path footer
-        ColumnLayout {
+        // Location path card
+        Rectangle {
             Layout.fillWidth: true
-            spacing: 4
+            implicitHeight: pathCol.implicitHeight + 16
+            radius: 12
+            color: Theme.surfaceContainerLowest
 
-            Text {
-                text: "Location"
-                font.pixelSize: 11
-                color: Theme.onSurfaceVariant || "#888888"
-            }
+            ColumnLayout {
+                id: pathCol
+                anchors.fill: parent
+                anchors.margins: 10
+                spacing: 4
 
-            Text {
-                Layout.fillWidth: true
-                text: ImageService.currentFilePath
-                font.pixelSize: 11
-                color: Theme.onSurface || "#dddddd"
-                wrapMode: Text.WrapAnywhere
+                RowLayout {
+                    spacing: 6
+                    DankIcon {
+                        name: "folder"
+                        size: 14
+                        color: Theme.surfaceVariantText
+                    }
+                    Text {
+                        text: "File Path"
+                        font.family: Theme.fontFamily || "Google Sans Flex"
+                        font.pixelSize: 11
+                        font.weight: Font.Medium
+                        color: Theme.surfaceVariantText
+                    }
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    text: ImageService.currentFilePath
+                    font.family: Theme.fontFamily || "Google Sans Flex"
+                    font.pixelSize: 11
+                    color: Theme.surfaceText
+                    wrapMode: Text.WrapAnywhere
+                }
             }
         }
     }

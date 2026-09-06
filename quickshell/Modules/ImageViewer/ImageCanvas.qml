@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Common
 import qs.Services
+import qs.DankCommon.Widgets
 
 Item {
     id: root
@@ -139,11 +140,11 @@ Item {
                 NumberAnimation { duration: 150 }
             }
 
-            Text {
+            DankIcon {
                 anchors.centerIn: parent
-                text: "‹"
-                font.pixelSize: 28
-                color: Theme.onSurface || "#ffffff"
+                name: "chevron_left"
+                size: 28
+                color: Theme.surfaceText
             }
         }
     }
@@ -172,11 +173,11 @@ Item {
                 NumberAnimation { duration: 150 }
             }
 
-            Text {
+            DankIcon {
                 anchors.centerIn: parent
-                text: "›"
-                font.pixelSize: 28
-                color: Theme.onSurface || "#ffffff"
+                name: "chevron_right"
+                size: 28
+                color: Theme.surfaceText
             }
         }
     }

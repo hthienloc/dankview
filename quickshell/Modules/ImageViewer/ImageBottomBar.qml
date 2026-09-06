@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import qs.Common
 import qs.Services
+import qs.DankCommon.Widgets
 
 Rectangle {
     id: root
@@ -10,41 +11,15 @@ Rectangle {
     height: 48
     implicitWidth: layout.implicitWidth + 24
     radius: 24
-    color: Theme.surfaceContainer ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.90) : "#e6222222"
-    border.color: Theme.outlineVariant ? Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.2) : "#33ffffff"
+    color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.92)
+    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.35)
     border.width: 1
-
-    component ToolButton: Rectangle {
-        property string iconText: ""
-        property string tooltip: ""
-        signal clicked
-
-        width: 36
-        height: 36
-        radius: 18
-        color: mouse.containsMouse ? (Theme.surfaceContainerHighest || "#444444") : "transparent"
-
-        Text {
-            anchors.centerIn: parent
-            text: iconText
-            font.pixelSize: 15
-            color: Theme.onSurface || "#ffffff"
-        }
-
-        MouseArea {
-            id: mouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: parent.clicked()
-        }
-    }
 
     component BarSeparator: Rectangle {
         width: 1
         height: 20
-        color: Theme.outlineVariant || "#44ffffff"
-        opacity: 0.3
+        color: Theme.outlineVariant
+        opacity: 0.35
     }
 
     RowLayout {
@@ -52,69 +27,109 @@ Rectangle {
         anchors.centerIn: parent
         spacing: 4
 
-        ToolButton {
-            iconText: "‹"
-            tooltip: "Previous Image (Left)"
+        DankActionButton {
+            iconName: "chevron_left"
+            iconSize: 20
+            iconColor: Theme.surfaceText
+            buttonSize: 36
+            tooltipText: "Previous Image (Left)"
+            tooltipSide: "top"
             onClicked: ImageService.prevImage()
         }
 
-        ToolButton {
-            iconText: "›"
-            tooltip: "Next Image (Right)"
+        DankActionButton {
+            iconName: "chevron_right"
+            iconSize: 20
+            iconColor: Theme.surfaceText
+            buttonSize: 36
+            tooltipText: "Next Image (Right)"
+            tooltipSide: "top"
             onClicked: ImageService.nextImage()
         }
 
         BarSeparator {}
 
-        ToolButton {
-            iconText: "↺"
-            tooltip: "Rotate Counter-Clockwise"
+        DankActionButton {
+            iconName: "rotate_left"
+            iconSize: 18
+            iconColor: Theme.surfaceText
+            buttonSize: 36
+            tooltipText: "Rotate Counter-Clockwise (Shift+R)"
+            tooltipSide: "top"
             onClicked: ImageService.rotateCounterClockwise()
         }
 
-        ToolButton {
-            iconText: "↻"
-            tooltip: "Rotate Clockwise"
+        DankActionButton {
+            iconName: "rotate_right"
+            iconSize: 18
+            iconColor: Theme.surfaceText
+            buttonSize: 36
+            tooltipText: "Rotate Clockwise (R)"
+            tooltipSide: "top"
             onClicked: ImageService.rotateClockwise()
         }
 
-        ToolButton {
-            iconText: "⇄"
-            tooltip: "Flip Horizontally"
+        DankActionButton {
+            iconName: "flip"
+            iconSize: 18
+            iconColor: Theme.surfaceText
+            buttonSize: 36
+            tooltipText: "Flip Horizontally"
+            tooltipSide: "top"
             onClicked: ImageService.toggleFlipHorizontal()
         }
 
         BarSeparator {}
 
-        ToolButton {
-            iconText: "−"
-            tooltip: "Zoom Out"
+        DankActionButton {
+            iconName: "zoom_out"
+            iconSize: 18
+            iconColor: Theme.surfaceText
+            buttonSize: 36
+            tooltipText: "Zoom Out (-)"
+            tooltipSide: "top"
             onClicked: ImageService.zoomOut()
         }
 
-        ToolButton {
-            iconText: "+"
-            tooltip: "Zoom In"
+        DankActionButton {
+            iconName: "zoom_in"
+            iconSize: 18
+            iconColor: Theme.surfaceText
+            buttonSize: 36
+            tooltipText: "Zoom In (+)"
+            tooltipSide: "top"
             onClicked: ImageService.zoomIn()
         }
 
-        ToolButton {
-            iconText: "1:1"
-            tooltip: "Actual Size"
+        DankActionButton {
+            iconName: "aspect_ratio"
+            iconSize: 18
+            iconColor: Theme.surfaceText
+            buttonSize: 36
+            tooltipText: "Actual Size 100% (0)"
+            tooltipSide: "top"
             onClicked: ImageService.resetZoom()
         }
 
         BarSeparator {}
 
-        ToolButton {
-            iconText: "📋"
-            tooltip: "Copy to Clipboard"
+        DankActionButton {
+            iconName: "content_copy"
+            iconSize: 18
+            iconColor: Theme.surfaceText
+            buttonSize: 36
+            tooltipText: "Copy to Clipboard (Ctrl+C)"
+            tooltipSide: "top"
             onClicked: ImageService.copyToClipboard()
         }
 
-        ToolButton {
-            iconText: "🗑"
-            tooltip: "Move to Trash"
+        DankActionButton {
+            iconName: "delete"
+            iconSize: 18
+            iconColor: Theme.error
+            buttonSize: 36
+            tooltipText: "Move to Trash (Delete)"
+            tooltipSide: "top"
             onClicked: ImageService.moveToTrash()
         }
     }

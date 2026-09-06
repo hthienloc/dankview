@@ -3,62 +3,98 @@ import QtQuick.Layouts
 import Quickshell
 import qs.Common
 import qs.Services
+import qs.DankCommon.Widgets
 
 Rectangle {
     id: root
 
-    height: 52
-    color: Theme.surfaceContainer ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.85) : "#cc1e1e1e"
-    radius: 0
+    property var windowControls: null
+
+    height: 48
+    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.88)
+    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.25)
+    border.width: 1
+
+    // Drag header to move window
+    MouseArea {
+        anchors.fill: parent
+        onPressed: {
+            if (root.windowControls)
+                root.windowControls.tryStartMove();
+        }
+        onDoubleClicked: {
+            if (root.windowControls)
+                root.windowControls.tryToggleMaximize();
+        }
+    }
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: 16
-        anchors.rightMargin: 16
-        spacing: 12
+        anchors.leftMargin: 12
+        anchors.rightMargin: 8
+        spacing: 8
 
-        // Left: File name
+        // App/File Icon & Name
+        DankIcon {
+            name: "image"
+            size: 20
+            color: Theme.primary
+        }
+
         Text {
             Layout.fillWidth: true
             text: ImageService.currentFileName || "DankView"
-            font.pixelSize: 14
+            font.family: Theme.fontFamily || "Google Sans Flex"
+            font.pixelSize: 13
             font.weight: Font.Medium
-            color: Theme.onSurface || "#ffffff"
+            color: Theme.surfaceText
             elide: Text.ElideMiddle
         }
 
-        // Center: Counter e.g. "3 / 12"
+        // Center: Counter badge e.g. "3 / 12"
         Rectangle {
             visible: ImageService.fileList.length > 0
-            height: 28
+            height: 26
             width: counterText.implicitWidth + 16
-            radius: 14
-            color: Theme.surfaceContainerHigh || "#333333"
+            radius: 13
+            color: Theme.surfaceContainerHighest
 
             Text {
                 id: counterText
                 anchors.centerIn: parent
                 text: (ImageService.currentIndex + 1) + " / " + ImageService.fileList.length
-                font.pixelSize: 12
-                color: Theme.onSurfaceVariant || "#cccccc"
+                font.family: Theme.fontFamily || "Google Sans Flex"
+                font.pixelSize: 11
+                font.weight: Font.Medium
+                color: Theme.surfaceVariantText
             }
         }
 
-        // Right actions
-        // Zoom % button
+        // Zoom percentage badge
         Rectangle {
-            height: 32
-            width: zoomText.implicitWidth + 20
-            radius: 16
-            color: zoomMouse.containsMouse ? (Theme.surfaceContainerHighest || "#444444") : (Theme.surfaceContainerHigh || "#333333")
+            height: 28
+            width: zoomRow.implicitWidth + 14
+            radius: 14
+            color: zoomMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
 
-            Text {
-                id: zoomText
+            RowLayout {
+                id: zoomRow
                 anchors.centerIn: parent
-                text: Math.round(ImageService.zoom * 100) + "%"
-                font.pixelSize: 12
-                font.weight: Font.Medium
-                color: Theme.onSurface || "#ffffff"
+                spacing: 4
+
+                DankIcon {
+                    name: "zoom_in"
+                    size: 14
+                    color: Theme.surfaceVariantText
+                }
+
+                Text {
+                    text: Math.round(ImageService.zoom * 100) + "%"
+                    font.family: Theme.fontFamily || "Google Sans Flex"
+                    font.pixelSize: 11
+                    font.weight: Font.Medium
+                    color: Theme.surfaceText
+                }
             }
 
             MouseArea {
@@ -70,50 +106,68 @@ Rectangle {
             }
         }
 
-        // Inspector Toggle Button
+        // Inspector Toggle
+        DankActionButton {
+            iconName: "info"
+            iconSize: 18
+            iconColor: ImageService.inspectorOpen ? Theme.primary : Theme.surfaceText
+            backgroundColor: ImageService.inspectorOpen ? Theme.surfaceContainerHighest : "transparent"
+            tooltipText: "Image Properties (I)"
+            tooltipSide: "bottom"
+            onClicked: ImageService.toggleInspector()
+        }
+
+        // Fullscreen Toggle
+        DankActionButton {
+            iconName: ImageService.isFullscreen ? "fullscreen_exit" : "fullscreen"
+            iconSize: 18
+            iconColor: Theme.surfaceText
+            tooltipText: ImageService.isFullscreen ? "Exit Fullscreen (F)" : "Fullscreen (F)"
+            tooltipSide: "bottom"
+            onClicked: ImageService.toggleFullscreen()
+        }
+
         Rectangle {
-            width: 32
-            height: 32
-            radius: 16
-            color: ImageService.inspectorOpen ? (Theme.primary || "#3b82f6") : (infoMouse.containsMouse ? (Theme.surfaceContainerHighest || "#444444") : "transparent")
+            width: 1
+            height: 18
+            color: Theme.outlineVariant
+            opacity: 0.4
+        }
 
-            Text {
-                anchors.centerIn: parent
-                text: "ℹ"
-                font.pixelSize: 14
-                color: ImageService.inspectorOpen ? (Theme.onPrimary || "#ffffff") : (Theme.onSurface || "#ffffff")
-            }
-
-            MouseArea {
-                id: infoMouse
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: ImageService.toggleInspector()
+        // Window Controls (minimize, maximize, close)
+        DankActionButton {
+            visible: root.windowControls && root.windowControls.canMinimize
+            iconName: "minimize"
+            iconSize: 16
+            iconColor: Theme.surfaceText
+            tooltipText: "Minimize"
+            tooltipSide: "bottom"
+            onClicked: {
+                if (root.windowControls)
+                    root.windowControls.tryMinimize();
             }
         }
 
-        // Fullscreen Toggle Button
-        Rectangle {
-            width: 32
-            height: 32
-            radius: 16
-            color: fsMouse.containsMouse ? (Theme.surfaceContainerHighest || "#444444") : "transparent"
-
-            Text {
-                anchors.centerIn: parent
-                text: ImageService.isFullscreen ? "⤦" : "⤢"
-                font.pixelSize: 15
-                color: Theme.onSurface || "#ffffff"
+        DankActionButton {
+            visible: root.windowControls && root.windowControls.supported
+            iconName: "crop_square"
+            iconSize: 15
+            iconColor: Theme.surfaceText
+            tooltipText: "Maximize"
+            tooltipSide: "bottom"
+            onClicked: {
+                if (root.windowControls)
+                    root.windowControls.tryToggleMaximize();
             }
+        }
 
-            MouseArea {
-                id: fsMouse
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: ImageService.toggleFullscreen()
-            }
+        DankActionButton {
+            iconName: "close"
+            iconSize: 18
+            iconColor: Theme.surfaceText
+            tooltipText: "Close"
+            tooltipSide: "bottom"
+            onClicked: Qt.quit()
         }
     }
 }
