@@ -186,6 +186,15 @@ FloatingWindow {
             anchors.fill: parent
         }
 
+        // Dismiss inspector when clicking outside it
+        MouseArea {
+            anchors.fill: parent
+            enabled: ImageService.inspectorOpen
+            visible: enabled
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: ImageService.inspectorOpen = false
+        }
+
         // Top Header Bar
         ImageHeaderBar {
             id: headerBar
