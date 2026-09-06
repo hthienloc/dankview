@@ -41,6 +41,7 @@ Item {
             ]
 
             Behavior on rotation {
+                enabled: !ImageService.resettingTransform
                 NumberAnimation {
                     duration: 180
                     easing.type: Easing.OutCubic

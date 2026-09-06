@@ -20,6 +20,8 @@ Singleton {
     property var currentMeta: ({})
     property real zoom: 1.0
     property int rotation: 0
+    readonly property int normalizedRotation: ((rotation % 360) + 360) % 360
+    property bool resettingTransform: false
     property bool flipH: false
     property bool flipV: false
     property bool inspectorOpen: false
@@ -127,11 +129,11 @@ Singleton {
     }
 
     function rotateClockwise() {
-        rotation = (rotation + 90) % 360;
+        rotation += 90;
     }
 
     function rotateCounterClockwise() {
-        rotation = (rotation + 270) % 360;
+        rotation -= 90;
     }
 
     function toggleFlipHorizontal() {
@@ -157,12 +159,14 @@ Singleton {
     }
 
     function resetTransform() {
+        resettingTransform = true;
         zoom = 1.0;
         rotation = 0;
         flipH = false;
         flipV = false;
         panX = 0;
         panY = 0;
+        resettingTransform = false;
     }
 
     function toggleInspector() {
