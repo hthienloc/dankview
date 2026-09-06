@@ -8,10 +8,10 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	"github.com/AvengeMedia/dankview/core/internal/exif"
 	"github.com/AvengeMedia/dankview/core/internal/fs"
+	"github.com/AvengeMedia/dankview/core/internal/theme"
 )
 
 var (
@@ -19,51 +19,6 @@ var (
 	BuildTime = "unknown"
 	Commit    = "unknown"
 )
-
-func getSystemFontSettings() (family string, scale float64, mono string) {
-	scale = 1.0
-	home, err := os.UserHomeDir()
-	if err == nil {
-		dmsPath := filepath.Join(home, ".config", "DankMaterialShell", "settings.json")
-		if data, err := os.ReadFile(dmsPath); err == nil {
-			var s struct {
-				FontFamily     string  `json:"fontFamily"`
-				MonoFontFamily string  `json:"monoFontFamily"`
-				FontScale      float64 `json:"fontScale"`
-			}
-			if err := json.Unmarshal(data, &s); err == nil {
-				if s.FontFamily != "" {
-					family = s.FontFamily
-				}
-				if s.MonoFontFamily != "" {
-					mono = s.MonoFontFamily
-				}
-				if s.FontScale > 0 {
-					scale = s.FontScale
-				}
-			}
-		}
-	}
-
-	if family == "" {
-		out, err := exec.Command("gsettings", "get", "org.gnome.desktop.interface", "font-name").Output()
-		if err == nil {
-			f := strings.Trim(string(out), "'\n\" ")
-			fields := strings.Fields(f)
-			if len(fields) > 1 {
-				if _, err := strconv.ParseFloat(fields[len(fields)-1], 64); err == nil {
-					family = strings.Join(fields[:len(fields)-1], " ")
-				} else {
-					family = f
-				}
-			} else {
-				family = f
-			}
-		}
-	}
-
-	return family, scale, mono
-}
 
 func findQuickshellDir(specified string) (string, error) {
 	if specified != "" {
@@ -191,15 +146,16 @@ func main() {
 		"DVIEW_DIR="+imgList.Directory,
 		"DVIEW_INDEX="+strconv.Itoa(imgList.CurrentIndex),
 	)
-	sysFont, sysScale, sysMono := getSystemFontSettings()
-	if sysFont != "" {
-		env = append(env, "DVIEW_FONT_FAMILY="+sysFont)
+
+	fontCfg := theme.GetSystemFontSettings()
+	if fontCfg.Family != "" {
+		env = append(env, "DVIEW_FONT_FAMILY="+fontCfg.Family)
 	}
-	if sysScale > 0 {
-		env = append(env, fmt.Sprintf("DVIEW_FONT_SCALE=%.2f", sysScale))
+	if fontCfg.Scale > 0 {
+		env = append(env, fmt.Sprintf("DVIEW_FONT_SCALE=%.2f", fontCfg.Scale))
 	}
-	if sysMono != "" {
-		env = append(env, "DVIEW_MONO_FONT="+sysMono)
+	if fontCfg.Mono != "" {
+		env = append(env, "DVIEW_MONO_FONT="+fontCfg.Mono)
 	}
 	if *fullscreen {
 		env = append(env, "DVIEW_FULLSCREEN=1")
