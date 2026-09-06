@@ -42,15 +42,6 @@ Rectangle {
             color: Theme.primary
         }
 
-        DankActionButton {
-            iconName: "folder_open"
-            iconSize: 19
-            iconColor: Theme.surfaceText
-            tooltipText: "Open Image (Ctrl+O)"
-            tooltipSide: "bottom"
-            onClicked: ImageService.openFileDialog()
-        }
-
         Text {
             Layout.fillWidth: true
             text: ImageService.currentFileName || "DankView"
@@ -151,6 +142,16 @@ Rectangle {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: ImageService.resetZoom()
             }
+        }
+
+        // Open File Action
+        DankActionButton {
+            iconName: "folder_open"
+            iconSize: 19
+            iconColor: Theme.surfaceText
+            tooltipText: "Open Image (Ctrl+O)"
+            tooltipSide: "bottom"
+            onClicked: ImageService.openFileDialog()
         }
 
         // Inspector Toggle
