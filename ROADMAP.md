@@ -34,7 +34,7 @@ Feature parity and tracking against [GNOME Loupe](https://gitlab.gnome.org/GNOME
 ## 3. Playback & Media Handling
 
 - [x] **Animated Image Playback Controls**:
-  - Play/Pause toggle badge on header (`Play` / `Pause`) and `Space` key shortcut for animated GIF / WebP.
+  - Play/Pause toggle badge on header (`Play` / `Pause`) for animated GIF / WebP.
 - [ ] Frame scrubber / seek slider for multi-frame animations.
 - [ ] **Extended Format Decoding**:
   - Native AVIF / HEIC / JXL support verification via Qt image plugins.
