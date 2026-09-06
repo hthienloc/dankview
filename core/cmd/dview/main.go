@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/AvengeMedia/dankview/core/internal/exif"
-	"github.com/AvengeMedia/dankview/core/internal/fs"
-	"github.com/AvengeMedia/dankview/core/internal/theme"
+	"github.com/hthienloc/dankview/core/internal/exif"
+	"github.com/hthienloc/dankview/core/internal/fs"
+	"github.com/hthienloc/dankview/core/internal/theme"
 )
 
 var (
