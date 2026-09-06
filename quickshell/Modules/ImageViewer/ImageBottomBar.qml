@@ -28,28 +28,6 @@ Rectangle {
         spacing: 5
 
         DankActionButton {
-            iconName: "chevron_left"
-            iconSize: 22
-            iconColor: Theme.surfaceText
-            buttonSize: 38
-            tooltipText: "Previous Image (Left)"
-            tooltipSide: "top"
-            onClicked: ImageService.prevImage()
-        }
-
-        DankActionButton {
-            iconName: "chevron_right"
-            iconSize: 22
-            iconColor: Theme.surfaceText
-            buttonSize: 38
-            tooltipText: "Next Image (Right)"
-            tooltipSide: "top"
-            onClicked: ImageService.nextImage()
-        }
-
-        BarSeparator {}
-
-        DankActionButton {
             iconName: "rotate_left"
             iconSize: 20
             iconColor: Theme.surfaceText
