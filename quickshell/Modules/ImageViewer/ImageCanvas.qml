@@ -98,17 +98,6 @@ Item {
             }
         }
 
-        // Mouse wheel for zooming
-        WheelHandler {
-            target: null
-            onWheel: event => {
-                if (event.angleDelta.y > 0) {
-                    ImageService.zoomIn();
-                } else if (event.angleDelta.y < 0) {
-                    ImageService.zoomOut();
-                }
-            }
-        }
 
         // Pinch handler for trackpad gestures
         PinchHandler {
@@ -127,10 +116,20 @@ Item {
             }
         }
 
-        // MouseArea for double-click and drag fallback
+        // MouseArea for double-click, drag, and mouse wheel zoom
         MouseArea {
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+            hoverEnabled: false
+
+            onWheel: wheel => {
+                if (wheel.angleDelta.y > 0) {
+                    ImageService.zoomIn();
+                } else if (wheel.angleDelta.y < 0) {
+                    ImageService.zoomOut();
+                }
+                wheel.accepted = true;
+            }
 
             onDoubleClicked: {
                 if (Math.abs(ImageService.zoom - 1.0) < 0.1) {
