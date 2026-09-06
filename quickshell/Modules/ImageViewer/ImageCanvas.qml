@@ -9,7 +9,10 @@ Item {
 
     clip: true
 
-    readonly property string source: ImageService.currentFilePath ? "file://" + ImageService.currentFilePath : ""
+    readonly property string source: {
+        if (!ImageService.currentFilePath) return "";
+        return "file://" + encodeURI(ImageService.currentFilePath).replace(/#/g, "%23").replace(/\?/g, "%3F");
+    }
     readonly property bool hasImage: ImageService.currentFilePath !== ""
 
     // Contrast background + checkerboard for transparent images
