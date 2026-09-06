@@ -14,6 +14,7 @@ Item {
     signal cropped(int x, int y, int w, int h)
     signal saveCopyRequested(int x, int y, int w, int h)
     signal saveAsRequested(int x, int y, int w, int h)
+    signal copyRequested(int x, int y, int w, int h)
     signal cancelled()
 
     property bool promptVisible: false
@@ -680,6 +681,64 @@ Item {
                             root.promptVisible = false;
                             if (root.pendingCrop) {
                                 root.saveCopyRequested(root.pendingCrop.x, root.pendingCrop.y, root.pendingCrop.w, root.pendingCrop.h);
+                            }
+                        }
+                    }
+                }
+
+                // Option: Copy to Clipboard
+                Rectangle {
+                    Layout.fillWidth: true
+                    implicitHeight: optCopyRow.implicitHeight + 20
+                    radius: 12
+                    color: optCopyMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerLow
+                    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.25)
+                    border.width: 1
+
+                    RowLayout {
+                        id: optCopyRow
+                        anchors.fill: parent
+                        anchors.margins: 12
+                        spacing: 12
+
+                        Rectangle {
+                            width: 36; height: 36; radius: 8
+                            color: Theme.surfaceContainerHigh
+                            DankIcon { anchors.centerIn: parent; name: "content_copy"; size: 20; color: Theme.surfaceText }
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 2
+                            Text {
+                                text: "Copy to Clipboard"
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.fontSizeMedium
+                                font.weight: Font.DemiBold
+                                color: Theme.surfaceText
+                            }
+                            Text {
+                                Layout.fillWidth: true
+                                text: "Copy cropped image directly to clipboard without saving to disk."
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                wrapMode: Text.WordWrap
+                            }
+                        }
+
+                        DankIcon { name: "chevron_right"; size: 18; color: Theme.surfaceVariantText; opacity: optCopyMouse.containsMouse ? 1.0 : 0.4 }
+                    }
+
+                    MouseArea {
+                        id: optCopyMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            root.promptVisible = false;
+                            if (root.pendingCrop) {
+                                root.copyRequested(root.pendingCrop.x, root.pendingCrop.y, root.pendingCrop.w, root.pendingCrop.h);
                             }
                         }
                     }

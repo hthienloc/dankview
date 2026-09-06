@@ -411,6 +411,31 @@ Singleton {
         }
     }
 
+    // Called by CropOverlay to copy cropped image to clipboard without saving a file
+    function copyCropToClipboard(x, y, w, h) {
+        cropMode = false;
+        if (!currentFilePath) return;
+
+        copyCropProc.command = [
+            "sh", "-c",
+            "magick " + JSON.stringify(currentFilePath) + " -crop " + w + "x" + h + "+" + x + "+" + y + " +repage png:- | (dms cl copy -t image/png 2>/dev/null || wl-copy -t image/png)"
+        ];
+        copyCropProc.running = true;
+    }
+
+    Process {
+        id: copyCropProc
+        running: false
+        command: []
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                root.showToast("Cropped image copied to clipboard");
+            } else {
+                root.showToast("Failed to copy to clipboard", true);
+            }
+        }
+    }
+
     Process {
         id: cropProc
         running: false
