@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import qs.Common
@@ -197,10 +196,15 @@ Rectangle {
                     }
                 }
 
-                Slider {
+                DankSlider {
                     id: qualitySlider
                     Layout.fillWidth: true
-                    from: 10; to: 100; stepSize: 1; value: 90
+                    height: 36
+                    minimum: 10
+                    maximum: 100
+                    step: 1
+                    value: 90
+                    unit: "%"
                 }
             }
 
