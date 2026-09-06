@@ -69,8 +69,8 @@ Item {
             Behavior on rotation {
                 enabled: !ImageService.resettingTransform
                 NumberAnimation {
-                    duration: 180
-                    easing.type: Easing.OutCubic
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
                 }
             }
 
@@ -164,7 +164,10 @@ Item {
             opacity: parent.containsMouse ? 0.9 : 0.0
 
             Behavior on opacity {
-                NumberAnimation { duration: 150 }
+                NumberAnimation {
+                    duration: Theme.shorterDuration
+                    easing.type: Theme.standardEasing
+                }
             }
 
             DankIcon {
@@ -197,7 +200,10 @@ Item {
             opacity: parent.containsMouse ? 0.9 : 0.0
 
             Behavior on opacity {
-                NumberAnimation { duration: 150 }
+                NumberAnimation {
+                    duration: Theme.shorterDuration
+                    easing.type: Theme.standardEasing
+                }
             }
 
             DankIcon {

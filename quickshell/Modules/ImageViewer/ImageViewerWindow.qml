@@ -136,7 +136,10 @@ FloatingWindow {
             visible: opacity > 0
 
             Behavior on opacity {
-                NumberAnimation { duration: 200 }
+                NumberAnimation {
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
+                }
             }
         }
 
@@ -150,7 +153,10 @@ FloatingWindow {
             visible: opacity > 0
 
             Behavior on opacity {
-                NumberAnimation { duration: 200 }
+                NumberAnimation {
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
+                }
             }
         }
 
@@ -165,8 +171,8 @@ FloatingWindow {
 
             Behavior on anchors.rightMargin {
                 NumberAnimation {
-                    duration: 220
-                    easing.type: Easing.OutCubic
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
                 }
             }
         }
