@@ -81,11 +81,17 @@ Item {
                 id: imageElement
                 anchors.centerIn: parent
                 source: root.source
+                playing: true
                 asynchronous: true
                 fillMode: Image.PreserveAspectFit
                 smooth: true
                 mipmap: true
-                cache: true
+                cache: false
+
+                onSourceChanged: {
+                    playing = true;
+                    currentFrame = 0;
+                }
 
                 // Scale up or down to fit viewport initially if needed
                 property real fitScale: {
