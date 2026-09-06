@@ -57,8 +57,34 @@ FloatingWindow {
                 ImageService.zoomOut();
                 event.accepted = true;
                 break;
+            case Qt.Key_1:
+                if (event.modifiers & Qt.ControlModifier) {
+                    ImageService.actualSize();
+                    event.accepted = true;
+                }
+                break;
             case Qt.Key_0:
-                ImageService.resetTransform();
+                ImageService.fitToWindow();
+                event.accepted = true;
+                break;
+            case Qt.Key_O:
+                if (event.modifiers & Qt.ControlModifier) {
+                    ImageService.openFileDialog();
+                    event.accepted = true;
+                }
+                break;
+            case Qt.Key_M:
+                if (event.modifiers & Qt.ControlModifier) {
+                    ImageService.toggleFlipHorizontal();
+                    event.accepted = true;
+                }
+                break;
+            case Qt.Key_H:
+                ImageService.toggleFlipHorizontal();
+                event.accepted = true;
+                break;
+            case Qt.Key_V:
+                ImageService.toggleFlipVertical();
                 event.accepted = true;
                 break;
             case Qt.Key_R:

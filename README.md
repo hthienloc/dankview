@@ -22,10 +22,14 @@ Frontend: **Quickshell (QtQuick/QML)**. Backend: **Go**.
 | `Left` / `Backspace` / `PageUp` | Previous image |
 | `+` / `=` / `Wheel Up` | Zoom in |
 | `-` / `Wheel Down` | Zoom out |
-| `0` | Reset zoom and transformations |
+| `0` | Fit to window (best fit) |
+| `Ctrl + 1` | Actual size 100% (1:1 pixel scale) |
 | `Double Click` | Toggle 200% zoom / 100% fit |
 | `r` / `Shift + r` | Rotate clockwise / counter-clockwise (90°) |
+| `Ctrl + M` / `h` | Flip horizontally |
+| `v` | Flip vertically |
 | `f` / `F11` | Toggle maximize / fullscreen |
+| `Ctrl + O` | Open image dialog |
 | `i` | Toggle EXIF inspector |
 | `Ctrl + C` | Copy image to clipboard |
 | `Delete` | Move image to trash (`gio trash`) |

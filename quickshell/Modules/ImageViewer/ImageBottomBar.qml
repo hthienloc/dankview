@@ -80,13 +80,23 @@ Rectangle {
         }
 
         DankActionButton {
+            iconName: "fit_screen"
+            iconSize: 20
+            iconColor: Theme.surfaceText
+            buttonSize: 38
+            tooltipText: "Fit to Window (0)"
+            tooltipSide: "top"
+            onClicked: ImageService.fitToWindow()
+        }
+
+        DankActionButton {
             iconName: "aspect_ratio"
             iconSize: 20
             iconColor: Theme.surfaceText
             buttonSize: 38
-            tooltipText: "Actual Size 100% (0)"
+            tooltipText: "Actual Size 100% (Ctrl+1)"
             tooltipSide: "top"
-            onClicked: ImageService.resetZoom()
+            onClicked: ImageService.actualSize()
         }
 
         BarSeparator {}

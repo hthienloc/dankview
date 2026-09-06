@@ -93,6 +93,10 @@ Item {
                     return Math.min(1.0, Math.min(scaleX, scaleY));
                 }
 
+                onFitScaleChanged: {
+                    ImageService.fitScale = fitScale;
+                }
+
                 width: implicitWidth > 0 ? implicitWidth * fitScale : 400
                 height: implicitHeight > 0 ? implicitHeight * fitScale : 300
             }

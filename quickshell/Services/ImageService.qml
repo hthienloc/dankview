@@ -19,6 +19,7 @@ Singleton {
 
     property var currentMeta: ({})
     property real zoom: 1.0
+    property real fitScale: 1.0
     property int rotation: 0
     readonly property int normalizedRotation: ((rotation % 360) + 360) % 360
     property bool resettingTransform: false
@@ -167,6 +168,27 @@ Singleton {
         flipV = !flipV;
     }
 
+    Process {
+        id: openDialogProc
+        running: false
+        command: [
+            "sh", "-c",
+            "zenity --file-selection --title=\"Open Image\" --file-filter=\"Images | *.jpg *.jpeg *.png *.webp *.svg *.gif *.bmp *.avif *.heic *.tiff\" 2>/dev/null || kdialog --getopenfilename . \"*.jpg *.jpeg *.png *.webp *.svg *.gif *.bmp *.avif *.heic *.tiff\" 2>/dev/null"
+        ]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const picked = text.trim();
+                if (picked.length > 0) {
+                    root.loadDirectoryFor(picked);
+                }
+            }
+        }
+    }
+
+    function openFileDialog() {
+        openDialogProc.running = true;
+    }
+
     function zoomAt(factor, cursorX, cursorY, vpWidth, vpHeight) {
         const oldZoom = zoom;
         const newZoom = Math.max(0.05, Math.min(30.0, oldZoom * factor));
@@ -190,10 +212,24 @@ Singleton {
         zoom = Math.max(zoom / 1.25, 0.05);
     }
 
-    function resetZoom() {
+    function fitToWindow() {
         zoom = 1.0;
         panX = 0;
         panY = 0;
+    }
+
+    function actualSize() {
+        panX = 0;
+        panY = 0;
+        if (fitScale > 0) {
+            zoom = 1.0 / fitScale;
+        } else {
+            zoom = 1.0;
+        }
+    }
+
+    function resetZoom() {
+        fitToWindow();
     }
 
     function resetTransform() {
