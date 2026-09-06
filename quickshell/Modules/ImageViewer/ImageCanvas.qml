@@ -81,15 +81,24 @@ Item {
                 id: imageElement
                 anchors.centerIn: parent
                 source: root.source
-                playing: true
+                playing: ImageService.isPlaying
                 asynchronous: true
                 fillMode: Image.PreserveAspectFit
                 smooth: true
                 mipmap: true
                 cache: false
 
+                onFrameCountChanged: {
+                    ImageService.frameCount = frameCount;
+                    ImageService.isAnimated = frameCount > 1;
+                }
+
+                onCurrentFrameChanged: {
+                    ImageService.currentFrame = currentFrame;
+                }
+
                 onSourceChanged: {
-                    playing = true;
+                    ImageService.isPlaying = true;
                     currentFrame = 0;
                 }
 

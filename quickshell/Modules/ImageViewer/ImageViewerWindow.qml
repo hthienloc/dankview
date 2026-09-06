@@ -44,8 +44,15 @@ FloatingWindow {
                 break;
             case Qt.Key_Right:
             case Qt.Key_PageDown:
-            case Qt.Key_Space:
                 ImageService.nextImage();
+                event.accepted = true;
+                break;
+            case Qt.Key_Space:
+                if (ImageService.isAnimated) {
+                    ImageService.togglePlayback();
+                } else {
+                    ImageService.nextImage();
+                }
                 event.accepted = true;
                 break;
             case Qt.Key_Plus:

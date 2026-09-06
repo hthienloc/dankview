@@ -61,6 +61,43 @@ Rectangle {
             elide: Text.ElideMiddle
         }
 
+        // Center: Animated Image Play/Pause Control
+        Rectangle {
+            visible: ImageService.isAnimated
+            height: 30
+            width: playPauseRow.implicitWidth + 16
+            radius: 15
+            color: playPauseMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
+
+            RowLayout {
+                id: playPauseRow
+                anchors.centerIn: parent
+                spacing: 4
+
+                DankIcon {
+                    name: ImageService.isPlaying ? "pause" : "play_arrow"
+                    size: 18
+                    color: Theme.primary
+                }
+
+                Text {
+                    text: ImageService.isPlaying ? "Pause" : "Play"
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontSizeSmall
+                    font.weight: Font.Medium
+                    color: Theme.surfaceText
+                }
+            }
+
+            MouseArea {
+                id: playPauseMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: ImageService.togglePlayback()
+            }
+        }
+
         // Center: Counter badge e.g. "3 / 12"
         Rectangle {
             visible: ImageService.fileList.length > 0

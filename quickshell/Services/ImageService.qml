@@ -25,10 +25,18 @@ Singleton {
     property bool resettingTransform: false
     property bool flipH: false
     property bool flipV: false
+    property bool isAnimated: false
+    property bool isPlaying: true
+    property int currentFrame: 0
+    property int frameCount: 1
     property bool inspectorOpen: false
     property bool isFullscreen: Quickshell.env("DVIEW_FULLSCREEN") === "1"
     property real panX: 0
     property real panY: 0
+
+    function togglePlayback() {
+        isPlaying = !isPlaying;
+    }
 
     onCurrentFilePathChanged: {
         resetTransform();
