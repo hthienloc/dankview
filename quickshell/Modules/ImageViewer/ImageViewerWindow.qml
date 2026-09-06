@@ -22,7 +22,7 @@ FloatingWindow {
         interval: 3000
         repeat: false
         onTriggered: {
-            if (!headerBar.containsMouse && !bottomBar.containsMouse && !ImageService.inspectorOpen) {
+            if (!headerHover.hovered && !bottomHover.hovered && !ImageService.inspectorOpen) {
                 window.showOverlays = false;
             }
         }
@@ -135,6 +135,10 @@ FloatingWindow {
             opacity: window.showOverlays || ImageService.inspectorOpen ? 1.0 : 0.0
             visible: opacity > 0
 
+            HoverHandler {
+                id: headerHover
+            }
+
             Behavior on opacity {
                 NumberAnimation {
                     duration: Theme.shortDuration
@@ -151,6 +155,10 @@ FloatingWindow {
             anchors.horizontalCenter: parent.horizontalCenter
             opacity: window.showOverlays && !ImageService.inspectorOpen ? 1.0 : 0.0
             visible: opacity > 0
+
+            HoverHandler {
+                id: bottomHover
+            }
 
             Behavior on opacity {
                 NumberAnimation {
