@@ -560,6 +560,64 @@ Rectangle {
                         }
                     }
                 }
+
+                // Section 4: GPS Coordinates (if available in EXIF)
+                ColumnLayout {
+                    visible: ImageService.currentMeta.gpsPosition !== undefined && ImageService.currentMeta.gpsPosition !== ""
+                    Layout.fillWidth: true
+                    spacing: 8
+
+                    SectionHeader {
+                        title: "GPS Location"
+                        iconName: "location_on"
+                    }
+
+                    M3Card {
+                        implicitHeight: gpsCol.implicitHeight + 24
+
+                        ColumnLayout {
+                            id: gpsCol
+                            anchors.fill: parent
+                            anchors.margins: 12
+                            spacing: 12
+
+                            DetailRow {
+                                label: "Coordinates"
+                                value: ImageService.currentMeta.gpsPosition || ""
+                                isMono: true
+                            }
+
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: 8
+
+                                ActionChip {
+                                    iconName: "map"
+                                    label: "Open in Maps"
+                                    onClicked: {
+                                        if (ImageService.currentMeta.mapsUrl) {
+                                            Quickshell.execDetached(["xdg-open", ImageService.currentMeta.mapsUrl]);
+                                        }
+                                    }
+                                }
+
+                                ActionChip {
+                                    iconName: "content_copy"
+                                    label: "Copy Coordinates"
+                                    onClicked: {
+                                        if (ImageService.currentMeta.gpsPosition) {
+                                            Quickshell.execDetached([
+                                                "sh", "-c",
+                                                "dms cl copy " + JSON.stringify(ImageService.currentMeta.gpsPosition) + " 2>/dev/null || wl-copy " + JSON.stringify(ImageService.currentMeta.gpsPosition)
+                                            ]);
+                                            ImageService.showToast("Coordinates copied to clipboard");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

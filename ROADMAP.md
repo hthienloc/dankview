@@ -27,7 +27,7 @@ Feature parity and tracking against [GNOME Loupe](https://gitlab.gnome.org/GNOME
 - [x] Image resolution, megapixels, format, file size, timestamps.
 - [x] Direct clipboard copy of image (`Ctrl+C`) and file path.
 - [x] Direct folder reveal (`xdg-open`).
-- [ ] GPS map coordinates link / preview (if GPS tags are present in EXIF).
+- [x] GPS map coordinates card with Open in Maps & Copy Coordinates actions (when GPS EXIF tags exist).
 
 ---
 
