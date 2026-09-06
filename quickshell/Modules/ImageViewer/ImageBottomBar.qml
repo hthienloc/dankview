@@ -8,16 +8,16 @@ import qs.DankCommon.Widgets
 Rectangle {
     id: root
 
-    height: 48
-    implicitWidth: layout.implicitWidth + 24
-    radius: 24
-    color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.92)
+    height: 52
+    implicitWidth: layout.implicitWidth + 28
+    radius: 26
+    color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.94)
     border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.35)
     border.width: 1
 
     component BarSeparator: Rectangle {
         width: 1
-        height: 20
+        height: 22
         color: Theme.outlineVariant
         opacity: 0.35
     }
@@ -25,13 +25,13 @@ Rectangle {
     RowLayout {
         id: layout
         anchors.centerIn: parent
-        spacing: 4
+        spacing: 5
 
         DankActionButton {
             iconName: "chevron_left"
-            iconSize: 20
+            iconSize: 22
             iconColor: Theme.surfaceText
-            buttonSize: 36
+            buttonSize: 38
             tooltipText: "Previous Image (Left)"
             tooltipSide: "top"
             onClicked: ImageService.prevImage()
@@ -39,9 +39,9 @@ Rectangle {
 
         DankActionButton {
             iconName: "chevron_right"
-            iconSize: 20
+            iconSize: 22
             iconColor: Theme.surfaceText
-            buttonSize: 36
+            buttonSize: 38
             tooltipText: "Next Image (Right)"
             tooltipSide: "top"
             onClicked: ImageService.nextImage()
@@ -51,9 +51,9 @@ Rectangle {
 
         DankActionButton {
             iconName: "rotate_left"
-            iconSize: 18
+            iconSize: 20
             iconColor: Theme.surfaceText
-            buttonSize: 36
+            buttonSize: 38
             tooltipText: "Rotate Counter-Clockwise (Shift+R)"
             tooltipSide: "top"
             onClicked: ImageService.rotateCounterClockwise()
@@ -61,9 +61,9 @@ Rectangle {
 
         DankActionButton {
             iconName: "rotate_right"
-            iconSize: 18
+            iconSize: 20
             iconColor: Theme.surfaceText
-            buttonSize: 36
+            buttonSize: 38
             tooltipText: "Rotate Clockwise (R)"
             tooltipSide: "top"
             onClicked: ImageService.rotateClockwise()
@@ -71,9 +71,9 @@ Rectangle {
 
         DankActionButton {
             iconName: "flip"
-            iconSize: 18
+            iconSize: 20
             iconColor: Theme.surfaceText
-            buttonSize: 36
+            buttonSize: 38
             tooltipText: "Flip Horizontally"
             tooltipSide: "top"
             onClicked: ImageService.toggleFlipHorizontal()
@@ -83,9 +83,9 @@ Rectangle {
 
         DankActionButton {
             iconName: "zoom_out"
-            iconSize: 18
+            iconSize: 20
             iconColor: Theme.surfaceText
-            buttonSize: 36
+            buttonSize: 38
             tooltipText: "Zoom Out (-)"
             tooltipSide: "top"
             onClicked: ImageService.zoomOut()
@@ -93,9 +93,9 @@ Rectangle {
 
         DankActionButton {
             iconName: "zoom_in"
-            iconSize: 18
+            iconSize: 20
             iconColor: Theme.surfaceText
-            buttonSize: 36
+            buttonSize: 38
             tooltipText: "Zoom In (+)"
             tooltipSide: "top"
             onClicked: ImageService.zoomIn()
@@ -103,9 +103,9 @@ Rectangle {
 
         DankActionButton {
             iconName: "aspect_ratio"
-            iconSize: 18
+            iconSize: 20
             iconColor: Theme.surfaceText
-            buttonSize: 36
+            buttonSize: 38
             tooltipText: "Actual Size 100% (0)"
             tooltipSide: "top"
             onClicked: ImageService.resetZoom()
@@ -115,9 +115,9 @@ Rectangle {
 
         DankActionButton {
             iconName: "content_copy"
-            iconSize: 18
+            iconSize: 20
             iconColor: Theme.surfaceText
-            buttonSize: 36
+            buttonSize: 38
             tooltipText: "Copy to Clipboard (Ctrl+C)"
             tooltipSide: "top"
             onClicked: ImageService.copyToClipboard()
@@ -125,9 +125,9 @@ Rectangle {
 
         DankActionButton {
             iconName: "delete"
-            iconSize: 18
+            iconSize: 20
             iconColor: Theme.error
-            buttonSize: 36
+            buttonSize: 38
             tooltipText: "Move to Trash (Delete)"
             tooltipSide: "top"
             onClicked: ImageService.moveToTrash()

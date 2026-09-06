@@ -8,7 +8,7 @@ import qs.DankCommon.Widgets
 Rectangle {
     id: root
 
-    width: 340
+    width: 360
     color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.96)
     border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.3)
     border.width: 1
@@ -22,7 +22,7 @@ Rectangle {
 
         DankIcon {
             name: iconName
-            size: 16
+            size: 18
             color: Theme.primary
         }
 
@@ -30,7 +30,7 @@ Rectangle {
             Layout.fillWidth: true
             text: title
             font.family: Theme.fontFamily || "Google Sans Flex"
-            font.pixelSize: 12
+            font.pixelSize: 13
             font.weight: Font.DemiBold
             color: Theme.primary
         }
@@ -45,10 +45,10 @@ Rectangle {
         spacing: 12
 
         Text {
-            Layout.preferredWidth: 100
+            Layout.preferredWidth: 105
             text: label
             font.family: Theme.fontFamily || "Google Sans Flex"
-            font.pixelSize: 12
+            font.pixelSize: 13
             color: Theme.surfaceVariantText
         }
 
@@ -56,7 +56,7 @@ Rectangle {
             Layout.fillWidth: true
             text: value
             font.family: Theme.fontFamily || "Google Sans Flex"
-            font.pixelSize: 12
+            font.pixelSize: 13
             font.weight: Font.Medium
             color: Theme.surfaceText
             wrapMode: Text.WrapAnywhere
@@ -75,7 +75,7 @@ Rectangle {
 
             DankIcon {
                 name: "info"
-                size: 20
+                size: 22
                 color: Theme.primary
             }
 
@@ -83,14 +83,14 @@ Rectangle {
                 Layout.fillWidth: true
                 text: "Image Properties"
                 font.family: Theme.fontFamily || "Google Sans Flex"
-                font.pixelSize: 15
+                font.pixelSize: 16
                 font.weight: Font.DemiBold
                 color: Theme.surfaceText
             }
 
             DankActionButton {
                 iconName: "close"
-                iconSize: 18
+                iconSize: 20
                 iconColor: Theme.surfaceText
                 tooltipText: "Close Inspector (I)"
                 tooltipSide: "left"
@@ -113,15 +113,15 @@ Rectangle {
 
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: fileCol.implicitHeight + 16
+            implicitHeight: fileCol.implicitHeight + 18
             radius: 12
             color: Theme.surfaceContainerHigh
 
             ColumnLayout {
                 id: fileCol
                 anchors.fill: parent
-                anchors.margins: 10
-                spacing: 8
+                anchors.margins: 12
+                spacing: 10
 
                 InfoRow {
                     label: "Name"
@@ -156,15 +156,15 @@ Rectangle {
         Rectangle {
             visible: ImageService.currentMeta.cameraModel !== undefined && ImageService.currentMeta.cameraModel !== ""
             Layout.fillWidth: true
-            implicitHeight: exifCol.implicitHeight + 16
+            implicitHeight: exifCol.implicitHeight + 18
             radius: 12
             color: Theme.surfaceContainerHigh
 
             ColumnLayout {
                 id: exifCol
                 anchors.fill: parent
-                anchors.margins: 10
-                spacing: 8
+                anchors.margins: 12
+                spacing: 10
 
                 InfoRow {
                     label: "Camera"
@@ -200,27 +200,27 @@ Rectangle {
         // Location path card
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: pathCol.implicitHeight + 16
+            implicitHeight: pathCol.implicitHeight + 18
             radius: 12
             color: Theme.surfaceContainerLowest
 
             ColumnLayout {
                 id: pathCol
                 anchors.fill: parent
-                anchors.margins: 10
-                spacing: 4
+                anchors.margins: 12
+                spacing: 6
 
                 RowLayout {
                     spacing: 6
                     DankIcon {
                         name: "folder"
-                        size: 14
+                        size: 16
                         color: Theme.surfaceVariantText
                     }
                     Text {
                         text: "File Path"
                         font.family: Theme.fontFamily || "Google Sans Flex"
-                        font.pixelSize: 11
+                        font.pixelSize: 12
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
                     }
@@ -230,7 +230,7 @@ Rectangle {
                     Layout.fillWidth: true
                     text: ImageService.currentFilePath
                     font.family: Theme.fontFamily || "Google Sans Flex"
-                    font.pixelSize: 11
+                    font.pixelSize: 12
                     color: Theme.surfaceText
                     wrapMode: Text.WrapAnywhere
                 }

@@ -71,7 +71,7 @@ FloatingWindow {
                 break;
             case Qt.Key_F:
             case Qt.Key_F11:
-                ImageService.toggleFullscreen();
+                windowControls.tryToggleMaximize();
                 event.accepted = true;
                 break;
             case Qt.Key_I:
@@ -92,8 +92,8 @@ FloatingWindow {
                 if (ImageService.inspectorOpen) {
                     ImageService.inspectorOpen = false;
                     event.accepted = true;
-                } else if (ImageService.isFullscreen) {
-                    ImageService.isFullscreen = false;
+                } else if (window.maximized) {
+                    windowControls.tryToggleMaximize();
                     event.accepted = true;
                 } else {
                     Qt.quit();
@@ -128,6 +128,7 @@ FloatingWindow {
         ImageHeaderBar {
             id: headerBar
             windowControls: windowControls
+            targetWindow: window
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
