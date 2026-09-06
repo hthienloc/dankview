@@ -43,7 +43,7 @@ Feature parity and tracking against [GNOME Loupe](https://gitlab.gnome.org/GNOME
 
 ## 4. Desktop Integration & Actions
 
-- [x] **Desktop Wallpaper Integration**: Set current image as wallpaper via `dms ipc call wallpaper set` (falls back to `swww`, then `swaybg`). Header button + `Ctrl+W`.
+- [x] **Desktop Wallpaper Integration**: Set current image as wallpaper via `dms ipc call wallpaper set` (falls back to `swww`, then `swaybg`). Action chip in Image Properties panel + `Ctrl+W`.
 - [ ] **Print Support (`Ctrl+P`)**: Launch system print portal (`org.freedesktop.portal.Print`).
 - [x] **Trash & Undo**:
   - Send to trash (`Delete`).

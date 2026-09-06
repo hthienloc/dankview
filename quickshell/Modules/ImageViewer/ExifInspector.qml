@@ -319,6 +319,12 @@ Rectangle {
                                 label: "Open Folder"
                                 onClicked: ImageService.openContainingFolder()
                             }
+
+                            ActionChip {
+                                iconName: "wallpaper"
+                                label: "Set as Wallpaper"
+                                onClicked: ImageService.setAsWallpaper()
+                            }
                         }
                     }
                 }

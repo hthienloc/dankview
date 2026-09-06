@@ -154,16 +154,6 @@ Rectangle {
             onClicked: ImageService.openFileDialog()
         }
 
-        // Set as Wallpaper Action
-        DankActionButton {
-            iconName: "wallpaper"
-            iconSize: 19
-            iconColor: Theme.surfaceText
-            tooltipText: "Set as Wallpaper (Ctrl+W)"
-            tooltipSide: "bottom"
-            onClicked: ImageService.setAsWallpaper()
-        }
-
         // Inspector Toggle
         DankActionButton {
             iconName: "info"
