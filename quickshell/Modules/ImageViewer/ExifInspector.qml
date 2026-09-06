@@ -325,6 +325,12 @@ Rectangle {
                                 label: "Set as Wallpaper"
                                 onClicked: ImageService.setAsWallpaper()
                             }
+
+                            ActionChip {
+                                iconName: "print"
+                                label: "Print"
+                                onClicked: ImageService.printImage()
+                            }
                         }
                     }
                 }

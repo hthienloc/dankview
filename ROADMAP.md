@@ -44,7 +44,7 @@ Feature parity and tracking against [GNOME Loupe](https://gitlab.gnome.org/GNOME
 ## 4. Desktop Integration & Actions
 
 - [x] **Desktop Wallpaper Integration**: Set current image as wallpaper via `dms ipc call wallpaper set`. Action chip in Image Properties panel + `Ctrl+W`.
-- [ ] **Print Support (`Ctrl+P`)**: Launch system print portal (`org.freedesktop.portal.Print`).
+- [x] **Print Support (`Ctrl+P`)**: Send to printer via `lp`. Action chip in Image Properties panel + `Ctrl+P`.
 - [x] **Trash & Undo**:
   - Send to trash (`Delete`).
   - Undo trash action (`Ctrl+Z`).

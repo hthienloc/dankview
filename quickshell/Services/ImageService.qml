@@ -174,6 +174,19 @@ Singleton {
         }
     }
 
+    Process {
+        id: printProc
+        running: false
+        command: []
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                root.showToast("Sent to printer");
+            } else {
+                root.showToast("Print failed — no printer available", true);
+            }
+        }
+    }
+
     function nextImage() {
         if (fileList.length <= 1) return;
         currentIndex = (currentIndex + 1) % fileList.length;
@@ -319,6 +332,12 @@ Singleton {
         if (!currentFilePath) return;
         wallpaperProc.command = ["dms", "ipc", "call", "wallpaper", "set", currentFilePath];
         wallpaperProc.running = true;
+    }
+
+    function printImage() {
+        if (!currentFilePath) return;
+        printProc.command = ["lp", currentFilePath];
+        printProc.running = true;
     }
 
     function showToast(message, isError) {

@@ -126,6 +126,12 @@ FloatingWindow {
                     event.accepted = true;
                 }
                 break;
+            case Qt.Key_P:
+                if (event.modifiers & Qt.ControlModifier) {
+                    ImageService.printImage();
+                    event.accepted = true;
+                }
+                break;
             case Qt.Key_Escape:
                 if (ImageService.inspectorOpen) {
                     ImageService.inspectorOpen = false;
