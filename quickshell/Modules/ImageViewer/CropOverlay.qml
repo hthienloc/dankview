@@ -630,6 +630,7 @@ Item {
 
     // Bottom toolbar: aspect ratio pills + Apply/Cancel
     Rectangle {
+        id: bottomToolbar
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottomMargin: 28
@@ -779,14 +780,14 @@ Item {
         }
     }
 
-    // Modal dialog prompting user: 1. Overwrite, 2. Save Copy (_crop), 3. Save to Another Location
-    Rectangle {
-        id: promptModal
+    // Action popover menu anchored directly above the Done button
+    Item {
+        id: doneMenuContainer
         visible: root.promptVisible
         anchors.fill: parent
-        color: Qt.rgba(0, 0, 0, 0.6)
         z: 100
 
+        // Click outside to dismiss
         MouseArea {
             anchors.fill: parent
             acceptedButtons: Qt.AllButtons
@@ -794,14 +795,18 @@ Item {
         }
 
         Rectangle {
-            anchors.centerIn: parent
-            width: 440
-            radius: 16
+            id: doneMenuCard
+            anchors.bottom: bottomToolbar.top
+            anchors.bottomMargin: 10
+            anchors.right: bottomToolbar.right
+            width: 240
+            radius: 14
             color: Theme.surfaceContainerHigh
-            border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.25)
+            border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.35)
             border.width: 1
-            implicitHeight: promptCol.implicitHeight + 36
+            height: doneMenuCol.implicitHeight + 12
 
+            // Swallow clicks inside the card
             MouseArea {
                 anchors.fill: parent
                 acceptedButtons: Qt.AllButtons
@@ -809,170 +814,60 @@ Item {
             }
 
             ColumnLayout {
-                id: promptCol
+                id: doneMenuCol
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
-                anchors.margins: 20
-                spacing: 12
+                anchors.margins: 6
+                spacing: 2
 
-                // Header
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: 10
-
-                    DankIcon {
-                        name: "crop"
-                        size: 22
-                        color: Theme.primary
-                    }
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: "Save Cropped Image"
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSizeLarge
-                        font.weight: Font.DemiBold
-                        color: Theme.surfaceText
-                    }
-
-                    DankActionButton {
-                        iconName: "close"
-                        iconSize: 18
-                        buttonSize: 32
-                        iconColor: Theme.surfaceText
-                        onClicked: root.promptVisible = false
-                    }
-                }
-
-                Text {
-                    Layout.fillWidth: true
-                    text: "Choose how you want to save the cropped result:"
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                }
-
-                // Option 1: Overwrite original
+                // Item 1: Save Copy (_crop) - Recommended
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: opt1Row.implicitHeight + 20
-                    radius: 12
-                    color: opt1Mouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerLow
-                    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.25)
-                    border.width: 1
+                    implicitHeight: 36
+                    radius: 8
+                    color: item1Mouse.containsMouse ? Theme.surfaceContainerHighest : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
 
                     RowLayout {
-                        id: opt1Row
                         anchors.fill: parent
-                        anchors.margins: 12
-                        spacing: 12
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 10
+                        spacing: 10
 
-                        Rectangle {
-                            width: 36; height: 36; radius: 8
-                            color: Theme.surfaceContainerHigh
-                            DankIcon { anchors.centerIn: parent; name: "save"; size: 20; color: Theme.surfaceText }
-                        }
-
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: 2
-                            Text {
-                                text: "Overwrite Original"
-                                font.family: Theme.fontFamily
-                                font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.DemiBold
-                                color: Theme.surfaceText
-                            }
-                            Text {
-                                Layout.fillWidth: true
-                                text: "Replace the original image file directly with the cropped image."
-                                font.family: Theme.fontFamily
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                wrapMode: Text.WordWrap
-                            }
-                        }
-
-                        DankIcon { name: "chevron_right"; size: 18; color: Theme.surfaceVariantText; opacity: opt1Mouse.containsMouse ? 1.0 : 0.4 }
-                    }
-
-                    MouseArea {
-                        id: opt1Mouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            root.promptVisible = false;
-                            if (root.pendingCrop) {
-                                root.cropped(root.pendingCrop.x, root.pendingCrop.y, root.pendingCrop.w, root.pendingCrop.h);
-                            }
-                        }
-                    }
-                }
-
-                // Option 2: Save copy in same folder (_crop) - Recommended
-                Rectangle {
-                    Layout.fillWidth: true
-                    implicitHeight: opt2Row.implicitHeight + 20
-                    radius: 12
-                    color: opt2Mouse.containsMouse ? Theme.surfaceContainerHighest : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
-                    border.color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.45)
-                    border.width: 1
-
-                    RowLayout {
-                        id: opt2Row
-                        anchors.fill: parent
-                        anchors.margins: 12
-                        spacing: 12
-
-                        Rectangle {
-                            width: 36; height: 36; radius: 8
+                        DankIcon {
+                            name: "copy_all"
+                            size: 18
                             color: Theme.primary
-                            DankIcon { anchors.centerIn: parent; name: "copy_all"; size: 20; color: Theme.primaryText }
                         }
 
-                        ColumnLayout {
+                        Text {
                             Layout.fillWidth: true
-                            spacing: 2
-                            RowLayout {
-                                spacing: 8
-                                Text {
-                                    text: "Save Copy in Current Folder"
-                                    font.family: Theme.fontFamily
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    font.weight: Font.DemiBold
-                                    color: Theme.surfaceText
-                                }
-                                Rectangle {
-                                    implicitHeight: 18; implicitWidth: badgeText.implicitWidth + 8; radius: 4
-                                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.25)
-                                    Text {
-                                        id: badgeText
-                                        anchors.centerIn: parent
-                                        text: "Recommended"
-                                        font.family: Theme.fontFamily
-                                        font.pixelSize: Theme.fontSizeSmall - 2
-                                        font.weight: Font.DemiBold
-                                        color: Theme.primary
-                                    }
-                                }
-                            }
-                            Text {
-                                Layout.fillWidth: true
-                                text: "Keep original and save as '" + (ImageService.currentFileName ? ImageService.currentFileName.replace(/\.[^.]+$/, "_crop") : "image_crop") + "' in the same folder."
-                                font.family: Theme.fontFamily
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                wrapMode: Text.WordWrap
-                            }
+                            text: "Save Copy (_crop)"
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.weight: Font.DemiBold
+                            color: Theme.surfaceText
                         }
 
-                        DankIcon { name: "chevron_right"; size: 18; color: Theme.primary; opacity: opt2Mouse.containsMouse ? 1.0 : 0.7 }
+                        Rectangle {
+                            implicitHeight: 16
+                            implicitWidth: recText.implicitWidth + 8
+                            radius: 4
+                            color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.25)
+                            Text {
+                                id: recText
+                                anchors.centerIn: parent
+                                text: "Rec"
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.fontSizeSmall - 3
+                                font.weight: Font.Bold
+                                color: Theme.primary
+                            }
+                        }
                     }
 
                     MouseArea {
-                        id: opt2Mouse
+                        id: item1Mouse
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
@@ -985,52 +880,37 @@ Item {
                     }
                 }
 
-                // Option: Copy to Clipboard
+                // Item 2: Copy to Clipboard
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: optCopyRow.implicitHeight + 20
-                    radius: 12
-                    color: optCopyMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerLow
-                    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.25)
-                    border.width: 1
+                    implicitHeight: 36
+                    radius: 8
+                    color: item2Mouse.containsMouse ? Theme.surfaceContainerHighest : "transparent"
 
                     RowLayout {
-                        id: optCopyRow
                         anchors.fill: parent
-                        anchors.margins: 12
-                        spacing: 12
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 10
+                        spacing: 10
 
-                        Rectangle {
-                            width: 36; height: 36; radius: 8
-                            color: Theme.surfaceContainerHigh
-                            DankIcon { anchors.centerIn: parent; name: "content_copy"; size: 20; color: Theme.surfaceText }
+                        DankIcon {
+                            name: "content_copy"
+                            size: 18
+                            color: Theme.surfaceText
                         }
 
-                        ColumnLayout {
+                        Text {
                             Layout.fillWidth: true
-                            spacing: 2
-                            Text {
-                                text: "Copy to Clipboard"
-                                font.family: Theme.fontFamily
-                                font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.DemiBold
-                                color: Theme.surfaceText
-                            }
-                            Text {
-                                Layout.fillWidth: true
-                                text: "Copy cropped image directly to clipboard without saving to disk."
-                                font.family: Theme.fontFamily
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                wrapMode: Text.WordWrap
-                            }
+                            text: "Copy to Clipboard"
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
                         }
-
-                        DankIcon { name: "chevron_right"; size: 18; color: Theme.surfaceVariantText; opacity: optCopyMouse.containsMouse ? 1.0 : 0.4 }
                     }
 
                     MouseArea {
-                        id: optCopyMouse
+                        id: item2Mouse
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
@@ -1043,52 +923,37 @@ Item {
                     }
                 }
 
-                // Option 3: Save to another location...
+                // Item 3: Save As...
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: opt3Row.implicitHeight + 20
-                    radius: 12
-                    color: opt3Mouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerLow
-                    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.25)
-                    border.width: 1
+                    implicitHeight: 36
+                    radius: 8
+                    color: item3Mouse.containsMouse ? Theme.surfaceContainerHighest : "transparent"
 
                     RowLayout {
-                        id: opt3Row
                         anchors.fill: parent
-                        anchors.margins: 12
-                        spacing: 12
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 10
+                        spacing: 10
 
-                        Rectangle {
-                            width: 36; height: 36; radius: 8
-                            color: Theme.surfaceContainerHigh
-                            DankIcon { anchors.centerIn: parent; name: "folder_open"; size: 20; color: Theme.surfaceText }
+                        DankIcon {
+                            name: "folder_open"
+                            size: 18
+                            color: Theme.surfaceText
                         }
 
-                        ColumnLayout {
+                        Text {
                             Layout.fillWidth: true
-                            spacing: 2
-                            Text {
-                                text: "Save As / Export Elsewhere..."
-                                font.family: Theme.fontFamily
-                                font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.DemiBold
-                                color: Theme.surfaceText
-                            }
-                            Text {
-                                Layout.fillWidth: true
-                                text: "Choose a custom destination folder, file name, format, and quality."
-                                font.family: Theme.fontFamily
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                wrapMode: Text.WordWrap
-                            }
+                            text: "Save As..."
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
                         }
-
-                        DankIcon { name: "chevron_right"; size: 18; color: Theme.surfaceVariantText; opacity: opt3Mouse.containsMouse ? 1.0 : 0.4 }
                     }
 
                     MouseArea {
-                        id: opt3Mouse
+                        id: item3Mouse
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
@@ -1101,35 +966,53 @@ Item {
                     }
                 }
 
-                // Cancel Button at bottom
-                RowLayout {
+                // Divider before overwrite
+                Rectangle {
                     Layout.fillWidth: true
-                    Layout.topMargin: 4
-                    Item { Layout.fillWidth: true }
-                    Rectangle {
-                        implicitWidth: cancelBtnText.implicitWidth + 28
-                        implicitHeight: 36
-                        radius: 18
-                        color: cancelBtnMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerLow
-                        border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.35)
-                        border.width: 1
+                    height: 1
+                    color: Theme.outlineVariant
+                    opacity: 0.25
+                }
+
+                // Item 4: Overwrite Original
+                Rectangle {
+                    Layout.fillWidth: true
+                    implicitHeight: 36
+                    radius: 8
+                    color: item4Mouse.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 10
+                        spacing: 10
+
+                        DankIcon {
+                            name: "save"
+                            size: 18
+                            color: Theme.surfaceText
+                        }
 
                         Text {
-                            id: cancelBtnText
-                            anchors.centerIn: parent
-                            text: "Cancel"
+                            Layout.fillWidth: true
+                            text: "Overwrite Original"
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSizeSmall
                             font.weight: Font.Medium
                             color: Theme.surfaceText
                         }
+                    }
 
-                        MouseArea {
-                            id: cancelBtnMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.promptVisible = false
+                    MouseArea {
+                        id: item4Mouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            root.promptVisible = false;
+                            if (root.pendingCrop) {
+                                root.cropped(root.pendingCrop.x, root.pendingCrop.y, root.pendingCrop.w, root.pendingCrop.h);
+                            }
                         }
                     }
                 }
