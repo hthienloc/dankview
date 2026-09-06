@@ -360,7 +360,10 @@ Singleton {
         }
     }
 
-    // Called by CropOverlay with pixel-space crop region
+    property int reloadToken: 0
+    property string lastCropCopyDest: ""
+
+    // Called by CropOverlay to overwrite original image
     function executeCrop(x, y, w, h) {
         cropMode = false;
         cropProc.command = [
@@ -371,15 +374,52 @@ Singleton {
         cropProc.running = true;
     }
 
+    // Called by CropOverlay to save copy in same directory with _crop suffix
+    function saveCropCopy(x, y, w, h) {
+        cropMode = false;
+        if (!currentFilePath) return;
+
+        const lastDot = currentFilePath.lastIndexOf(".");
+        let dest = "";
+        if (lastDot > 0) {
+            dest = currentFilePath.substring(0, lastDot) + "_crop" + currentFilePath.substring(lastDot);
+        } else {
+            dest = currentFilePath + "_crop";
+        }
+
+        lastCropCopyDest = dest;
+        cropCopyProc.command = [
+            "magick", currentFilePath,
+            "-crop", w + "x" + h + "+" + x + "+" + y,
+            "+repage", dest
+        ];
+        cropCopyProc.running = true;
+    }
+
+    Process {
+        id: cropCopyProc
+        running: false
+        command: []
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                const fileName = root.lastCropCopyDest.split("/").pop();
+                root.showToast("Saved copy as " + fileName);
+                root.loadDirectoryFor(root.lastCropCopyDest);
+            } else {
+                root.showToast("Failed to save crop copy", true);
+            }
+        }
+    }
+
     Process {
         id: cropProc
         running: false
         command: []
         onExited: exitCode => {
             if (exitCode === 0) {
-                // Reload the (now-cropped) image by re-triggering metadata fetch
+                root.reloadToken++;
                 root.fetchMetadata();
-                root.showToast("Image cropped");
+                root.showToast("Image cropped and saved");
             } else {
                 root.showToast("Crop failed", true);
             }

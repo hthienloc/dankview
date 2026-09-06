@@ -21,6 +21,9 @@ Rectangle {
     // Optional crop region { x: int, y: int, w: int, h: int }
     property var cropRegion: null
 
+    // Optional user-selected destination path (via Browse...)
+    property string customDestPath: ""
+
     color: Qt.rgba(0, 0, 0, 0.55)
 
     // Block input to canvas behind
@@ -33,7 +36,7 @@ Rectangle {
     // Sheet card
     Rectangle {
         anchors.centerIn: parent
-        width: 360
+        width: 420
         radius: 16
         color: Theme.surfaceContainerHigh
         border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.25)
@@ -75,6 +78,49 @@ Rectangle {
                     iconName: "close"; iconSize: 18; buttonSize: 32
                     iconColor: Theme.surfaceText
                     onClicked: root.cancelled()
+                }
+            }
+
+            // Destination row
+            Text {
+                text: "Destination"
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceVariantText
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: 38
+                radius: 8
+                color: Theme.surfaceContainerLow
+                border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.35)
+                border.width: 1
+
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.leftMargin: 10
+                    anchors.rightMargin: 6
+                    spacing: 8
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: root.getDisplayDestPath()
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceText
+                        elide: Text.ElideMiddle
+                    }
+
+                    DankActionButton {
+                        iconName: "folder_open"
+                        iconSize: 18
+                        buttonSize: 28
+                        iconColor: Theme.primary
+                        tooltipText: "Browse Destination..."
+                        tooltipSide: "top"
+                        onClicked: root.openBrowseDialog()
+                    }
                 }
             }
 
@@ -258,17 +304,59 @@ Rectangle {
         return "png";
     }
 
+    function getDefaultDestPath() {
+        const src = root.sourcePath;
+        if (!src) return "";
+        const ext = _extFor(formatSelector.currentFormat);
+        const lastDot = src.lastIndexOf(".");
+        const base = lastDot > 0 ? src.substring(0, lastDot) : src;
+        const suffix = root.cropRegion ? "_crop" : "_export";
+        return base + suffix + "." + ext;
+    }
+
+    function getDisplayDestPath() {
+        const ext = _extFor(formatSelector.currentFormat);
+        if (customDestPath && customDestPath.length > 0) {
+            const lastDot = customDestPath.lastIndexOf(".");
+            if (lastDot > 0) {
+                return customDestPath.substring(0, lastDot) + "." + ext;
+            }
+            return customDestPath + "." + ext;
+        }
+        return getDefaultDestPath();
+    }
+
+    function openBrowseDialog() {
+        const defaultName = root.getDisplayDestPath();
+        browseProc.command = [
+            "sh", "-c",
+            "zenity --file-selection --save --confirm-overwrite --title=\"Save As\" --filename=" + JSON.stringify(defaultName) + " 2>/dev/null || kdialog --getsavefilename " + JSON.stringify(defaultName) + " 2>/dev/null"
+        ];
+        browseProc.running = true;
+    }
+
+    Process {
+        id: browseProc
+        running: false
+        command: []
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const picked = text.trim();
+                if (picked.length > 0) {
+                    root.customDestPath = picked;
+                }
+            }
+        }
+    }
+
     function _doSave() {
         const src = root.sourcePath;
         if (!src) return;
 
-        const fmt = formatSelector.currentFormat;
-        const ext = _extFor(fmt);
-        const quality = fmt === "PNG" ? "" : String(Math.round(qualitySlider.value));
+        let dest = root.getDisplayDestPath();
+        if (!dest) return;
 
-        // Build dest path: same dir as source, append _export suffix, change ext
-        const base = src.substring(0, src.lastIndexOf(".")) || src;
-        const dest = base + "_export." + ext;
+        const quality = formatSelector.currentFormat === "PNG" ? "" : String(Math.round(qualitySlider.value));
 
         root.saved(dest);
 
@@ -284,19 +372,23 @@ Rectangle {
             cmd.push("-strip");
         }
         cmd.push(dest);
+        saveProc.targetDest = dest;
         saveProc.command = cmd;
         saveProc.running = true;
     }
 
     Process {
         id: saveProc
+        property string targetDest: ""
         running: false
         command: []
         onExited: exitCode => {
             if (exitCode === 0) {
-                ImageService.showToast("Saved to " + ImageService.currentFileName.replace(/\.[^.]+$/, "_export") + "…");
+                const fileName = targetDest.split("/").pop();
+                ImageService.showToast("Saved to " + fileName);
+                ImageService.loadDirectoryFor(targetDest);
             } else {
-                ImageService.showToast("Export failed", true);
+                ImageService.showToast("Save failed", true);
             }
         }
     }

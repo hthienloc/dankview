@@ -296,9 +296,11 @@ FloatingWindow {
             srcH: ImageService.currentMeta.height || 1
 
             onCropped: (x, y, w, h) => ImageService.executeCrop(x, y, w, h)
+            onSaveCopyRequested: (x, y, w, h) => ImageService.saveCropCopy(x, y, w, h)
             onSaveAsRequested: (x, y, w, h) => {
                 ImageService.cropMode = false;
                 saveDialog.cropRegion = { x: x, y: y, w: w, h: h };
+                saveDialog.customDestPath = "";
                 ImageService.saveMode = true;
             }
             onCancelled: ImageService.cropMode = false

@@ -11,7 +11,8 @@ Item {
 
     readonly property string source: {
         if (!ImageService.currentFilePath) return "";
-        return "file://" + encodeURI(ImageService.currentFilePath).replace(/#/g, "%23").replace(/\?/g, "%3F");
+        const base = "file://" + encodeURI(ImageService.currentFilePath).replace(/#/g, "%23").replace(/\?/g, "%3F");
+        return ImageService.reloadToken > 0 ? (base + "?v=" + ImageService.reloadToken) : base;
     }
     readonly property bool hasImage: ImageService.currentFilePath !== ""
 
