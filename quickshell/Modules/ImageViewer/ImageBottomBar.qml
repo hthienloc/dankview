@@ -120,5 +120,27 @@ Rectangle {
             tooltipSide: "top"
             onClicked: ImageService.moveToTrash()
         }
+
+        BarSeparator {}
+
+        DankActionButton {
+            iconName: "crop"
+            iconSize: 20
+            iconColor: ImageService.cropMode ? Theme.primary : Theme.surfaceText
+            buttonSize: 38
+            tooltipText: "Crop (Ctrl+X)"
+            tooltipSide: "top"
+            onClicked: ImageService.toggleCropMode()
+        }
+
+        DankActionButton {
+            iconName: "save"
+            iconSize: 20
+            iconColor: ImageService.saveMode ? Theme.primary : Theme.surfaceText
+            buttonSize: 38
+            tooltipText: "Save As / Export (Ctrl+S)"
+            tooltipSide: "top"
+            onClicked: ImageService.openSaveDialog()
+        }
     }
 }

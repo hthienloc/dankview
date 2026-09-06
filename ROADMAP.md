@@ -53,5 +53,5 @@ Feature parity and tracking against [GNOME Loupe](https://gitlab.gnome.org/GNOME
 
 ## 5. Basic Editing Tools
 
-- [ ] **Crop Tool**: Interactive rectangular crop overlay with aspect ratio presets (1:1, 4:3, 16:9, Freeform).
-- [ ] **Save As / Export**: Export to PNG, JPEG, WebP with compression quality options and metadata stripping.
+- [x] **Crop Tool**: Interactive rectangular overlay with draggable handles, corner grips, aspect ratio presets (Free/1:1/4:3/16:9/3:2). Applies via `magick -crop` in-place. Bottom bar button + `Ctrl+X`.
+- [x] **Save As / Export**: Export to PNG, JPEG, WebP with quality slider and metadata-strip toggle via `magick`. Bottom bar button + `Ctrl+S`. Output named `<basename>_export.<ext>`.

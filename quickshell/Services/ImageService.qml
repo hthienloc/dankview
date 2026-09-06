@@ -30,6 +30,8 @@ Singleton {
     property int currentFrame: 0
     property int frameCount: 1
     property bool inspectorOpen: false
+    property bool cropMode: false
+    property bool saveMode: false
     property bool isFullscreen: Quickshell.env("DVIEW_FULLSCREEN") === "1"
     property real panX: 0
     property real panY: 0
@@ -338,6 +340,50 @@ Singleton {
         if (!currentFilePath) return;
         printProc.command = ["lp", currentFilePath];
         printProc.running = true;
+    }
+
+    function toggleCropMode() {
+        if (!currentFilePath) return;
+        cropMode = !cropMode;
+        if (cropMode) {
+            saveMode = false;
+            inspectorOpen = false;
+        }
+    }
+
+    function openSaveDialog() {
+        if (!currentFilePath) return;
+        saveMode = !saveMode;
+        if (saveMode) {
+            cropMode = false;
+            inspectorOpen = false;
+        }
+    }
+
+    // Called by CropOverlay with pixel-space crop region
+    function executeCrop(x, y, w, h) {
+        cropMode = false;
+        cropProc.command = [
+            "magick", currentFilePath,
+            "-crop", w + "x" + h + "+" + x + "+" + y,
+            "+repage", currentFilePath
+        ];
+        cropProc.running = true;
+    }
+
+    Process {
+        id: cropProc
+        running: false
+        command: []
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                // Reload the (now-cropped) image by re-triggering metadata fetch
+                root.fetchMetadata();
+                root.showToast("Image cropped");
+            } else {
+                root.showToast("Crop failed", true);
+            }
+        }
     }
 
     function showToast(message, isError) {

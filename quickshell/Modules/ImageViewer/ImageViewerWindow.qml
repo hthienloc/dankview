@@ -132,8 +132,26 @@ FloatingWindow {
                     event.accepted = true;
                 }
                 break;
+            case Qt.Key_X:
+                if (event.modifiers & Qt.ControlModifier) {
+                    ImageService.toggleCropMode();
+                    event.accepted = true;
+                }
+                break;
+            case Qt.Key_S:
+                if (event.modifiers & Qt.ControlModifier) {
+                    ImageService.openSaveDialog();
+                    event.accepted = true;
+                }
+                break;
             case Qt.Key_Escape:
-                if (ImageService.inspectorOpen) {
+                if (ImageService.cropMode) {
+                    ImageService.cropMode = false;
+                    event.accepted = true;
+                } else if (ImageService.saveMode) {
+                    ImageService.saveMode = false;
+                    event.accepted = true;
+                } else if (ImageService.inspectorOpen) {
                     ImageService.inspectorOpen = false;
                     event.accepted = true;
                 } else if (window.maximized) {
@@ -176,7 +194,7 @@ FloatingWindow {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            opacity: window.showOverlays || ImageService.inspectorOpen ? 1.0 : 0.0
+            opacity: window.showOverlays || ImageService.inspectorOpen || ImageService.cropMode ? 1.0 : 0.0
             visible: opacity > 0
 
             HoverHandler {
@@ -197,7 +215,7 @@ FloatingWindow {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 24
             anchors.horizontalCenter: parent.horizontalCenter
-            opacity: window.showOverlays && !ImageService.inspectorOpen ? 1.0 : 0.0
+            opacity: window.showOverlays && !ImageService.inspectorOpen && !ImageService.cropMode && !ImageService.saveMode ? 1.0 : 0.0
             visible: opacity > 0
 
             HoverHandler {
@@ -227,6 +245,45 @@ FloatingWindow {
                     easing.type: Theme.standardEasing
                 }
             }
+        }
+
+        // Crop Overlay
+        CropOverlay {
+            id: cropOverlay
+            anchors.fill: parent
+            visible: ImageService.cropMode
+            imageX: {
+                if (!visible) return 0;
+                const canvas = rootContent.children[0]; // ImageCanvas
+                return (parent.width - imageW) / 2 + ImageService.panX;
+            }
+            imageY: {
+                if (!visible) return 0;
+                return (parent.height - imageH) / 2 + ImageService.panY;
+            }
+            imageW: {
+                if (!visible) return 1;
+                const m = ImageService.currentMeta;
+                return m.width > 0 ? m.width * ImageService.fitScale * ImageService.zoom : 1;
+            }
+            imageH: {
+                if (!visible) return 1;
+                const m = ImageService.currentMeta;
+                return m.height > 0 ? m.height * ImageService.fitScale * ImageService.zoom : 1;
+            }
+            srcW: ImageService.currentMeta.width || 1
+            srcH: ImageService.currentMeta.height || 1
+
+            onCropped: (x, y, w, h) => ImageService.executeCrop(x, y, w, h)
+            onCancelled: ImageService.cropMode = false
+        }
+
+        // Save As / Export Dialog
+        SaveDialog {
+            anchors.fill: parent
+            visible: ImageService.saveMode
+            onCancelled: ImageService.saveMode = false
+            onSaved: ImageService.saveMode = false
         }
     }
 }
