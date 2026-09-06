@@ -46,13 +46,19 @@ Item {
     }
 
     function _clamp() {
-        // Ensure rect stays within image bounds
+        // Clamp size when resizing: keep within image bounds, preserve min size
         if (cropX < imageX) { cropW -= (imageX - cropX); cropX = imageX; }
         if (cropY < imageY) { cropH -= (imageY - cropY); cropY = imageY; }
         if (cropX + cropW > imageX + imageW) cropW = imageX + imageW - cropX;
         if (cropY + cropH > imageY + imageH) cropH = imageY + imageH - cropY;
         cropW = Math.max(20, cropW);
         cropH = Math.max(20, cropH);
+    }
+
+    // Clamp position only (used when moving): preserves rect size
+    function _clampMove() {
+        cropX = Math.max(imageX, Math.min(cropX, imageX + imageW - cropW));
+        cropY = Math.max(imageY, Math.min(cropY, imageY + imageH - cropH));
     }
 
     function _applyAspect() {
@@ -137,7 +143,7 @@ Item {
         onPositionChanged: mouse => {
             cropX = origCropX + (mouse.x - startX);
             cropY = origCropY + (mouse.y - startY);
-            root._clamp();
+            root._clampMove();
         }
     }
 
