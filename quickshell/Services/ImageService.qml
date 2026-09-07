@@ -35,6 +35,7 @@ Singleton {
     property bool cropMode: false
     property bool saveMode: false
     property bool isFullscreen: Quickshell.env("DVIEW_FULLSCREEN") === "1"
+    property bool uiLocked: false
     property real panX: 0
     property real panY: 0
 
@@ -304,6 +305,18 @@ Singleton {
 
     function toggleFullscreen() {
         isFullscreen = !isFullscreen;
+    }
+
+    function toggleLockUI() {
+        uiLocked = !uiLocked;
+        if (uiLocked) {
+            inspectorOpen = false;
+            cropMode = false;
+            saveMode = false;
+            showToast("UI locked (press K to unlock)");
+        } else {
+            showToast("UI unlocked");
+        }
     }
 
     function copyToClipboard() {

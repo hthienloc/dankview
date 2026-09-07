@@ -141,6 +141,11 @@ FloatingWindow {
                 ImageService.toggleInspector();
                 event.accepted = true;
                 break;
+            case Qt.Key_K:
+            case Qt.Key_Tab:
+                ImageService.toggleLockUI();
+                event.accepted = true;
+                break;
 
             // Modal & Dialog Keys
             case Qt.Key_Return:
@@ -151,7 +156,12 @@ FloatingWindow {
                 }
                 break;
             case Qt.Key_Escape:
-                if (cropOverlay.promptVisible) {
+                if (ImageService.uiLocked) {
+                    ImageService.uiLocked = false;
+                    window.showOverlays = true;
+                    hideOverlaysTimer.restart();
+                    event.accepted = true;
+                } else if (cropOverlay.promptVisible) {
                     cropOverlay.promptVisible = false;
                     event.accepted = true;
                 } else if (ImageService.cropMode) {
@@ -180,8 +190,10 @@ FloatingWindow {
             hoverEnabled: true
             acceptedButtons: Qt.NoButton
             onPositionChanged: {
-                window.showOverlays = true;
-                hideOverlaysTimer.restart();
+                if (!ImageService.uiLocked) {
+                    window.showOverlays = true;
+                    hideOverlaysTimer.restart();
+                }
             }
         }
 
@@ -213,7 +225,7 @@ FloatingWindow {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            opacity: window.showOverlays || ImageService.inspectorOpen || ImageService.cropMode ? 1.0 : 0.0
+            opacity: !ImageService.uiLocked && (window.showOverlays || ImageService.inspectorOpen || ImageService.cropMode) ? 1.0 : 0.0
             visible: opacity > 0
 
             HoverHandler {
@@ -234,7 +246,7 @@ FloatingWindow {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 24
             anchors.horizontalCenter: parent.horizontalCenter
-            opacity: window.showOverlays && ImageService.currentFilePath !== "" && !ImageService.inspectorOpen && !ImageService.cropMode && !ImageService.saveMode ? 1.0 : 0.0
+            opacity: !ImageService.uiLocked && window.showOverlays && ImageService.currentFilePath !== "" && !ImageService.inspectorOpen && !ImageService.cropMode && !ImageService.saveMode ? 1.0 : 0.0
             visible: opacity > 0
 
             HoverHandler {
@@ -245,6 +257,49 @@ FloatingWindow {
                 NumberAnimation {
                     duration: Theme.shortDuration
                     easing.type: Theme.standardEasing
+                }
+            }
+        }
+
+        // Floating Lock Badge (shown only when UI is locked)
+        Rectangle {
+            id: floatingLockBadge
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.margins: 18
+            width: 40
+            height: 40
+            radius: 20
+            color: lockBadgeMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
+            opacity: ImageService.uiLocked ? (lockBadgeMouse.containsMouse ? 0.95 : 0.35) : 0.0
+            visible: opacity > 0
+            border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.3)
+            border.width: 1
+            z: 90
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
+                }
+            }
+
+            DankIcon {
+                anchors.centerIn: parent
+                name: lockBadgeMouse.containsMouse ? "lock_open" : "lock"
+                size: 20
+                color: lockBadgeMouse.containsMouse ? Theme.primary : Theme.surfaceText
+            }
+
+            MouseArea {
+                id: lockBadgeMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    ImageService.toggleLockUI();
+                    window.showOverlays = true;
+                    hideOverlaysTimer.restart();
                 }
             }
         }

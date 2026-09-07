@@ -167,6 +167,17 @@ Rectangle {
             onClicked: ImageService.toggleInspector()
         }
 
+        // Lock UI / Zen View
+        DankActionButton {
+            visible: ImageService.currentFilePath !== ""
+            iconName: "lock_open"
+            iconSize: 19
+            iconColor: Theme.surfaceText
+            tooltipText: "Lock UI / Clean View (K)"
+            tooltipSide: "bottom"
+            onClicked: ImageService.toggleLockUI()
+        }
+
         Rectangle {
             width: 1
             height: 20

@@ -33,7 +33,8 @@ Image viewer for DankMaterialShell, inspired by GNOME Loupe.
 | | `u` / `z` / `Ctrl + Z` | Undo trash (restore last trashed image) |
 | **Window & UI** | `f` / `F11` | Toggle maximize / fullscreen |
 | | `i` | Toggle EXIF inspector |
-| | `Esc` | Close dialog / exit crop / close inspector / quit |
+| | `k` / `Tab` | Toggle Lock UI / Clean View (hide all controls) |
+| | `Esc` | Close dialog / exit crop / close inspector / unlock UI / quit |
 
 ## CLI Usage
 

@@ -280,7 +280,7 @@ Item {
         width: 80
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        visible: root.hasImage && ImageService.fileList.length > 1
+        visible: !ImageService.uiLocked && root.hasImage && ImageService.fileList.length > 1
         onClicked: ImageService.prevImage()
 
         Rectangle {
@@ -316,7 +316,7 @@ Item {
         width: 80
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        visible: root.hasImage && ImageService.fileList.length > 1 && !ImageService.inspectorOpen
+        visible: !ImageService.uiLocked && root.hasImage && ImageService.fileList.length > 1 && !ImageService.inspectorOpen
         onClicked: ImageService.nextImage()
 
         Rectangle {
