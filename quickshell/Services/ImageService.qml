@@ -313,9 +313,6 @@ Singleton {
             inspectorOpen = false;
             cropMode = false;
             saveMode = false;
-            showToast("UI locked (press K to unlock)");
-        } else {
-            showToast("UI unlocked");
         }
     }
 
