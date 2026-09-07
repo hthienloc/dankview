@@ -306,11 +306,32 @@ Singleton {
 
     function copyToClipboard() {
         if (!currentFilePath) return;
-        const ext = currentFilePath.split('.').pop().toLowerCase();
-        const mime = (ext === "jpg" || ext === "jpeg") ? "image/jpeg" : ("image/" + ext);
+        const mimeTypes = {
+            "png": "image/png",
+            "jpg": "image/jpeg",
+            "jpeg": "image/jpeg",
+            "webp": "image/webp",
+            "svg": "image/svg+xml",
+            "gif": "image/gif",
+            "bmp": "image/bmp",
+            "avif": "image/avif",
+            "heic": "image/heic",
+            "heif": "image/heif",
+            "jxl": "image/jxl",
+            "tif": "image/tiff",
+            "tiff": "image/tiff",
+            "ico": "image/x-icon"
+        };
+        const lastDot = currentFilePath.lastIndexOf(".");
+        const ext = lastDot > 0 ? currentFilePath.substring(lastDot + 1).toLowerCase() : "";
+        const mime = mimeTypes[ext] || "image/png";
+
         copyProc.command = [
             "sh", "-c",
-            "dms cl copy -t " + mime + " < " + JSON.stringify(currentFilePath)
+            'exec dms cl copy -t "$1" < "$2"',
+            "copyProc",
+            mime,
+            currentFilePath
         ];
         copyProc.running = true;
     }
@@ -413,9 +434,13 @@ Singleton {
         cropMode = false;
         if (!currentFilePath) return;
 
+        const cropGeom = `${Math.round(w)}x${Math.round(h)}+${Math.round(x)}+${Math.round(y)}`;
         copyCropProc.command = [
             "sh", "-c",
-            "magick " + JSON.stringify(currentFilePath) + " -crop " + w + "x" + h + "+" + x + "+" + y + " +repage png:- | dms cl copy -t image/png"
+            'exec magick "$1" -crop "$2" +repage png:- | dms cl copy -t image/png',
+            "copyCropProc",
+            currentFilePath,
+            cropGeom
         ];
         copyCropProc.running = true;
     }

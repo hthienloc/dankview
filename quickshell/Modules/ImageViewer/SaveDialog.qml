@@ -334,7 +334,9 @@ Rectangle {
         const defaultName = root.getDisplayDestPath();
         browseProc.command = [
             "sh", "-c",
-            "zenity --file-selection --save --confirm-overwrite --title=\"Save As\" --filename=" + JSON.stringify(defaultName) + " 2>/dev/null || kdialog --getsavefilename " + JSON.stringify(defaultName) + " 2>/dev/null"
+            'zenity --file-selection --save --confirm-overwrite --title="Save As" --filename="$1" 2>/dev/null || kdialog --getsavefilename "$1" 2>/dev/null',
+            "browseProc",
+            defaultName
         ];
         browseProc.running = true;
     }
