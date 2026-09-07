@@ -18,6 +18,8 @@ Singleton {
     }
 
     property var currentMeta: ({})
+    readonly property real minZoom: 0.25
+    readonly property real maxZoom: 30.0
     property real zoom: 1.0
     property real fitScale: 1.0
     property int rotation: 0
@@ -244,7 +246,7 @@ Singleton {
 
     function zoomAt(factor, cursorX, cursorY, vpWidth, vpHeight) {
         const oldZoom = zoom;
-        const newZoom = Math.max(0.05, Math.min(30.0, oldZoom * factor));
+        const newZoom = Math.max(minZoom, Math.min(maxZoom, oldZoom * factor));
         if (Math.abs(newZoom - oldZoom) < 0.0001) return;
 
         // Center of viewport relative to cursor
@@ -258,11 +260,11 @@ Singleton {
     }
 
     function zoomIn() {
-        zoom = Math.min(zoom * 1.25, 30.0);
+        zoom = Math.min(zoom * 1.25, maxZoom);
     }
 
     function zoomOut() {
-        zoom = Math.max(zoom / 1.25, 0.05);
+        zoom = Math.max(zoom / 1.25, minZoom);
     }
 
     function fitToWindow() {

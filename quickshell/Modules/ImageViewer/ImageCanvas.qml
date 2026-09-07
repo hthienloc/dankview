@@ -146,7 +146,7 @@ Item {
             target: null
             enabled: !ImageService.cropMode
             onScaleChanged: delta => {
-                ImageService.zoom = Math.max(0.05, Math.min(30.0, ImageService.zoom * delta));
+                ImageService.zoom = Math.max(ImageService.minZoom, Math.min(ImageService.maxZoom, ImageService.zoom * delta));
             }
         }
 
