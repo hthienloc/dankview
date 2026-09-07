@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import qs.Common
 import qs.Services
@@ -16,6 +17,22 @@ Item {
     }
     readonly property bool hasImage: ImageService.currentFilePath !== ""
 
+    DropArea {
+        anchors.fill: parent
+        onDropped: drop => {
+            if (drop.hasUrls && drop.urls.length > 0) {
+                let urlStr = drop.urls[0].toString();
+                if (urlStr.startsWith("file://")) {
+                    urlStr = decodeURIComponent(urlStr.substring(7));
+                }
+                if (urlStr) {
+                    ImageService.loadDirectoryFor(urlStr);
+                    drop.acceptProposedAction();
+                }
+            }
+        }
+    }
+
     // Contrast background + checkerboard for transparent images
     Rectangle {
         anchors.fill: parent
@@ -24,7 +41,8 @@ Item {
         Canvas {
             id: checkerCanvas
             anchors.fill: parent
-            opacity: 0.5
+            opacity: root.hasImage ? 0.5 : 0.0
+            visible: opacity > 0
             onPaint: {
                 const ctx = getContext("2d");
                 const s = 16;
@@ -51,6 +69,7 @@ Item {
     Item {
         id: viewport
         anchors.fill: parent
+        visible: root.hasImage
 
         Item {
             id: container
@@ -164,6 +183,95 @@ Item {
         }
     }
 
+    // Empty State Browser View
+    Item {
+        id: emptyState
+        anchors.fill: parent
+        visible: !root.hasImage
+
+        ColumnLayout {
+            anchors.centerIn: parent
+            spacing: 20
+
+            Rectangle {
+                Layout.alignment: Qt.AlignHCenter
+                width: 88
+                height: 88
+                radius: 44
+                color: Theme.surfaceContainerHigh
+                border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.25)
+                border.width: 1
+
+                DankIcon {
+                    anchors.centerIn: parent
+                    name: "add_photo_alternate"
+                    size: 44
+                    color: Theme.primary
+                }
+            }
+
+            ColumnLayout {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 6
+
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "No Image Open"
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontSizeXLarge
+                    font.weight: Font.DemiBold
+                    color: Theme.surfaceText
+                }
+
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "Drag and drop an image here, or browse files"
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontSizeMedium
+                    color: Theme.surfaceVariantText
+                }
+            }
+
+            Rectangle {
+                Layout.alignment: Qt.AlignHCenter
+                implicitWidth: openBtnRow.implicitWidth + 36
+                implicitHeight: 46
+                radius: 23
+                color: openBtnMouse.containsMouse
+                    ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.85)
+                    : Theme.primary
+
+                RowLayout {
+                    id: openBtnRow
+                    anchors.centerIn: parent
+                    spacing: 8
+
+                    DankIcon {
+                        name: "folder_open"
+                        size: 20
+                        color: Theme.primaryText
+                    }
+
+                    Text {
+                        text: "Open Image (Ctrl+O)"
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeMedium
+                        font.weight: Font.DemiBold
+                        color: Theme.primaryText
+                    }
+                }
+
+                MouseArea {
+                    id: openBtnMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: ImageService.openFileDialog()
+                }
+            }
+        }
+    }
+
     // Previous / Next overlay edge buttons (hovering edges reveals subtle arrows)
     MouseArea {
         anchors.left: parent.left
@@ -172,7 +280,7 @@ Item {
         width: 80
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        visible: ImageService.fileList.length > 1
+        visible: root.hasImage && ImageService.fileList.length > 1
         onClicked: ImageService.prevImage()
 
         Rectangle {
@@ -208,7 +316,7 @@ Item {
         width: 80
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        visible: ImageService.fileList.length > 1 && !ImageService.inspectorOpen
+        visible: root.hasImage && ImageService.fileList.length > 1 && !ImageService.inspectorOpen
         onClicked: ImageService.nextImage()
 
         Rectangle {

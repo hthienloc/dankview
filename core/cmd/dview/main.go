@@ -38,6 +38,12 @@ func findQuickshellDir(specified string) (string, error) {
 		"/usr/share/quickshell/dankview",
 	}
 
+	if home, err := os.UserHomeDir(); err == nil {
+		candidates = append(candidates,
+			filepath.Join(home, ".local/share/quickshell/dankview"),
+		)
+	}
+
 	execPath, err := os.Executable()
 	if err == nil {
 		execDir := filepath.Dir(execPath)
@@ -97,49 +103,58 @@ func main() {
 		return
 	}
 
-	targetPath := "."
+	var initialImage string
+	var imgList *fs.ImageList
+
 	if flag.NArg() > 0 {
-		targetPath = flag.Arg(0)
-	}
+		targetPath := flag.Arg(0)
+		absPath, err := filepath.Abs(targetPath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error resolving path: %v\n", err)
+			os.Exit(1)
+		}
 
-	absPath, err := filepath.Abs(targetPath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error resolving path: %v\n", err)
+		if *printInfo {
+			meta, err := exif.GetMetadata(absPath)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error reading metadata: %v\n", err)
+				os.Exit(1)
+			}
+			enc := json.NewEncoder(os.Stdout)
+			enc.SetIndent("", "  ")
+			enc.Encode(meta)
+			return
+		}
+
+		if *printList {
+			list, err := fs.ScanDirectory(absPath)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error scanning directory: %v\n", err)
+				os.Exit(1)
+			}
+			enc := json.NewEncoder(os.Stdout)
+			enc.SetIndent("", "  ")
+			enc.Encode(list)
+			return
+		}
+
+		var scanErr error
+		imgList, scanErr = fs.ScanDirectory(absPath)
+		if scanErr != nil {
+			imgList = &fs.ImageList{
+				Directory:    filepath.Dir(absPath),
+				Files:        []string{absPath},
+				CurrentIndex: 0,
+			}
+		}
+
+		initialImage = absPath
+		if len(imgList.Files) > 0 && imgList.CurrentIndex < len(imgList.Files) {
+			initialImage = imgList.Files[imgList.CurrentIndex]
+		}
+	} else if *printInfo || *printList {
+		fmt.Fprintf(os.Stderr, "Error: no image path provided\n")
 		os.Exit(1)
-	}
-
-	if *printInfo {
-		meta, err := exif.GetMetadata(absPath)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error reading metadata: %v\n", err)
-			os.Exit(1)
-		}
-		enc := json.NewEncoder(os.Stdout)
-		enc.SetIndent("", "  ")
-		enc.Encode(meta)
-		return
-	}
-
-	if *printList {
-		list, err := fs.ScanDirectory(absPath)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error scanning directory: %v\n", err)
-			os.Exit(1)
-		}
-		enc := json.NewEncoder(os.Stdout)
-		enc.SetIndent("", "  ")
-		enc.Encode(list)
-		return
-	}
-
-	imgList, err := fs.ScanDirectory(absPath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Warning: unable to scan directory: %v\n", err)
-		imgList = &fs.ImageList{
-			Directory:    filepath.Dir(absPath),
-			Files:        []string{absPath},
-			CurrentIndex: 0,
-		}
 	}
 
 	qsDir, err := findQuickshellDir(*configDir)
@@ -148,21 +163,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	initialImage := absPath
-	if len(imgList.Files) > 0 && imgList.CurrentIndex < len(imgList.Files) {
-		initialImage = imgList.Files[imgList.CurrentIndex]
-	}
-
 	env := os.Environ()
 	execPath, err := os.Executable()
 	if err == nil {
 		env = append(env, "DVIEW_BIN="+execPath)
 	}
-	env = append(env,
-		"DVIEW_INITIAL_IMAGE="+initialImage,
-		"DVIEW_DIR="+imgList.Directory,
-		"DVIEW_INDEX="+strconv.Itoa(imgList.CurrentIndex),
-	)
+
+	if initialImage != "" {
+		env = append(env, "DVIEW_INITIAL_IMAGE="+initialImage)
+	}
+	if imgList != nil {
+		env = append(env,
+			"DVIEW_DIR="+imgList.Directory,
+			"DVIEW_INDEX="+strconv.Itoa(imgList.CurrentIndex),
+		)
+	}
 
 	fontCfg := theme.GetSystemFontSettings()
 	if fontCfg.Family != "" {

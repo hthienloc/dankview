@@ -9,9 +9,10 @@ INSTALL_DIR=$(PREFIX)/bin
 DATA_DIR=$(PREFIX)/share
 ICON_DIR=$(DATA_DIR)/icons/hicolor/scalable/apps
 APPLICATIONS_DIR=$(DATA_DIR)/applications
+QUICKSHELL_DIR=$(DATA_DIR)/quickshell/$(SHELL_NAME)
 SHELL_DIR=quickshell
 
-.PHONY: all build dev run clean test fmt vet update-common install uninstall help
+.PHONY: all build dev run clean test fmt vet update-common install uninstall install-user uninstall-user help
 
 all: build
 
@@ -42,10 +43,19 @@ update-common:
 install: build
 	@install -D -m 755 $(BUILD_DIR)/$(BINARY_NAME) $(DESTDIR)$(INSTALL_DIR)/$(BINARY_NAME)
 	@install -D -m 644 distro/$(ICON_NAME).desktop $(DESTDIR)$(APPLICATIONS_DIR)/$(ICON_NAME).desktop
+	@mkdir -p $(DESTDIR)$(QUICKSHELL_DIR)
+	@cp -rL $(SHELL_DIR)/* $(DESTDIR)$(QUICKSHELL_DIR)/
 
 uninstall:
 	@rm -f $(DESTDIR)$(INSTALL_DIR)/$(BINARY_NAME)
 	@rm -f $(DESTDIR)$(APPLICATIONS_DIR)/$(ICON_NAME).desktop
+	@rm -rf $(DESTDIR)$(QUICKSHELL_DIR)
+
+install-user: build
+	@$(MAKE) install PREFIX=$(HOME)/.local
+
+uninstall-user:
+	@$(MAKE) uninstall PREFIX=$(HOME)/.local
 
 help:
 	@echo "DankView Makefile targets:"

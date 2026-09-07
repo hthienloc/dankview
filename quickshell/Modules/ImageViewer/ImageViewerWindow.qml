@@ -236,7 +236,7 @@ FloatingWindow {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 24
             anchors.horizontalCenter: parent.horizontalCenter
-            opacity: window.showOverlays && !ImageService.inspectorOpen && !ImageService.cropMode && !ImageService.saveMode ? 1.0 : 0.0
+            opacity: window.showOverlays && ImageService.currentFilePath !== "" && !ImageService.inspectorOpen && !ImageService.cropMode && !ImageService.saveMode ? 1.0 : 0.0
             visible: opacity > 0
 
             HoverHandler {

@@ -110,6 +110,7 @@ Rectangle {
 
         // Zoom percentage badge
         Rectangle {
+            visible: ImageService.currentFilePath !== ""
             height: 30
             width: zoomRow.implicitWidth + 16
             radius: 15
@@ -156,6 +157,7 @@ Rectangle {
 
         // Inspector Toggle
         DankActionButton {
+            visible: ImageService.currentFilePath !== ""
             iconName: "info"
             iconSize: 19
             iconColor: ImageService.inspectorOpen ? Theme.primary : Theme.surfaceText
