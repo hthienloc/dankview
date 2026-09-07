@@ -63,7 +63,7 @@ Rectangle {
             iconSize: 20
             iconColor: Theme.surfaceText
             buttonSize: 38
-            tooltipText: "Actual Size 100% (Ctrl+1)"
+            tooltipText: "Actual Size 100% (1 / Ctrl+1)"
             tooltipSide: "top"
             onClicked: ImageService.actualSize()
         }
@@ -76,7 +76,7 @@ Rectangle {
             iconSize: 20
             iconColor: Theme.surfaceText
             buttonSize: 38
-            tooltipText: "Rotate Counter-Clockwise (Shift+R)"
+            tooltipText: "Rotate Counter-Clockwise (L / Shift+R)"
             tooltipSide: "top"
             onClicked: ImageService.rotateCounterClockwise()
         }
@@ -96,7 +96,7 @@ Rectangle {
             iconSize: 20
             iconColor: Theme.surfaceText
             buttonSize: 38
-            tooltipText: "Flip Horizontally (Ctrl+M / H)"
+            tooltipText: "Flip Horizontally (H / M)"
             tooltipSide: "top"
             onClicked: ImageService.toggleFlipHorizontal()
         }
@@ -106,7 +106,7 @@ Rectangle {
             iconSize: 20
             iconColor: ImageService.cropMode ? Theme.primary : Theme.surfaceText
             buttonSize: 38
-            tooltipText: "Crop (Ctrl+X)"
+            tooltipText: "Crop (X / Ctrl+X)"
             tooltipSide: "top"
             onClicked: ImageService.toggleCropMode()
         }
@@ -119,7 +119,7 @@ Rectangle {
             iconSize: 20
             iconColor: Theme.surfaceText
             buttonSize: 38
-            tooltipText: "Copy to Clipboard (Ctrl+C)"
+            tooltipText: "Copy to Clipboard (C / Ctrl+C)"
             tooltipSide: "top"
             onClicked: ImageService.copyToClipboard()
         }
@@ -129,7 +129,7 @@ Rectangle {
             iconSize: 20
             iconColor: ImageService.saveMode ? Theme.primary : Theme.surfaceText
             buttonSize: 38
-            tooltipText: "Save As / Export (Ctrl+S)"
+            tooltipText: "Save As / Export (S / Ctrl+S)"
             tooltipSide: "top"
             onClicked: ImageService.openSaveDialog()
         }
@@ -142,7 +142,7 @@ Rectangle {
             iconSize: 20
             iconColor: Theme.error
             buttonSize: 38
-            tooltipText: "Move to Trash (Delete)"
+            tooltipText: "Move to Trash (D / Delete)"
             tooltipSide: "top"
             onClicked: ImageService.moveToTrash()
         }

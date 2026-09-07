@@ -33,9 +33,10 @@ FloatingWindow {
         anchors.fill: parent
         focus: true
 
-        // Keyboard navigation
+        // Keyboard navigation and shortcuts
         Keys.onPressed: event => {
             switch (event.key) {
+            // Navigation
             case Qt.Key_Left:
             case Qt.Key_PageUp:
             case Qt.Key_Backspace:
@@ -48,6 +49,8 @@ FloatingWindow {
                 ImageService.nextImage();
                 event.accepted = true;
                 break;
+
+            // Zoom & Scale
             case Qt.Key_Plus:
             case Qt.Key_Equal:
                 ImageService.zoomIn();
@@ -57,36 +60,16 @@ FloatingWindow {
                 ImageService.zoomOut();
                 event.accepted = true;
                 break;
-            case Qt.Key_1:
-                if (event.modifiers & Qt.ControlModifier) {
-                    ImageService.actualSize();
-                    event.accepted = true;
-                }
-                break;
             case Qt.Key_0:
                 ImageService.fitToWindow();
                 event.accepted = true;
                 break;
-            case Qt.Key_O:
-                if (event.modifiers & Qt.ControlModifier) {
-                    ImageService.openFileDialog();
-                    event.accepted = true;
-                }
-                break;
-            case Qt.Key_M:
-                if (event.modifiers & Qt.ControlModifier) {
-                    ImageService.toggleFlipHorizontal();
-                    event.accepted = true;
-                }
-                break;
-            case Qt.Key_H:
-                ImageService.toggleFlipHorizontal();
+            case Qt.Key_1:
+                ImageService.actualSize();
                 event.accepted = true;
                 break;
-            case Qt.Key_V:
-                ImageService.toggleFlipVertical();
-                event.accepted = true;
-                break;
+
+            // Rotation & Orientation
             case Qt.Key_R:
                 if (event.modifiers & Qt.ShiftModifier) {
                     ImageService.rotateCounterClockwise();
@@ -95,6 +78,60 @@ FloatingWindow {
                 }
                 event.accepted = true;
                 break;
+            case Qt.Key_L:
+                ImageService.rotateCounterClockwise();
+                event.accepted = true;
+                break;
+            case Qt.Key_H:
+            case Qt.Key_M:
+                ImageService.toggleFlipHorizontal();
+                event.accepted = true;
+                break;
+            case Qt.Key_V:
+                ImageService.toggleFlipVertical();
+                event.accepted = true;
+                break;
+
+            // Actions & Editing
+            case Qt.Key_C:
+                ImageService.copyToClipboard();
+                event.accepted = true;
+                break;
+            case Qt.Key_X:
+                ImageService.toggleCropMode();
+                event.accepted = true;
+                break;
+            case Qt.Key_S:
+                saveDialog.cropRegion = null;
+                ImageService.openSaveDialog();
+                event.accepted = true;
+                break;
+            case Qt.Key_P:
+                ImageService.printImage();
+                event.accepted = true;
+                break;
+            case Qt.Key_W:
+                ImageService.setAsWallpaper();
+                event.accepted = true;
+                break;
+
+            // File & Trash Management
+            case Qt.Key_O:
+                ImageService.openFileDialog();
+                event.accepted = true;
+                break;
+            case Qt.Key_Delete:
+            case Qt.Key_D:
+                ImageService.moveToTrash();
+                event.accepted = true;
+                break;
+            case Qt.Key_Z:
+            case Qt.Key_U:
+                ImageService.undoTrash();
+                event.accepted = true;
+                break;
+
+            // View & Window Controls
             case Qt.Key_F:
             case Qt.Key_F11:
                 windowControls.tryToggleMaximize();
@@ -104,47 +141,8 @@ FloatingWindow {
                 ImageService.toggleInspector();
                 event.accepted = true;
                 break;
-            case Qt.Key_C:
-                if (event.modifiers & Qt.ControlModifier) {
-                    ImageService.copyToClipboard();
-                    event.accepted = true;
-                }
-                break;
-            case Qt.Key_Z:
-                if (event.modifiers & Qt.ControlModifier) {
-                    ImageService.undoTrash();
-                    event.accepted = true;
-                }
-                break;
-            case Qt.Key_Delete:
-                ImageService.moveToTrash();
-                event.accepted = true;
-                break;
-            case Qt.Key_W:
-                if (event.modifiers & Qt.ControlModifier) {
-                    ImageService.setAsWallpaper();
-                    event.accepted = true;
-                }
-                break;
-            case Qt.Key_P:
-                if (event.modifiers & Qt.ControlModifier) {
-                    ImageService.printImage();
-                    event.accepted = true;
-                }
-                break;
-            case Qt.Key_X:
-                if (event.modifiers & Qt.ControlModifier) {
-                    ImageService.toggleCropMode();
-                    event.accepted = true;
-                }
-                break;
-            case Qt.Key_S:
-                if (event.modifiers & Qt.ControlModifier) {
-                    saveDialog.cropRegion = null;
-                    ImageService.openSaveDialog();
-                    event.accepted = true;
-                }
-                break;
+
+            // Modal & Dialog Keys
             case Qt.Key_Return:
             case Qt.Key_Enter:
                 if (ImageService.cropMode && !cropOverlay.promptVisible) {

@@ -10,25 +10,30 @@ Image viewer for DankMaterialShell, inspired by GNOME Loupe.
 
 ## Keyboard Shortcuts
 
-| Shortcut | Action |
-|---|---|
-| `Right` / `Space` / `PageDown` | Next image |
-| `Left` / `Backspace` / `PageUp` | Previous image |
-| `+` / `=` / `Wheel Up` | Zoom in |
-| `-` / `Wheel Down` | Zoom out |
-| `0` | Fit to window (best fit) |
-| `Ctrl + 1` | Actual size 100% (1:1 pixel scale) |
-| `Double Click` | Toggle 200% zoom / 100% fit |
-| `r` / `Shift + r` | Rotate clockwise / counter-clockwise (90°) |
-| `Ctrl + M` / `h` | Flip horizontally |
-| `v` | Flip vertically |
-| `f` / `F11` | Toggle maximize / fullscreen |
-| `Ctrl + O` | Open image dialog |
-| `i` | Toggle EXIF inspector |
-| `Ctrl + C` | Copy image to clipboard |
-| `Delete` | Move image to trash (`gio trash`) |
-| `Ctrl + Z` | Undo trash (restore last trashed image) |
-| `Esc` | Close inspector / restore window / quit |
+| Category | Shortcut | Action |
+|---|---|---|
+| **Navigation** | `Right` / `Space` / `PageDown` | Next image |
+| | `Left` / `Backspace` / `PageUp` | Previous image |
+| **Zoom & View** | `+` / `=` / `Wheel Up` | Zoom in |
+| | `-` / `Wheel Down` | Zoom out |
+| | `0` | Fit to window (best fit) |
+| | `1` / `Ctrl + 1` | Actual size (1:1 pixel scale) |
+| | `Double Click` | Toggle 200% zoom / fit |
+| **Transform** | `r` | Rotate clockwise (90°) |
+| | `l` / `Shift + r` | Rotate counter-clockwise (90°) |
+| | `h` / `m` / `Ctrl + M` | Flip horizontally |
+| | `v` | Flip vertically |
+| **Actions** | `c` / `Ctrl + C` | Copy image to clipboard |
+| | `x` / `Ctrl + X` | Toggle Crop tool |
+| | `s` / `Ctrl + S` | Save As / Export image |
+| | `p` / `Ctrl + P` | Print image |
+| | `w` / `Ctrl + W` | Set as wallpaper |
+| **File & Trash** | `o` / `Ctrl + O` | Open image dialog |
+| | `d` / `Delete` | Move image to trash (`gio trash`) |
+| | `u` / `z` / `Ctrl + Z` | Undo trash (restore last trashed image) |
+| **Window & UI** | `f` / `F11` | Toggle maximize / fullscreen |
+| | `i` | Toggle EXIF inspector |
+| | `Esc` | Close dialog / exit crop / close inspector / quit |
 
 ## CLI Usage
 

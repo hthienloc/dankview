@@ -150,7 +150,7 @@ Rectangle {
             iconName: "folder_open"
             iconSize: 19
             iconColor: Theme.surfaceText
-            tooltipText: "Open Image (Ctrl+O)"
+            tooltipText: "Open Image (O / Ctrl+O)"
             tooltipSide: "bottom"
             onClicked: ImageService.openFileDialog()
         }
