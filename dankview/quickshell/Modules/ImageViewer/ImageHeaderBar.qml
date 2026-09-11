@@ -155,18 +155,6 @@ Rectangle {
             onClicked: ImageService.openFileDialog()
         }
 
-        // Inspector Toggle
-        DankActionButton {
-            visible: ImageService.currentFilePath !== ""
-            iconName: "info"
-            iconSize: 19
-            iconColor: ImageService.inspectorOpen ? Theme.primary : Theme.surfaceText
-            backgroundColor: ImageService.inspectorOpen ? Theme.surfaceContainerHighest : "transparent"
-            tooltipText: "Image Properties (I)"
-            tooltipSide: "bottom"
-            onClicked: ImageService.toggleInspector()
-        }
-
         // Lock UI / Zen View
         DankActionButton {
             visible: ImageService.currentFilePath !== ""
@@ -177,6 +165,7 @@ Rectangle {
             tooltipSide: "bottom"
             onClicked: ImageService.toggleLockUI()
         }
+
 
         Rectangle {
             width: 1
