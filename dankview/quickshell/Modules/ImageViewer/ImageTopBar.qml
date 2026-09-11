@@ -8,7 +8,7 @@ import qs.DankCommon.Widgets
 Item {
     id: root
 
-    height: 40
+    height: 44
 
     component IslandButton: Rectangle {
         id: btn
@@ -18,9 +18,9 @@ Item {
         property bool isActive: false
         signal clicked()
 
-        implicitWidth: 36
-        implicitHeight: 36
-        radius: 8
+        implicitWidth: 38
+        implicitHeight: 38
+        radius: 10
         color: isActive ? Theme.primaryContainer : (btnMouse.containsMouse ? Theme.surfaceContainerHighest : "transparent")
 
         Behavior on color {
@@ -31,7 +31,7 @@ Item {
             anchors.centerIn: parent
             name: btn.iconName
             rotation: btn.iconRotation
-            size: 18
+            size: 21
             color: btn.isActive ? Theme.primary : Theme.surfaceText
         }
 
@@ -54,7 +54,7 @@ Item {
             id: zoomIsland
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
-            height: 40
+            height: 44
             width: zoomRow.implicitWidth + 8
             radius: 12
             color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.88)
@@ -91,7 +91,7 @@ Item {
             id: editIsland
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            height: 40
+            height: 44
             width: editRow.implicitWidth + 8
             radius: 12
             color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.88)
@@ -170,9 +170,9 @@ Item {
 
             // Copy button
             Rectangle {
-                width: 40
-                height: 40
-                radius: 12
+                width: 38
+                height: 38
+                radius: 10
                 color: copyMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
                 border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.28)
                 border.width: 1
@@ -182,7 +182,7 @@ Item {
                 DankIcon {
                     anchors.centerIn: parent
                     name: "content_copy"
-                    size: 19
+                    size: 21
                     color: Theme.surfaceText
                 }
 
@@ -197,9 +197,9 @@ Item {
 
             // Delete / Trash button (Accent Red)
             Rectangle {
-                width: 40
-                height: 40
-                radius: 12
+                width: 38
+                height: 38
+                radius: 10
                 color: deleteMouse.containsMouse ? Qt.lighter(Theme.error, 1.15) : Theme.error
 
                 Behavior on color { ColorAnimation { duration: 100 } }
@@ -207,7 +207,7 @@ Item {
                 DankIcon {
                     anchors.centerIn: parent
                     name: "delete"
-                    size: 19
+                    size: 21
                     color: Theme.onError || "#ffffff"
                 }
 
