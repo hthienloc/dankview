@@ -126,6 +126,23 @@ FloatingWindow {
                 event.accepted = true;
                 break;
             case Qt.Key_Z:
+                if (event.modifiers & Qt.ControlModifier) {
+                    if (event.modifiers & Qt.ShiftModifier) {
+                        ImageService.redoTransform();
+                    } else {
+                        ImageService.undoTransform();
+                    }
+                } else {
+                    ImageService.undoTrash();
+                }
+                event.accepted = true;
+                break;
+            case Qt.Key_Y:
+                if (event.modifiers & Qt.ControlModifier) {
+                    ImageService.redoTransform();
+                    event.accepted = true;
+                }
+                break;
             case Qt.Key_U:
                 ImageService.undoTrash();
                 event.accepted = true;
@@ -203,84 +220,30 @@ FloatingWindow {
             targetWindow: window
         }
 
-        // Main Image Canvas
-        ImageCanvas {
+        // Window background card with border outline
+        Rectangle {
+            id: windowFrame
             anchors.fill: parent
-        }
+            radius: window.maximized ? 0 : 16
+            color: Theme.surfaceContainerLowest
+            border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.4)
+            border.width: window.maximized ? 0 : 1
 
-        // Dismiss inspector when clicking outside it
-        MouseArea {
-            anchors.fill: parent
-            enabled: ImageService.inspectorOpen
-            visible: enabled
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onClicked: ImageService.inspectorOpen = false
-        }
+            // Top Header & Islands Toolbar
+            ImageTopBar {
+                id: topBar
+                windowControls: windowControls
+                targetWindow: window
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                opacity: !ImageService.uiLocked && (window.showOverlays || ImageService.inspectorOpen || ImageService.cropMode) ? 1.0 : 0.0
+                visible: opacity > 0
+                z: 40
 
-        // Top Header Bar
-        ImageHeaderBar {
-            id: headerBar
-            windowControls: windowControls
-            targetWindow: window
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            opacity: !ImageService.uiLocked && (window.showOverlays || ImageService.inspectorOpen || ImageService.cropMode) ? 1.0 : 0.0
-            visible: opacity > 0
-
-            HoverHandler {
-                id: headerHover
-            }
-
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: Theme.shortDuration
-                    easing.type: Theme.standardEasing
+                HoverHandler {
+                    id: headerHover
                 }
-            }
-        }
-
-        // Bottom Tool Bar (Floating Pill)
-        ImageBottomBar {
-            id: bottomBar
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 24
-            anchors.horizontalCenter: parent.horizontalCenter
-            opacity: !ImageService.uiLocked && window.showOverlays && ImageService.currentFilePath !== "" && !ImageService.inspectorOpen && !ImageService.cropMode && !ImageService.saveMode ? 1.0 : 0.0
-            visible: opacity > 0
-
-            HoverHandler {
-                id: bottomHover
-            }
-
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: Theme.shortDuration
-                    easing.type: Theme.standardEasing
-                }
-            }
-        }
-
-        // Floating Lock Badge (shown only when UI is locked and hovered nearby)
-        Item {
-            id: lockBadgeArea
-            anchors.top: parent.top
-            anchors.right: parent.right
-            width: 76
-            height: 76
-            z: 90
-            visible: ImageService.uiLocked
-
-            Rectangle {
-                id: floatingLockBadge
-                anchors.centerIn: parent
-                width: 40
-                height: 40
-                radius: 20
-                color: lockBadgeMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
-                opacity: lockBadgeMouse.containsMouse ? 0.95 : 0.0
-                border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.3)
-                border.width: 1
 
                 Behavior on opacity {
                     NumberAnimation {
@@ -288,95 +251,200 @@ FloatingWindow {
                         easing.type: Theme.standardEasing
                     }
                 }
+            }
 
-                DankIcon {
+            // Main Image Canvas Container (Rounded Viewport with Checkerboard)
+            Rectangle {
+                id: canvasContainer
+                anchors.top: topBar.bottom
+                anchors.topMargin: 8
+                anchors.left: parent.left
+                anchors.leftMargin: 16
+                anchors.right: parent.right
+                anchors.rightMargin: 16
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 16
+                radius: 16
+                color: Theme.surfaceContainerLowest
+                clip: true
+                border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.2)
+                border.width: 1
+
+                ImageCanvas {
+                    anchors.fill: parent
+                }
+
+                // Crop Overlay inside canvas container
+                CropOverlay {
+                    id: cropOverlay
+                    anchors.fill: parent
+                    visible: ImageService.cropMode
+                    imageX: {
+                        if (!visible) return 0;
+                        return (parent.width - imageW) / 2 + ImageService.panX;
+                    }
+                    imageY: {
+                        if (!visible) return 0;
+                        return (parent.height - imageH) / 2 + ImageService.panY;
+                    }
+                    imageW: {
+                        if (!visible) return 1;
+                        const m = ImageService.currentMeta;
+                        return m.width > 0 ? m.width * ImageService.fitScale * ImageService.zoom : 1;
+                    }
+                    imageH: {
+                        if (!visible) return 1;
+                        const m = ImageService.currentMeta;
+                        return m.height > 0 ? m.height * ImageService.fitScale * ImageService.zoom : 1;
+                    }
+                    srcW: ImageService.currentMeta.width || 1
+                    srcH: ImageService.currentMeta.height || 1
+
+                    onCropped: (x, y, w, h) => ImageService.executeCrop(x, y, w, h)
+                    onSaveCopyRequested: (x, y, w, h) => ImageService.saveCropCopy(x, y, w, h)
+                    onCopyRequested: (x, y, w, h) => ImageService.copyCropToClipboard(x, y, w, h)
+                    onSaveAsRequested: (x, y, w, h) => {
+                        ImageService.cropMode = false;
+                        saveDialog.cropRegion = { x: x, y: y, w: w, h: h };
+                        saveDialog.customDestPath = "";
+                        ImageService.saveMode = true;
+                    }
+                    onCancelled: ImageService.cropMode = false
+                }
+            }
+
+            // Bottom Dock Tab (Details / EXIF Trigger)
+            Rectangle {
+                id: bottomDockTab
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: 220
+                height: 18
+                radius: 9
+                color: bottomTabMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
+                border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.3)
+                border.width: 1
+                visible: !ImageService.uiLocked && window.showOverlays && ImageService.currentFilePath !== ""
+                z: 50
+
+                Behavior on color { ColorAnimation { duration: 100 } }
+
+                HoverHandler {
+                    id: bottomHover
+                }
+
+                // Handle indicator line
+                Rectangle {
                     anchors.centerIn: parent
-                    name: "lock_open"
-                    size: 20
-                    color: Theme.primary
+                    width: 38
+                    height: 4
+                    radius: 2
+                    color: bottomTabMouse.containsMouse ? Theme.primary : Theme.outlineVariant
+                }
+
+                MouseArea {
+                    id: bottomTabMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: ImageService.toggleInspector()
                 }
             }
 
+            // Floating Lock Badge (shown only when UI is locked and hovered nearby)
+            Item {
+                id: lockBadgeArea
+                anchors.top: parent.top
+                anchors.right: parent.right
+                width: 76
+                height: 76
+                z: 90
+                visible: ImageService.uiLocked
+
+                Rectangle {
+                    id: floatingLockBadge
+                    anchors.centerIn: parent
+                    width: 40
+                    height: 40
+                    radius: 20
+                    color: lockBadgeMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
+                    opacity: lockBadgeMouse.containsMouse ? 0.95 : 0.0
+                    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.3)
+                    border.width: 1
+
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
+                        }
+                    }
+
+                    DankIcon {
+                        anchors.centerIn: parent
+                        name: "lock_open"
+                        size: 20
+                        color: Theme.primary
+                    }
+                }
+
+                MouseArea {
+                    id: lockBadgeMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        ImageService.toggleLockUI();
+                        window.showOverlays = true;
+                        hideOverlaysTimer.restart();
+                    }
+                }
+            }
+
+            // Dismiss inspector when clicking outside it
             MouseArea {
-                id: lockBadgeMouse
                 anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    ImageService.toggleLockUI();
-                    window.showOverlays = true;
-                    hideOverlaysTimer.restart();
+                enabled: ImageService.inspectorOpen
+                visible: enabled
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                onClicked: ImageService.inspectorOpen = false
+                z: 92
+            }
+
+            // Slide-out EXIF Inspector Drawer
+            ExifInspector {
+                id: inspector
+                anchors.top: parent.top
+                anchors.topMargin: 16
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 16
+                anchors.right: parent.right
+                anchors.rightMargin: ImageService.inspectorOpen ? 16 : -width - 24
+                visible: anchors.rightMargin > -width || ImageService.inspectorOpen
+                radius: 16
+                z: 95
+
+                Behavior on anchors.rightMargin {
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
+                    }
                 }
             }
-        }
 
-        // Slide-out EXIF Inspector Drawer
-        ExifInspector {
-            id: inspector
-            anchors.top: headerBar.bottom
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            anchors.rightMargin: ImageService.inspectorOpen ? 0 : -width
-            visible: anchors.rightMargin > -width || ImageService.inspectorOpen
-
-            Behavior on anchors.rightMargin {
-                NumberAnimation {
-                    duration: Theme.shortDuration
-                    easing.type: Theme.standardEasing
+            // Save As / Export Dialog
+            SaveDialog {
+                id: saveDialog
+                anchors.fill: parent
+                visible: ImageService.saveMode
+                z: 100
+                onCancelled: {
+                    ImageService.saveMode = false;
+                    saveDialog.cropRegion = null;
                 }
-            }
-        }
-
-        // Crop Overlay
-        CropOverlay {
-            id: cropOverlay
-            anchors.fill: parent
-            visible: ImageService.cropMode
-            imageX: {
-                if (!visible) return 0;
-                return (parent.width - imageW) / 2 + ImageService.panX;
-            }
-            imageY: {
-                if (!visible) return 0;
-                return (parent.height - imageH) / 2 + ImageService.panY;
-            }
-            imageW: {
-                if (!visible) return 1;
-                const m = ImageService.currentMeta;
-                return m.width > 0 ? m.width * ImageService.fitScale * ImageService.zoom : 1;
-            }
-            imageH: {
-                if (!visible) return 1;
-                const m = ImageService.currentMeta;
-                return m.height > 0 ? m.height * ImageService.fitScale * ImageService.zoom : 1;
-            }
-            srcW: ImageService.currentMeta.width || 1
-            srcH: ImageService.currentMeta.height || 1
-
-            onCropped: (x, y, w, h) => ImageService.executeCrop(x, y, w, h)
-            onSaveCopyRequested: (x, y, w, h) => ImageService.saveCropCopy(x, y, w, h)
-            onCopyRequested: (x, y, w, h) => ImageService.copyCropToClipboard(x, y, w, h)
-            onSaveAsRequested: (x, y, w, h) => {
-                ImageService.cropMode = false;
-                saveDialog.cropRegion = { x: x, y: y, w: w, h: h };
-                saveDialog.customDestPath = "";
-                ImageService.saveMode = true;
-            }
-            onCancelled: ImageService.cropMode = false
-        }
-
-        // Save As / Export Dialog
-        SaveDialog {
-            id: saveDialog
-            anchors.fill: parent
-            visible: ImageService.saveMode
-            onCancelled: {
-                ImageService.saveMode = false;
-                saveDialog.cropRegion = null;
-            }
-            onSaved: {
-                ImageService.saveMode = false;
-                saveDialog.cropRegion = null;
+                onSaved: {
+                    ImageService.saveMode = false;
+                    saveDialog.cropRegion = null;
+                }
             }
         }
     }

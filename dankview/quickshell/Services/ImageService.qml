@@ -27,6 +27,10 @@ Singleton {
     property bool resettingTransform: false
     property bool flipH: false
     property bool flipV: false
+    property var undoStack: []
+    property var redoStack: []
+    readonly property bool canUndo: undoStack.length > 0
+    readonly property bool canRedo: redoStack.length > 0
     property bool isAnimated: false
     property bool isPlaying: true
     property int currentFrame: 0
@@ -41,6 +45,46 @@ Singleton {
 
     function togglePlayback() {
         isPlaying = !isPlaying;
+    }
+
+    function pushHistory() {
+        const state = { rotation: root.rotation, flipH: root.flipH, flipV: root.flipV };
+        var u = root.undoStack.slice();
+        u.push(state);
+        root.undoStack = u;
+        root.redoStack = [];
+    }
+
+    function undoTransform() {
+        if (undoStack.length === 0) return;
+        const currentState = { rotation: root.rotation, flipH: root.flipH, flipV: root.flipV };
+        var r = root.redoStack.slice();
+        r.push(currentState);
+        root.redoStack = r;
+
+        var u = root.undoStack.slice();
+        const prev = u.pop();
+        root.undoStack = u;
+
+        root.rotation = prev.rotation;
+        root.flipH = prev.flipH;
+        root.flipV = prev.flipV;
+    }
+
+    function redoTransform() {
+        if (redoStack.length === 0) return;
+        const currentState = { rotation: root.rotation, flipH: root.flipH, flipV: root.flipV };
+        var u = root.undoStack.slice();
+        u.push(currentState);
+        root.undoStack = u;
+
+        var r = root.redoStack.slice();
+        const next = r.pop();
+        root.redoStack = r;
+
+        root.rotation = next.rotation;
+        root.flipH = next.flipH;
+        root.flipV = next.flipV;
     }
 
     onCurrentFilePathChanged: {
@@ -209,18 +253,22 @@ Singleton {
     }
 
     function rotateClockwise() {
+        pushHistory();
         rotation += 90;
     }
 
     function rotateCounterClockwise() {
+        pushHistory();
         rotation -= 90;
     }
 
     function toggleFlipHorizontal() {
+        pushHistory();
         flipH = !flipH;
     }
 
     function toggleFlipVertical() {
+        pushHistory();
         flipV = !flipV;
     }
 
@@ -290,6 +338,8 @@ Singleton {
 
     function resetTransform() {
         resettingTransform = true;
+        undoStack = [];
+        redoStack = [];
         zoom = 1.0;
         rotation = 0;
         flipH = false;

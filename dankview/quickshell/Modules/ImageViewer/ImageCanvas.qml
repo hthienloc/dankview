@@ -126,8 +126,8 @@ Item {
                 property real fitScale: {
                     if (implicitWidth <= 0 || implicitHeight <= 0 || viewport.width <= 0 || viewport.height <= 0)
                         return 1.0;
-                    const scaleX = (viewport.width - 64) / implicitWidth;
-                    const scaleY = (viewport.height - 128) / implicitHeight;
+                    const scaleX = (viewport.width - 32) / implicitWidth;
+                    const scaleY = (viewport.height - 32) / implicitHeight;
                     return Math.min(1.0, Math.min(scaleX, scaleY));
                 }
 
