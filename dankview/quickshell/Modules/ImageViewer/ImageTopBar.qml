@@ -8,10 +8,7 @@ import qs.DankCommon.Widgets
 Item {
     id: root
 
-    property var windowControls: null
-    property var targetWindow: null
-
-    height: 58
+    height: 40
 
     component IslandButton: Rectangle {
         id: btn
@@ -47,46 +44,10 @@ Item {
         }
     }
 
-    // Window Drag & Maximize Area
-    MouseArea {
-        id: windowDragArea
-        anchors.fill: parent
-        z: 0
-        onPressed: {
-            if (root.windowControls)
-                root.windowControls.tryStartMove();
-        }
-        onDoubleClicked: {
-            if (root.windowControls)
-                root.windowControls.tryToggleMaximize();
-        }
-    }
-
-    // Top Center Window Drag Handle
-    Rectangle {
-        id: dragHandle
-        anchors.top: parent.top
-        anchors.topMargin: 7
-        anchors.horizontalCenter: parent.horizontalCenter
-        width: 38
-        height: 4
-        radius: 2
-        color: Qt.rgba(1, 1, 1, 0.4)
-        visible: !root.targetWindow || !root.targetWindow.maximized
-        z: 1
-    }
-
     // Toolbar Row containing 3 islands
     Item {
         id: toolbarRow
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 2
-        anchors.leftMargin: 16
-        anchors.rightMargin: 16
-        height: 40
-        z: 10
+        anchors.fill: parent
 
         // Left Island: Zoom Controls
         Rectangle {

@@ -22,7 +22,7 @@ FloatingWindow {
         interval: 3000
         repeat: false
         onTriggered: {
-            if (!headerHover.hovered && !bottomHover.hovered && !ImageService.inspectorOpen) {
+            if (!headerHover.hovered && !topBarHover.hovered && !bottomHover.hovered && !ImageService.inspectorOpen) {
                 window.showOverlays = false;
             }
         }
@@ -229,9 +229,9 @@ FloatingWindow {
             border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.4)
             border.width: window.maximized ? 0 : 1
 
-            // Top Header & Islands Toolbar
-            ImageTopBar {
-                id: topBar
+            // Top Header Bar (Classic DankView Header)
+            ImageHeaderBar {
+                id: headerBar
                 windowControls: windowControls
                 targetWindow: window
                 anchors.top: parent.top
@@ -253,10 +253,35 @@ FloatingWindow {
                 }
             }
 
+            // Action Islands Toolbar
+            ImageTopBar {
+                id: topBar
+                anchors.top: headerBar.bottom
+                anchors.topMargin: 8
+                anchors.left: parent.left
+                anchors.leftMargin: 16
+                anchors.right: parent.right
+                anchors.rightMargin: 16
+                opacity: !ImageService.uiLocked && window.showOverlays && ImageService.currentFilePath !== "" && !ImageService.cropMode && !ImageService.saveMode ? 1.0 : 0.0
+                visible: opacity > 0
+                z: 40
+
+                HoverHandler {
+                    id: topBarHover
+                }
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
+                    }
+                }
+            }
+
             // Main Image Canvas Container (Rounded Viewport with Checkerboard)
             Rectangle {
                 id: canvasContainer
-                anchors.top: topBar.bottom
+                anchors.top: topBar.visible ? topBar.bottom : headerBar.bottom
                 anchors.topMargin: 8
                 anchors.left: parent.left
                 anchors.leftMargin: 16
