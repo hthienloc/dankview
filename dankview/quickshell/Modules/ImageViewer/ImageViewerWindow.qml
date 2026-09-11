@@ -15,19 +15,6 @@ FloatingWindow {
     color: Theme.surfaceContainerLowest
     visible: true
 
-    property bool showOverlays: true
-
-    Timer {
-        id: hideOverlaysTimer
-        interval: 3000
-        repeat: false
-        onTriggered: {
-            if (!headerHover.hovered && !topBarHover.hovered && !bottomHover.hovered && !ImageService.inspectorOpen) {
-                window.showOverlays = false;
-            }
-        }
-    }
-
     Item {
         id: rootContent
         anchors.fill: parent
@@ -175,8 +162,6 @@ FloatingWindow {
             case Qt.Key_Escape:
                 if (ImageService.uiLocked) {
                     ImageService.uiLocked = false;
-                    window.showOverlays = true;
-                    hideOverlaysTimer.restart();
                     event.accepted = true;
                 } else if (cropOverlay.promptVisible) {
                     cropOverlay.promptVisible = false;
@@ -198,19 +183,6 @@ FloatingWindow {
                     Qt.quit();
                 }
                 break;
-            }
-        }
-
-        // Global mouse activity tracker to show/hide controls
-        MouseArea {
-            anchors.fill: parent
-            hoverEnabled: true
-            acceptedButtons: Qt.NoButton
-            onPositionChanged: {
-                if (!ImageService.uiLocked) {
-                    window.showOverlays = true;
-                    hideOverlaysTimer.restart();
-                }
             }
         }
 
@@ -237,13 +209,9 @@ FloatingWindow {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
-                opacity: !ImageService.uiLocked && (window.showOverlays || ImageService.inspectorOpen || ImageService.cropMode) ? 1.0 : 0.0
+                opacity: !ImageService.uiLocked ? 1.0 : 0.0
                 visible: opacity > 0
                 z: 40
-
-                HoverHandler {
-                    id: headerHover
-                }
 
                 Behavior on opacity {
                     NumberAnimation {
@@ -262,13 +230,9 @@ FloatingWindow {
                 anchors.leftMargin: 16
                 anchors.right: parent.right
                 anchors.rightMargin: 16
-                opacity: !ImageService.uiLocked && window.showOverlays && ImageService.currentFilePath !== "" && !ImageService.cropMode && !ImageService.saveMode ? 1.0 : 0.0
+                opacity: !ImageService.uiLocked && ImageService.currentFilePath !== "" && !ImageService.cropMode && !ImageService.saveMode ? 1.0 : 0.0
                 visible: opacity > 0
                 z: 40
-
-                HoverHandler {
-                    id: topBarHover
-                }
 
                 Behavior on opacity {
                     NumberAnimation {
@@ -349,14 +313,10 @@ FloatingWindow {
                 color: bottomTabMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
                 border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.3)
                 border.width: 1
-                visible: !ImageService.uiLocked && window.showOverlays && ImageService.currentFilePath !== "" && !ImageService.inspectorOpen
+                visible: !ImageService.uiLocked && ImageService.currentFilePath !== "" && !ImageService.inspectorOpen
                 z: 50
 
                 Behavior on color { ColorAnimation { duration: 100 } }
-
-                HoverHandler {
-                    id: bottomHover
-                }
 
                 // Handle indicator line
                 Rectangle {
@@ -419,8 +379,6 @@ FloatingWindow {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         ImageService.toggleLockUI();
-                        window.showOverlays = true;
-                        hideOverlaysTimer.restart();
                     }
                 }
             }
