@@ -245,7 +245,7 @@ FloatingWindow {
             // Main Image Canvas Container (Rounded Viewport with Checkerboard)
             Rectangle {
                 id: canvasContainer
-                anchors.top: topBar.visible ? topBar.bottom : headerBar.bottom
+                anchors.top: topBar.bottom
                 anchors.topMargin: 8
                 anchors.left: parent.left
                 anchors.leftMargin: 16
