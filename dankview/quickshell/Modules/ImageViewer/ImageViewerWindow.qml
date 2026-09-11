@@ -324,7 +324,7 @@ FloatingWindow {
                 color: bottomTabMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
                 border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.3)
                 border.width: 1
-                visible: !ImageService.uiLocked && window.showOverlays && ImageService.currentFilePath !== ""
+                visible: !ImageService.uiLocked && window.showOverlays && ImageService.currentFilePath !== "" && !ImageService.inspectorOpen
                 z: 50
 
                 Behavior on color { ColorAnimation { duration: 100 } }
@@ -410,20 +410,18 @@ FloatingWindow {
                 z: 92
             }
 
-            // Slide-out EXIF Inspector Drawer
+            // Slide-up EXIF Inspector Bottom Sheet
             ExifInspector {
                 id: inspector
-                anchors.top: parent.top
-                anchors.topMargin: 16
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: 16
-                anchors.right: parent.right
-                anchors.rightMargin: ImageService.inspectorOpen ? 16 : -width - 24
-                visible: anchors.rightMargin > -width || ImageService.inspectorOpen
-                radius: 16
+                anchors.bottomMargin: ImageService.inspectorOpen ? 16 : -height - 30
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: Math.min(760, parent.width - 32)
+                height: Math.min(380, parent.height * 0.55)
+                visible: anchors.bottomMargin > -height || ImageService.inspectorOpen
                 z: 95
 
-                Behavior on anchors.rightMargin {
+                Behavior on anchors.bottomMargin {
                     NumberAnimation {
                         duration: Theme.shortDuration
                         easing.type: Theme.standardEasing

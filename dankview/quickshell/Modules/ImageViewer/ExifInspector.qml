@@ -8,10 +8,24 @@ import qs.DankCommon.Widgets
 Rectangle {
     id: root
 
-    width: 380
+    width: 720
+    height: 360
+    radius: 18
     color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.96)
-    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.25)
+    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.3)
     border.width: 1
+
+    // Grab handle indicator for bottom sheet
+    Rectangle {
+        anchors.top: parent.top
+        anchors.topMargin: 7
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: 36
+        height: 4
+        radius: 2
+        color: Qt.rgba(1, 1, 1, 0.35)
+        z: 2
+    }
 
     component M3Card: Rectangle {
         Layout.fillWidth: true
@@ -191,7 +205,10 @@ Rectangle {
         // Header
         RowLayout {
             Layout.fillWidth: true
-            Layout.margins: 14
+            Layout.topMargin: 16
+            Layout.bottomMargin: 10
+            Layout.leftMargin: 16
+            Layout.rightMargin: 16
             spacing: 10
 
             DankIcon {
