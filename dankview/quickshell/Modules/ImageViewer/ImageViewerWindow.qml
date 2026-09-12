@@ -224,13 +224,14 @@ FloatingWindow {
             // Action Islands Toolbar
             ImageTopBar {
                 id: topBar
+                cropOverlay: cropOverlay
                 anchors.top: headerBar.bottom
                 anchors.topMargin: 8
                 anchors.left: parent.left
                 anchors.leftMargin: 16
                 anchors.right: parent.right
                 anchors.rightMargin: 16
-                opacity: !ImageService.uiLocked && ImageService.currentFilePath !== "" && !ImageService.cropMode && !ImageService.saveMode ? 1.0 : 0.0
+                opacity: !ImageService.uiLocked && ImageService.currentFilePath !== "" && !ImageService.saveMode ? 1.0 : 0.0
                 visible: opacity > 0
                 z: 40
 

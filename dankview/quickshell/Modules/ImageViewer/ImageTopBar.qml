@@ -8,6 +8,8 @@ import qs.DankCommon.Widgets
 Item {
     id: root
 
+    property var cropOverlay: null
+
     height: 44
 
     component IslandButton: Rectangle {
@@ -86,22 +88,40 @@ Item {
             }
         }
 
-        // Center Island: Transform & Editing Controls
+        // Center Island: Transform & Editing Controls (morphs into Crop controls in cropMode)
         Rectangle {
             id: editIsland
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             height: 44
-            width: editRow.implicitWidth + 8
+            width: (ImageService.cropMode ? cropRow.implicitWidth : editRow.implicitWidth) + 12
             radius: 12
             color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.88)
             border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.28)
             border.width: 1
+            clip: true
 
+            Behavior on width {
+                NumberAnimation {
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
+                }
+            }
+
+            // Normal editing tools row
             RowLayout {
                 id: editRow
                 anchors.centerIn: parent
                 spacing: 2
+                opacity: !ImageService.cropMode ? 1.0 : 0.0
+                visible: opacity > 0
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
+                    }
+                }
 
                 IslandButton {
                     iconName: "rotate_left"
@@ -141,6 +161,162 @@ Item {
                     iconName: ImageService.isPlaying ? "pause" : "play_arrow"
                     tooltipText: ImageService.isPlaying ? "Pause Animation (Space)" : "Play Animation (Space)"
                     onClicked: ImageService.togglePlayback()
+                }
+            }
+
+            // Morphed Crop Controls Row
+            RowLayout {
+                id: cropRow
+                anchors.centerIn: parent
+                spacing: 4
+                opacity: ImageService.cropMode ? 1.0 : 0.0
+                visible: opacity > 0
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
+                    }
+                }
+
+                // Aspect ratio presets
+                Repeater {
+                    model: [
+                        { label: "Free",  ar: "" },
+                        { label: "1:1",   ar: "1:1" },
+                        { label: "4:3",   ar: "4:3" },
+                        { label: "16:9",  ar: "16:9" },
+                        { label: "3:2",   ar: "3:2" }
+                    ]
+                    delegate: Rectangle {
+                        readonly property bool isSelected: root.cropOverlay ? root.cropOverlay.aspectRatio === modelData.ar : false
+                        implicitWidth: arLabel.implicitWidth + 14
+                        implicitHeight: 32
+                        radius: 8
+                        color: isSelected
+                            ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.25)
+                            : (arMouse.containsMouse ? Theme.surfaceContainerHighest : "transparent")
+                        border.color: isSelected
+                            ? Theme.primary
+                            : Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.35)
+                        border.width: 1
+
+                        Text {
+                            id: arLabel
+                            anchors.centerIn: parent
+                            text: modelData.label
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.weight: Font.Medium
+                            color: isSelected ? Theme.primary : Theme.surfaceText
+                        }
+
+                        MouseArea {
+                            id: arMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (root.cropOverlay) {
+                                    root.cropOverlay.aspectRatio = modelData.ar;
+                                    root.cropOverlay._applyAspect();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Reset button
+                IslandButton {
+                    iconName: "restart_alt"
+                    tooltipText: "Reset Crop"
+                    onClicked: {
+                        if (root.cropOverlay) {
+                            root.cropOverlay.aspectRatio = "";
+                            root.cropOverlay.cropX = root.cropOverlay.imageX;
+                            root.cropOverlay.cropY = root.cropOverlay.imageY;
+                            root.cropOverlay.cropW = root.cropOverlay.imageW;
+                            root.cropOverlay.cropH = root.cropOverlay.imageH;
+                        }
+                    }
+                }
+
+                // Separator
+                Rectangle {
+                    width: 1
+                    height: 20
+                    color: Theme.outlineVariant
+                    opacity: 0.4
+                }
+
+                // Cancel button
+                Rectangle {
+                    implicitWidth: cancelRow.implicitWidth + 16
+                    implicitHeight: 32
+                    radius: 8
+                    color: cancelMouse.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+                    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.35)
+                    border.width: 1
+
+                    RowLayout {
+                        id: cancelRow
+                        anchors.centerIn: parent
+                        spacing: 4
+                        DankIcon { name: "close"; size: 16; color: Theme.surfaceText }
+                        Text {
+                            text: "Cancel"
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                        }
+                    }
+
+                    MouseArea {
+                        id: cancelMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            if (root.cropOverlay)
+                                root.cropOverlay.cancelled();
+                        }
+                    }
+                }
+
+                // Done / Apply button
+                Rectangle {
+                    implicitWidth: doneRow.implicitWidth + 16
+                    implicitHeight: 32
+                    radius: 8
+                    color: doneMouse.containsMouse
+                        ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.85)
+                        : Theme.primary
+
+                    RowLayout {
+                        id: doneRow
+                        anchors.centerIn: parent
+                        spacing: 4
+                        DankIcon { name: "check"; size: 16; color: Theme.primaryText }
+                        Text {
+                            text: "Done"
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.weight: Font.DemiBold
+                            color: Theme.primaryText
+                        }
+                    }
+
+                    MouseArea {
+                        id: doneMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            if (root.cropOverlay)
+                                root.cropOverlay.applyCrop();
+                        }
+                    }
                 }
             }
         }
