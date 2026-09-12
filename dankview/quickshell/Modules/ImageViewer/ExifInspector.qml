@@ -15,16 +15,34 @@ Rectangle {
     border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.28)
     border.width: 1
 
-    // Grab handle indicator for bottom sheet
-    Rectangle {
+    // Grab handle indicator for bottom sheet (Click to dismiss/close)
+    Item {
+        id: grabHandleArea
         anchors.top: parent.top
-        anchors.topMargin: 8
         anchors.horizontalCenter: parent.horizontalCenter
-        width: 36
-        height: 4
-        radius: 2
-        color: Qt.rgba(1, 1, 1, 0.35)
-        z: 2
+        width: 120
+        height: 24
+        z: 10
+
+        Rectangle {
+            id: grabHandleBar
+            anchors.centerIn: parent
+            width: grabHandleMouse.containsMouse ? 48 : 36
+            height: 4
+            radius: 2
+            color: grabHandleMouse.containsMouse ? Theme.primary : Qt.rgba(1, 1, 1, 0.38)
+
+            Behavior on width { NumberAnimation { duration: 150; easing.type: Theme.standardEasing } }
+            Behavior on color { ColorAnimation { duration: 150 } }
+        }
+
+        MouseArea {
+            id: grabHandleMouse
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: ImageService.inspectorOpen = false
+        }
     }
 
     component M3Card: Rectangle {
