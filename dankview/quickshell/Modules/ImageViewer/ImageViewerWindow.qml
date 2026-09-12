@@ -254,16 +254,8 @@ FloatingWindow {
                 anchors.leftMargin: 16
                 anchors.right: parent.right
                 anchors.rightMargin: 16
-                opacity: !ImageService.galleryMode && !ImageService.uiLocked && ImageService.currentFilePath !== "" && !ImageService.saveMode ? 1.0 : 0.0
-                visible: !ImageService.galleryMode && opacity > 0
+                visible: !ImageService.galleryMode && !ImageService.uiLocked && ImageService.currentFilePath !== "" && !ImageService.saveMode
                 z: 40
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.shortDuration
-                        easing.type: Theme.standardEasing
-                    }
-                }
             }
 
             // Gallery View (Shown when dankview opens without an image or when returned to gallery)
@@ -275,16 +267,8 @@ FloatingWindow {
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                opacity: ImageService.galleryMode ? 1.0 : 0.0
-                visible: opacity > 0
+                visible: ImageService.galleryMode
                 z: 35
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.shortDuration
-                        easing.type: Theme.standardEasing
-                    }
-                }
             }
 
             // Main Image Canvas Container (Rounded Viewport with Checkerboard)
@@ -301,17 +285,9 @@ FloatingWindow {
                 radius: 16
                 color: Theme.surfaceContainerLowest
                 clip: true
-                opacity: !ImageService.galleryMode ? 1.0 : 0.0
-                visible: opacity > 0
+                visible: !ImageService.galleryMode
                 border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.2)
                 border.width: 1
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.shortDuration
-                        easing.type: Theme.standardEasing
-                    }
-                }
 
                 ImageCanvas {
                     anchors.fill: parent
