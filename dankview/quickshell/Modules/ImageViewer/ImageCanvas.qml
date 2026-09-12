@@ -97,6 +97,36 @@ Item {
                 }
             }
 
+            // Instant low-res / cached preview while full-res is decoding asynchronously
+            Image {
+                id: previewImage
+                anchors.centerIn: parent
+                source: ImageService.previewThumbnail ? ("file://" + ImageService.previewThumbnail) : ""
+                fillMode: Image.PreserveAspectFit
+                asynchronous: false
+                cache: true
+                visible: opacity > 0
+                opacity: (imageElement.status === Image.Ready) ? 0.0 : 1.0
+
+                width: implicitWidth > 0 ? implicitWidth * fitScale : 400
+                height: implicitHeight > 0 ? implicitHeight * fitScale : 300
+
+                readonly property real fitScale: {
+                    if (implicitWidth <= 0 || implicitHeight <= 0 || viewport.width <= 0 || viewport.height <= 0)
+                        return 1.0;
+                    const scaleX = (viewport.width - 32) / implicitWidth;
+                    const scaleY = (viewport.height - 32) / implicitHeight;
+                    return Math.min(1.0, Math.min(scaleX, scaleY));
+                }
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 120
+                        easing.type: Theme.standardEasing
+                    }
+                }
+            }
+
             AnimatedImage {
                 id: imageElement
                 anchors.centerIn: parent
@@ -107,6 +137,14 @@ Item {
                 smooth: true
                 mipmap: true
                 cache: false
+                opacity: status === Image.Ready ? 1.0 : (previewImage.visible ? 0.0 : 1.0)
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 120
+                        easing.type: Theme.standardEasing
+                    }
+                }
 
                 onFrameCountChanged: {
                     ImageService.frameCount = frameCount;
@@ -135,8 +173,8 @@ Item {
                     ImageService.fitScale = fitScale;
                 }
 
-                width: implicitWidth > 0 ? implicitWidth * fitScale : 400
-                height: implicitHeight > 0 ? implicitHeight * fitScale : 300
+                width: implicitWidth > 0 ? implicitWidth * fitScale : (previewImage.implicitWidth > 0 ? previewImage.width : 400)
+                height: implicitHeight > 0 ? implicitHeight * fitScale : (previewImage.implicitHeight > 0 ? previewImage.height : 300)
             }
         }
 

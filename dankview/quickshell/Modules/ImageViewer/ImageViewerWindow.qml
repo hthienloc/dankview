@@ -275,8 +275,16 @@ FloatingWindow {
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                visible: ImageService.galleryMode
+                opacity: ImageService.galleryMode ? 1.0 : 0.0
+                visible: opacity > 0
                 z: 35
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
+                    }
+                }
             }
 
             // Main Image Canvas Container (Rounded Viewport with Checkerboard)
@@ -293,9 +301,17 @@ FloatingWindow {
                 radius: 16
                 color: Theme.surfaceContainerLowest
                 clip: true
-                visible: !ImageService.galleryMode
+                opacity: !ImageService.galleryMode ? 1.0 : 0.0
+                visible: opacity > 0
                 border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.2)
                 border.width: 1
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
+                    }
+                }
 
                 ImageCanvas {
                     anchors.fill: parent

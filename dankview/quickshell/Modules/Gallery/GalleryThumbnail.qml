@@ -151,7 +151,7 @@ Item {
             z: -1
             onClicked: {
                 if (root.imageItem) {
-                    ImageService.openImageFromGallery(root.imageItem.path);
+                    ImageService.openImageFromGallery(root.imageItem.path, root.imageItem.thumbnail || "");
                 }
             }
         }

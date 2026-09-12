@@ -51,6 +51,7 @@ Singleton {
     property var galleryFavorites: ({})
     property var gallerySelectedFiles: ({})
     property bool isGalleryLoading: false
+    property string previewThumbnail: ""
 
     function toggleFavorite(filePath) {
         const favs = Object.assign({}, galleryFavorites);
@@ -227,15 +228,19 @@ Singleton {
         galleryProc.running = true;
     }
 
-    function openImageFromGallery(filePath) {
+    function openImageFromGallery(filePath, thumbPath) {
+        previewThumbnail = thumbPath || "";
+        fileList = [filePath];
+        currentIndex = 0;
         galleryMode = false;
         loadDirectoryFor(filePath);
     }
 
     function backToGallery() {
-        galleryMode = true;
+        previewThumbnail = "";
         fileList = [];
         currentIndex = -1;
+        galleryMode = true;
         loadGallery();
     }
 
