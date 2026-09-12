@@ -38,3 +38,10 @@ dankapps/
 ├── dankvideo/     # Video player
 └── go.work        # Go workspace (dev only)
 ```
+
+## Credits & Acknowledgements
+
+Special thanks to the community members who helped shape the design and conception of the apps:
+
+- **Zurvan** (Discord) — Core design inspiration and UI concepts.
+- **Stumbling** (Discord) & **bbedward** — Invaluable feedback, critique, and quality insights.

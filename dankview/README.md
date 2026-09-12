@@ -69,6 +69,13 @@ make test
 sudo make install PREFIX=/usr/local
 ```
 
+## Credits & Acknowledgements
+
+Special thanks to the community members who helped shape the design and conception of DankView:
+
+- **Zurvan** (Discord) — Core design inspiration and UI concepts.
+- **Stumbling** (Discord) & **bbedward** — Invaluable feedback, critique, and quality insights.
+
 ## License
 
 MIT
