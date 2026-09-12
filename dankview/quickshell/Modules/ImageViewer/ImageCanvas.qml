@@ -225,7 +225,7 @@ Item {
     Item {
         id: emptyState
         anchors.fill: parent
-        visible: !root.hasImage
+        visible: !root.hasImage && !ImageService.galleryMode
 
         ColumnLayout {
             anchors.centerIn: parent

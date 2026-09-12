@@ -237,10 +237,8 @@ Singleton {
     }
 
     function backToGallery() {
-        previewThumbnail = "";
-        fileList = [];
-        currentIndex = -1;
         galleryMode = true;
+        previewThumbnail = "";
         loadGallery();
     }
 
