@@ -145,63 +145,31 @@ Item {
             }
         }
 
-        // Right Island: Actions (Copy & Delete)
-        RowLayout {
-            id: rightIsland
+        // Right Island: Delete / Trash button (Accent Red)
+        Rectangle {
+            id: deleteBtn
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 8
+            width: 38
+            height: 38
+            radius: 10
+            color: deleteMouse.containsMouse ? Qt.lighter(Theme.error, 1.15) : Theme.error
 
-            // Copy button
-            Rectangle {
-                width: 38
-                height: 38
-                radius: 10
-                color: copyMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
-                border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.28)
-                border.width: 1
+            Behavior on color { ColorAnimation { duration: 100 } }
 
-                Behavior on color { ColorAnimation { duration: 100 } }
-
-                DankIcon {
-                    anchors.centerIn: parent
-                    name: "content_copy"
-                    size: 21
-                    color: Theme.surfaceText
-                }
-
-                MouseArea {
-                    id: copyMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: ImageService.copyToClipboard()
-                }
+            DankIcon {
+                anchors.centerIn: parent
+                name: "delete"
+                size: 21
+                color: Theme.onError || "#ffffff"
             }
 
-            // Delete / Trash button (Accent Red)
-            Rectangle {
-                width: 38
-                height: 38
-                radius: 10
-                color: deleteMouse.containsMouse ? Qt.lighter(Theme.error, 1.15) : Theme.error
-
-                Behavior on color { ColorAnimation { duration: 100 } }
-
-                DankIcon {
-                    anchors.centerIn: parent
-                    name: "delete"
-                    size: 21
-                    color: Theme.onError || "#ffffff"
-                }
-
-                MouseArea {
-                    id: deleteMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: ImageService.moveToTrash()
-                }
+            MouseArea {
+                id: deleteMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: ImageService.moveToTrash()
             }
         }
     }
