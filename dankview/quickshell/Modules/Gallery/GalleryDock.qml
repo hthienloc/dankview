@@ -10,21 +10,26 @@ Rectangle {
     readonly property bool isSelectionMode: ImageService.gallerySelectedCount > 0
 
     implicitHeight: 46
-    implicitWidth: isSelectionMode ? Math.max(340, selectionRow.implicitWidth + 24) : 240
+    implicitWidth: (isSelectionMode ? selectionRow.implicitWidth : navRow.implicitWidth) + 24
     radius: 23
     color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.95)
     border.color: isSelectionMode
         ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.40)
         : Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.28)
     border.width: 1
+    clip: true
 
     Behavior on implicitWidth {
         NumberAnimation {
-            duration: 200
+            duration: Theme.shortDuration
             easing.type: Theme.standardEasing
         }
     }
-    Behavior on border.color { ColorAnimation { duration: 150 } }
+    Behavior on border.color {
+        ColorAnimation {
+            duration: Theme.shortDuration
+        }
+    }
 
     // Navigation Tabs (Shown when 0 images selected)
     RowLayout {
@@ -33,8 +38,20 @@ Rectangle {
         spacing: 6
         visible: opacity > 0
         opacity: root.isSelectionMode ? 0.0 : 1.0
+        scale: root.isSelectionMode ? 0.92 : 1.0
 
-        Behavior on opacity { NumberAnimation { duration: 120 } }
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+        Behavior on scale {
+            NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
 
         // Gallery Tab Button
         Rectangle {
@@ -122,8 +139,20 @@ Rectangle {
         spacing: 8
         visible: opacity > 0
         opacity: root.isSelectionMode ? 1.0 : 0.0
+        scale: root.isSelectionMode ? 1.0 : 0.92
 
-        Behavior on opacity { NumberAnimation { duration: 120 } }
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+        Behavior on scale {
+            NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
 
         // Selected Count Badge + Dismiss Button
         Rectangle {
