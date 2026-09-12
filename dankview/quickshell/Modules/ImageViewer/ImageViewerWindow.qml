@@ -251,6 +251,7 @@ FloatingWindow {
             GalleryView {
                 id: galleryView
                 windowControls: windowControls
+                targetWindow: window
                 anchors.fill: parent
                 visible: ImageService.galleryMode
                 z: 35

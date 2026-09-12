@@ -7,6 +7,9 @@ import qs.DankCommon.Widgets
 Item {
     id: root
 
+    property var windowControls: null
+    property var targetWindow: null
+
     implicitHeight: ImageService.galleryTab === "gallery" ? 76 : 32
     Behavior on implicitHeight { NumberAnimation { duration: 150; easing.type: Theme.standardEasing } }
 
@@ -18,6 +21,18 @@ Item {
         Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 18
+
+            MouseArea {
+                anchors.fill: parent
+                onPressed: {
+                    if (root.windowControls)
+                        root.windowControls.tryStartMove();
+                }
+                onDoubleClicked: {
+                    if (root.windowControls)
+                        root.windowControls.tryToggleMaximize();
+                }
+            }
 
             Rectangle {
                 anchors.centerIn: parent

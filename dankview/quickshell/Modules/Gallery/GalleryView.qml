@@ -7,8 +7,13 @@ import qs.DankCommon.Widgets
 Item {
     id: root
 
+    property var windowControls: null
+    property var targetWindow: null
+
     GalleryHeader {
         id: header
+        windowControls: root.windowControls
+        targetWindow: root.targetWindow
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
