@@ -49,7 +49,7 @@ Item {
                         height: parent.cellH
                         radius: 8
                         clip: true
-                        color: Theme.surfaceContainerLowest || "#181818"
+                        color: Theme.surfaceContainerLowest
 
                         readonly property string imgPath: {
                             if (!root.album || !root.album.previews || root.album.previews.length === 0) return "";

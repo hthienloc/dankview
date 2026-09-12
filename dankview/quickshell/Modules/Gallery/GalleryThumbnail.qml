@@ -71,7 +71,7 @@ Item {
                 visible: root.isSelected
                 name: "check"
                 size: 16
-                color: Theme.primaryText || "#ffffff"
+                color: Theme.primaryText
             }
 
             MouseArea {
@@ -101,7 +101,7 @@ Item {
                 anchors.centerIn: parent
                 name: root.isFav ? "favorite" : "favorite_border"
                 size: 16
-                color: root.isFav ? "#ff4081" : Qt.rgba(1, 1, 1, 0.9)
+                color: root.isFav ? Theme.error : Qt.rgba(1, 1, 1, 0.9)
             }
 
             MouseArea {
