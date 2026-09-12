@@ -99,7 +99,8 @@ Item {
 
             DankIcon {
                 anchors.centerIn: parent
-                name: root.isFav ? "favorite" : "favorite_border"
+                name: "favorite"
+                filled: root.isFav
                 size: 16
                 color: root.isFav ? Theme.error : Qt.rgba(1, 1, 1, 0.9)
             }
