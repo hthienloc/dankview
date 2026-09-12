@@ -46,6 +46,16 @@ Item {
         }
     }
 
+    component IslandSeparator: Rectangle {
+        implicitWidth: 1
+        implicitHeight: 20
+        Layout.alignment: Qt.AlignVCenter
+        Layout.leftMargin: 4
+        Layout.rightMargin: 4
+        color: Theme.outlineVariant
+        opacity: 0.38
+    }
+
     // Toolbar Row containing 3 islands
     Item {
         id: toolbarRow
@@ -57,7 +67,7 @@ Item {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             height: 44
-            width: zoomRow.implicitWidth + 8
+            width: zoomRow.implicitWidth + 12
             radius: 12
             color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.88)
             border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.28)
@@ -80,6 +90,8 @@ Item {
                     onClicked: ImageService.zoomIn()
                 }
 
+                IslandSeparator {}
+
                 IslandButton {
                     iconName: "crop_free"
                     tooltipText: "Fit to Window (0)"
@@ -94,7 +106,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             height: 44
-            width: (ImageService.cropMode ? cropRow.implicitWidth : editRow.implicitWidth) + 12
+            width: (ImageService.cropMode ? cropRow.implicitWidth : editRow.implicitWidth) + 16
             radius: 12
             color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.88)
             border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.28)
@@ -123,6 +135,7 @@ Item {
                     }
                 }
 
+                // Group 1: Rotation
                 IslandButton {
                     iconName: "rotate_left"
                     tooltipText: "Rotate Counter-Clockwise (L / Shift+R)"
@@ -135,6 +148,9 @@ Item {
                     onClicked: ImageService.rotateClockwise()
                 }
 
+                IslandSeparator {}
+
+                // Group 2: Flip
                 IslandButton {
                     iconName: "flip"
                     tooltipText: "Flip Horizontally (H / M)"
@@ -148,6 +164,9 @@ Item {
                     onClicked: ImageService.toggleFlipVertical()
                 }
 
+                IslandSeparator {}
+
+                // Group 3: Crop
                 IslandButton {
                     iconName: "crop"
                     tooltipText: "Crop (X / Ctrl+X)"
@@ -155,7 +174,11 @@ Item {
                     onClicked: ImageService.toggleCropMode()
                 }
 
-                // Animation Play/Pause if image is animated
+                IslandSeparator {
+                    visible: ImageService.isAnimated
+                }
+
+                // Group 4: Animation Play/Pause if image is animated
                 IslandButton {
                     visible: ImageService.isAnimated
                     iconName: ImageService.isPlaying ? "pause" : "play_arrow"
@@ -226,6 +249,8 @@ Item {
                     }
                 }
 
+                IslandSeparator {}
+
                 // Reset button
                 IslandButton {
                     iconName: "restart_alt"
@@ -241,13 +266,7 @@ Item {
                     }
                 }
 
-                // Separator
-                Rectangle {
-                    width: 1
-                    height: 20
-                    color: Theme.outlineVariant
-                    opacity: 0.4
-                }
+                IslandSeparator {}
 
                 // Cancel button
                 Rectangle {
