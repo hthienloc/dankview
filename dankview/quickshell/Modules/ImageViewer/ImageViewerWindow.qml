@@ -81,8 +81,20 @@ FloatingWindow {
                 break;
 
             // Actions & Editing
+            case Qt.Key_A:
+                if (event.modifiers & Qt.ControlModifier) {
+                    if (ImageService.galleryMode) {
+                        ImageService.selectAll();
+                        event.accepted = true;
+                    }
+                }
+                break;
             case Qt.Key_C:
-                ImageService.copyToClipboard();
+                if (ImageService.galleryMode && ImageService.gallerySelectedCount > 0) {
+                    ImageService.copySelectedFiles();
+                } else {
+                    ImageService.copyToClipboard();
+                }
                 event.accepted = true;
                 break;
             case Qt.Key_X:
@@ -110,7 +122,11 @@ FloatingWindow {
                 break;
             case Qt.Key_Delete:
             case Qt.Key_D:
-                ImageService.moveToTrash();
+                if (ImageService.galleryMode && ImageService.gallerySelectedCount > 0) {
+                    ImageService.trashSelected();
+                } else {
+                    ImageService.moveToTrash();
+                }
                 event.accepted = true;
                 break;
             case Qt.Key_Z:
@@ -161,7 +177,10 @@ FloatingWindow {
                 }
                 break;
             case Qt.Key_Escape:
-                if (ImageService.uiLocked) {
+                if (ImageService.galleryMode && ImageService.gallerySelectedCount > 0) {
+                    ImageService.clearSelection();
+                    event.accepted = true;
+                } else if (ImageService.uiLocked) {
                     ImageService.uiLocked = false;
                     event.accepted = true;
                 } else if (cropOverlay.promptVisible) {

@@ -80,6 +80,111 @@ Singleton {
         return !!gallerySelectedFiles[filePath];
     }
 
+    readonly property int gallerySelectedCount: Object.keys(gallerySelectedFiles).length
+    readonly property var gallerySelectedList: Object.keys(gallerySelectedFiles)
+
+    function clearSelection() {
+        gallerySelectedFiles = ({});
+    }
+
+    function selectAll() {
+        if (!galleryData || !galleryData.allImages) return;
+        const sel = {};
+        const cat = selectedCategory;
+        for (let i = 0; i < galleryData.allImages.length; i++) {
+            const img = galleryData.allImages[i];
+            if (!cat || cat === "All" || img.category === cat) {
+                sel[img.path] = true;
+            }
+        }
+        gallerySelectedFiles = sel;
+    }
+
+    function toggleFavoriteSelected() {
+        const list = gallerySelectedList;
+        if (list.length === 0) return;
+        const favs = Object.assign({}, galleryFavorites);
+        // Check if all are already favorite
+        let allFav = true;
+        for (let i = 0; i < list.length; i++) {
+            if (!favs[list[i]]) {
+                allFav = false;
+                break;
+            }
+        }
+        for (let i = 0; i < list.length; i++) {
+            if (allFav) {
+                delete favs[list[i]];
+            } else {
+                favs[list[i]] = true;
+            }
+        }
+        galleryFavorites = favs;
+        showToast(allFav ? "Removed from favorites" : `Added ${list.length} to favorites`);
+    }
+
+    function copySelectedFiles() {
+        const list = gallerySelectedList;
+        if (list.length === 0) return;
+        if (list.length === 1) {
+            const filePath = list[0];
+            const mimeTypes = {
+                "png": "image/png",
+                "jpg": "image/jpeg",
+                "jpeg": "image/jpeg",
+                "webp": "image/webp",
+                "svg": "image/svg+xml",
+                "gif": "image/gif"
+            };
+            const lastDot = filePath.lastIndexOf(".");
+            const ext = lastDot > 0 ? filePath.substring(lastDot + 1).toLowerCase() : "";
+            const mime = mimeTypes[ext] || "image/png";
+            copyProc.command = [
+                "sh", "-c",
+                'exec dms cl copy -t "$1" < "$2"',
+                "copyProc",
+                mime,
+                filePath
+            ];
+            copyProc.running = true;
+        } else {
+            // Copy list of paths separated by newline
+            copyPathProc.command = ["dms", "cl", "copy", list.join("\n")];
+            copyPathProc.running = true;
+        }
+        showToast(`Copied ${list.length} item${list.length > 1 ? "s" : ""}`);
+    }
+
+    function openSelectedWith() {
+        const list = gallerySelectedList;
+        if (list.length === 0) return;
+        for (let i = 0; i < Math.min(list.length, 10); i++) {
+            Quickshell.execDetached(["xdg-open", list[i]]);
+        }
+    }
+
+    function trashSelected() {
+        const list = gallerySelectedList;
+        if (list.length === 0) return;
+        batchTrashProc.command = ["gio", "trash"].concat(list);
+        batchTrashProc.running = true;
+    }
+
+    Process {
+        id: batchTrashProc
+        running: false
+        command: []
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                root.showToast(`Moved ${root.gallerySelectedList.length} to trash`);
+                root.clearSelection();
+                root.loadGallery();
+            } else {
+                root.showToast("Failed to delete selected items", true);
+            }
+        }
+    }
+
     function loadGallery(dirPath) {
         isGalleryLoading = true;
         const cmd = [dviewBin, "-gallery"];

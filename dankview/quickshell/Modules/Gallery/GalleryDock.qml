@@ -7,17 +7,34 @@ import qs.DankCommon.Widgets
 Rectangle {
     id: root
 
+    readonly property bool isSelectionMode: ImageService.gallerySelectedCount > 0
+
     implicitHeight: 46
-    implicitWidth: 240
+    implicitWidth: isSelectionMode ? Math.max(340, selectionRow.implicitWidth + 24) : 240
     radius: 23
     color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.95)
-    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.28)
+    border.color: isSelectionMode
+        ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.40)
+        : Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.28)
     border.width: 1
 
+    Behavior on implicitWidth {
+        NumberAnimation {
+            duration: 200
+            easing.type: Theme.standardEasing
+        }
+    }
+    Behavior on border.color { ColorAnimation { duration: 150 } }
+
+    // Navigation Tabs (Shown when 0 images selected)
     RowLayout {
         id: navRow
         anchors.centerIn: parent
         spacing: 6
+        visible: opacity > 0
+        opacity: root.isSelectionMode ? 0.0 : 1.0
+
+        Behavior on opacity { NumberAnimation { duration: 120 } }
 
         // Gallery Tab Button
         Rectangle {
@@ -95,6 +112,117 @@ Rectangle {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: ImageService.galleryTab = "albums"
             }
+        }
+    }
+
+    // Selection Action Toolbar (Morphs in when 1 or more images are selected)
+    RowLayout {
+        id: selectionRow
+        anchors.centerIn: parent
+        spacing: 8
+        visible: opacity > 0
+        opacity: root.isSelectionMode ? 1.0 : 0.0
+
+        Behavior on opacity { NumberAnimation { duration: 120 } }
+
+        // Selected Count Badge + Dismiss Button
+        Rectangle {
+            implicitHeight: 34
+            implicitWidth: countInner.implicitWidth + 16
+            radius: 17
+            color: Theme.primaryContainer
+
+            RowLayout {
+                id: countInner
+                anchors.centerIn: parent
+                spacing: 6
+
+                DankIcon {
+                    name: "check_circle"
+                    size: 18
+                    color: Theme.primary
+                }
+
+                Text {
+                    text: ImageService.gallerySelectedCount + " selected"
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontSizeSmall
+                    font.weight: Font.DemiBold
+                    color: Theme.primary
+                }
+
+                DankIcon {
+                    name: "close"
+                    size: 16
+                    color: Theme.primary
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: ImageService.clearSelection()
+            }
+        }
+
+        // Thin Separator
+        Rectangle {
+            implicitWidth: 1
+            implicitHeight: 20
+            color: Theme.outlineVariant
+            opacity: 0.35
+        }
+
+        // Action: Select All / Deselect
+        DankActionButton {
+            iconName: "select_all"
+            iconSize: 18
+            buttonSize: 34
+            tooltipText: "Select All (Ctrl+A)"
+            tooltipSide: "top"
+            onClicked: ImageService.selectAll()
+        }
+
+        // Action: Favorite / Unfavorite Selected
+        DankActionButton {
+            iconName: "favorite"
+            iconSize: 18
+            buttonSize: 34
+            tooltipText: "Favorite Selected"
+            tooltipSide: "top"
+            onClicked: ImageService.toggleFavoriteSelected()
+        }
+
+        // Action: Copy / Clipboard
+        DankActionButton {
+            iconName: "content_copy"
+            iconSize: 18
+            buttonSize: 34
+            tooltipText: "Copy to Clipboard (Ctrl+C)"
+            tooltipSide: "top"
+            onClicked: ImageService.copySelectedFiles()
+        }
+
+        // Action: Open With
+        DankActionButton {
+            iconName: "open_in_new"
+            iconSize: 18
+            buttonSize: 34
+            tooltipText: "Open With System App"
+            tooltipSide: "top"
+            onClicked: ImageService.openSelectedWith()
+        }
+
+        // Action: Delete / Move to Trash
+        DankActionButton {
+            iconName: "delete"
+            iconSize: 18
+            buttonSize: 34
+            iconColor: Theme.error
+            tooltipText: "Move to Trash (Delete)"
+            tooltipSide: "top"
+            onClicked: ImageService.trashSelected()
         }
     }
 }
