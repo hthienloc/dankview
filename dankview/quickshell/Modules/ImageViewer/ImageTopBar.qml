@@ -104,22 +104,6 @@ Item {
                 spacing: 2
 
                 IslandButton {
-                    iconName: "undo"
-                    tooltipText: "Undo (Ctrl+Z)"
-                    enabled: ImageService.canUndo
-                    opacity: enabled ? 1.0 : 0.35
-                    onClicked: ImageService.undoTransform()
-                }
-
-                IslandButton {
-                    iconName: "redo"
-                    tooltipText: "Redo (Ctrl+Y)"
-                    enabled: ImageService.canRedo
-                    opacity: enabled ? 1.0 : 0.35
-                    onClicked: ImageService.redoTransform()
-                }
-
-                IslandButton {
                     iconName: "rotate_left"
                     tooltipText: "Rotate Counter-Clockwise (L / Shift+R)"
                     onClicked: ImageService.rotateCounterClockwise()
