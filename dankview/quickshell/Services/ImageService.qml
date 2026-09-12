@@ -89,16 +89,14 @@ Singleton {
     }
 
     function openImageFromGallery(filePath) {
-        loadDirectoryFor(filePath);
-        currentFilePath = filePath;
         galleryMode = false;
+        loadDirectoryFor(filePath);
     }
 
     function backToGallery() {
-        currentFilePath = "";
-        fileList = [];
-        currentIndex = 0;
         galleryMode = true;
+        fileList = [];
+        currentIndex = -1;
         loadGallery();
     }
 
