@@ -43,6 +43,65 @@ Singleton {
     property real panX: 0
     property real panY: 0
 
+    // Gallery State
+    property bool galleryMode: currentFilePath === ""
+    property string galleryTab: "gallery" // "gallery" | "albums"
+    property string selectedCategory: "All"
+    property var galleryData: null
+    property var galleryFavorites: ({})
+    property var gallerySelectedFiles: ({})
+    property bool isGalleryLoading: false
+
+    function toggleFavorite(filePath) {
+        const favs = Object.assign({}, galleryFavorites);
+        if (favs[filePath]) {
+            delete favs[filePath];
+        } else {
+            favs[filePath] = true;
+        }
+        galleryFavorites = favs;
+    }
+
+    function isFavorite(filePath) {
+        return !!galleryFavorites[filePath];
+    }
+
+    function toggleSelect(filePath) {
+        const sel = Object.assign({}, gallerySelectedFiles);
+        if (sel[filePath]) {
+            delete sel[filePath];
+        } else {
+            sel[filePath] = true;
+        }
+        gallerySelectedFiles = sel;
+    }
+
+    function isSelected(filePath) {
+        return !!gallerySelectedFiles[filePath];
+    }
+
+    function loadGallery(dirPath) {
+        isGalleryLoading = true;
+        const cmd = [dviewBin, "-gallery"];
+        if (dirPath) cmd.push(dirPath);
+        galleryProc.command = cmd;
+        galleryProc.running = true;
+    }
+
+    function openImageFromGallery(filePath) {
+        loadDirectoryFor(filePath);
+        currentFilePath = filePath;
+        galleryMode = false;
+    }
+
+    function backToGallery() {
+        currentFilePath = "";
+        fileList = [];
+        currentIndex = 0;
+        galleryMode = true;
+        loadGallery();
+    }
+
     function togglePlayback() {
         isPlaying = !isPlaying;
     }
@@ -90,9 +149,12 @@ Singleton {
     onCurrentFilePathChanged: {
         resetTransform();
         if (currentFilePath) {
+            galleryMode = false;
             fetchMetadata();
         } else {
+            galleryMode = true;
             currentMeta = ({});
+            loadGallery();
         }
     }
 
@@ -100,6 +162,8 @@ Singleton {
         const initImg = Quickshell.env("DVIEW_INITIAL_IMAGE");
         if (initImg) {
             loadDirectoryFor(initImg);
+        } else {
+            loadGallery();
         }
     }
 
@@ -150,6 +214,28 @@ Singleton {
                     console.warn("Failed to parse metadata JSON:", e);
                 }
             }
+        }
+    }
+
+    Process {
+        id: galleryProc
+        running: false
+        command: []
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.isGalleryLoading = false;
+                try {
+                    const data = JSON.parse(text);
+                    if (data) {
+                        root.galleryData = data;
+                    }
+                } catch (e) {
+                    console.warn("Failed to parse gallery JSON:", e);
+                }
+            }
+        }
+        onExited: exitCode => {
+            root.isGalleryLoading = false;
         }
     }
 

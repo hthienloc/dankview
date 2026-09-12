@@ -72,6 +72,7 @@ func main() {
 	showVersion := flag.Bool("v", false, "show version")
 	printInfo := flag.Bool("info", false, "print image metadata as JSON and exit")
 	printList := flag.Bool("list", false, "print directory image list as JSON and exit")
+	printGallery := flag.Bool("gallery", false, "print gallery data as JSON and exit")
 	restoreFlag := flag.Bool("restore", false, "restore trashed image and exit")
 
 	flag.Usage = func() {
@@ -84,6 +85,22 @@ func main() {
 
 	if *showVersion {
 		fmt.Printf("dview version %s (built %s, commit %s)\n", Version, BuildTime, Commit)
+		return
+	}
+
+	if *printGallery {
+		dir := ""
+		if flag.NArg() > 0 {
+			dir = flag.Arg(0)
+		}
+		data, err := fs.ScanGallery(dir)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error scanning gallery: %v\n", err)
+			os.Exit(1)
+		}
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		enc.Encode(data)
 		return
 	}
 

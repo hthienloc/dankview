@@ -4,11 +4,12 @@ import qs.Common
 import qs.Services
 import qs.DankCommon.Widgets
 import "."
+import "../Gallery"
 
 FloatingWindow {
     id: window
 
-    title: ImageService.currentFileName ? (ImageService.currentFileName + " — DankView") : "DankView"
+    title: ImageService.galleryMode ? "Gallery — DankView" : (ImageService.currentFileName ? (ImageService.currentFileName + " — DankView") : "DankView")
     minimumSize: Qt.size(480, 360)
     implicitWidth: 1050
     implicitHeight: 720
@@ -176,6 +177,9 @@ FloatingWindow {
                 } else if (ImageService.inspectorOpen) {
                     ImageService.inspectorOpen = false;
                     event.accepted = true;
+                } else if (!ImageService.galleryMode && ImageService.galleryData.allImages && ImageService.galleryData.allImages.length > 0) {
+                    ImageService.backToGallery();
+                    event.accepted = true;
                 } else if (window.maximized) {
                     windowControls.tryToggleMaximize();
                     event.accepted = true;
@@ -209,8 +213,8 @@ FloatingWindow {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
-                opacity: !ImageService.uiLocked ? 1.0 : 0.0
-                visible: opacity > 0
+                opacity: !ImageService.galleryMode && !ImageService.uiLocked ? 1.0 : 0.0
+                visible: !ImageService.galleryMode && opacity > 0
                 z: 40
 
                 Behavior on opacity {
@@ -231,8 +235,8 @@ FloatingWindow {
                 anchors.leftMargin: 16
                 anchors.right: parent.right
                 anchors.rightMargin: 16
-                opacity: !ImageService.uiLocked && ImageService.currentFilePath !== "" && !ImageService.saveMode ? 1.0 : 0.0
-                visible: opacity > 0
+                opacity: !ImageService.galleryMode && !ImageService.uiLocked && ImageService.currentFilePath !== "" && !ImageService.saveMode ? 1.0 : 0.0
+                visible: !ImageService.galleryMode && opacity > 0
                 z: 40
 
                 Behavior on opacity {
@@ -241,6 +245,15 @@ FloatingWindow {
                         easing.type: Theme.standardEasing
                     }
                 }
+            }
+
+            // Gallery View (Shown when dankview opens without an image or when returned to gallery)
+            GalleryView {
+                id: galleryView
+                windowControls: windowControls
+                anchors.fill: parent
+                visible: ImageService.galleryMode
+                z: 35
             }
 
             // Main Image Canvas Container (Rounded Viewport with Checkerboard)
@@ -257,6 +270,7 @@ FloatingWindow {
                 radius: 16
                 color: Theme.surfaceContainerLowest
                 clip: true
+                visible: !ImageService.galleryMode
                 border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.2)
                 border.width: 1
 
@@ -314,7 +328,7 @@ FloatingWindow {
                 color: bottomTabMouse.containsMouse ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh
                 border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.3)
                 border.width: 1
-                visible: !ImageService.uiLocked && ImageService.currentFilePath !== "" && !ImageService.inspectorOpen
+                visible: !ImageService.galleryMode && !ImageService.uiLocked && ImageService.currentFilePath !== "" && !ImageService.inspectorOpen
                 z: 50
 
                 Behavior on color { ColorAnimation { duration: 100 } }

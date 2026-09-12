@@ -35,11 +35,14 @@ Rectangle {
         anchors.rightMargin: 10
         spacing: 10
 
-        // App/File Icon & Name
-        DankIcon {
-            name: "image"
-            size: 22
-            color: Theme.primary
+        // Back to Gallery button
+        DankActionButton {
+            iconName: "arrow_back"
+            iconSize: 20
+            buttonSize: 32
+            tooltipText: "Back to Gallery (Esc)"
+            tooltipSide: "bottom"
+            onClicked: ImageService.backToGallery()
         }
 
         Text {
