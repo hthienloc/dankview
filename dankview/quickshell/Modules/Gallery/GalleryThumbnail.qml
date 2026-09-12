@@ -19,11 +19,23 @@ Item {
 
     // Viewport visibility calculation to avoid loading off-screen images in large galleries
     readonly property real itemContentY: flickable ? root.mapToItem(flickable.contentItem, 0, 0).y : 0
-    readonly property bool shouldLoad: {
+    readonly property bool inView: {
         if (!flickable) return true;
-        const topBound = flickable.contentY - 500;
-        const bottomBound = flickable.contentY + flickable.height + 500;
+        const topBound = flickable.contentY - 600;
+        const bottomBound = flickable.contentY + flickable.height + 600;
         return itemContentY + height >= topBound && itemContentY <= bottomBound;
+    }
+
+    property bool hasLoaded: false
+    onInViewChanged: {
+        if (inView && !hasLoaded) {
+            hasLoaded = true;
+        }
+    }
+    Component.onCompleted: {
+        if (inView) {
+            hasLoaded = true;
+        }
     }
 
     Rectangle {
@@ -45,7 +57,7 @@ Item {
             asynchronous: true
             cache: true
             source: {
-                if (!root.imageItem || !root.shouldLoad) return "";
+                if (!root.imageItem || !root.hasLoaded) return "";
                 if (root.imageItem.thumbnail) return "file://" + root.imageItem.thumbnail;
                 return "file://" + root.imageItem.path;
             }
