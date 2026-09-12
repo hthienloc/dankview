@@ -205,7 +205,7 @@ FloatingWindow {
             border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.4)
             border.width: window.maximized ? 0 : 1
 
-            // Top Header Bar (Classic DankView Header)
+            // Top Header Bar (Classic DankView Header - consistent in both Viewer & Gallery modes)
             ImageHeaderBar {
                 id: headerBar
                 windowControls: windowControls
@@ -213,8 +213,8 @@ FloatingWindow {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
-                opacity: !ImageService.galleryMode && !ImageService.uiLocked ? 1.0 : 0.0
-                visible: !ImageService.galleryMode && opacity > 0
+                opacity: !ImageService.uiLocked ? 1.0 : 0.0
+                visible: opacity > 0
                 z: 40
 
                 Behavior on opacity {
@@ -252,7 +252,10 @@ FloatingWindow {
                 id: galleryView
                 windowControls: windowControls
                 targetWindow: window
-                anchors.fill: parent
+                anchors.top: headerBar.bottom
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
                 visible: ImageService.galleryMode
                 z: 35
             }

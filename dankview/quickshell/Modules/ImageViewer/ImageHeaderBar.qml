@@ -35,8 +35,9 @@ Rectangle {
         anchors.rightMargin: 10
         spacing: 10
 
-        // Back to Gallery button
+        // Back to Gallery button (only when viewing an image from gallery)
         DankActionButton {
+            visible: !ImageService.galleryMode && ImageService.galleryData.allImages && ImageService.galleryData.allImages.length > 0
             iconName: "arrow_back"
             iconSize: 20
             buttonSize: 32
@@ -47,7 +48,7 @@ Rectangle {
 
         Text {
             Layout.fillWidth: true
-            text: ImageService.currentFileName || "DankView"
+            text: ImageService.galleryMode ? "Gallery" : (ImageService.currentFileName || "DankView")
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeLarge
             font.weight: Font.DemiBold

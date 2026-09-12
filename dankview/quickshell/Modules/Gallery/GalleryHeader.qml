@@ -7,59 +7,25 @@ import qs.DankCommon.Widgets
 Item {
     id: root
 
-    property var windowControls: null
-    property var targetWindow: null
+    implicitHeight: ImageService.galleryTab === "gallery" ? 44 : 0
+    visible: ImageService.galleryTab === "gallery"
 
-    implicitHeight: ImageService.galleryTab === "gallery" ? 76 : 32
     Behavior on implicitHeight { NumberAnimation { duration: 150; easing.type: Theme.standardEasing } }
 
-    ColumnLayout {
+    // Category Filter Chips (Gallery tab only)
+    Flickable {
+        id: chipFlick
         anchors.fill: parent
-        spacing: 10
+        anchors.topMargin: 4
+        anchors.bottomMargin: 6
+        anchors.leftMargin: 20
+        anchors.rightMargin: 20
+        contentWidth: chipRow.implicitWidth
+        boundsBehavior: Flickable.StopAtBounds
+        clip: true
 
-        // Grab Handle at the top center
-        Item {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 18
-
-            MouseArea {
-                anchors.fill: parent
-                onPressed: {
-                    if (root.windowControls)
-                        root.windowControls.tryStartMove();
-                }
-                onDoubleClicked: {
-                    if (root.windowControls)
-                        root.windowControls.tryToggleMaximize();
-                }
-            }
-
-            Rectangle {
-                anchors.centerIn: parent
-                width: 38
-                height: 4
-                radius: 2
-                color: Qt.rgba(1, 1, 1, 0.35)
-            }
-        }
-
-        // Category Filter Chips (Gallery tab only)
-        Flickable {
-            id: chipFlick
-            Layout.fillWidth: true
-            Layout.preferredHeight: 34
-            Layout.leftMargin: 20
-            Layout.rightMargin: 20
-            visible: ImageService.galleryTab === "gallery"
-            opacity: visible ? 1.0 : 0.0
-            contentWidth: chipRow.implicitWidth
-            boundsBehavior: Flickable.StopAtBounds
-            clip: true
-
-            Behavior on opacity { NumberAnimation { duration: 150 } }
-
-            RowLayout {
-                id: chipRow
+        RowLayout {
+            id: chipRow
                 spacing: 8
 
                 Repeater {
@@ -100,4 +66,3 @@ Item {
             }
         }
     }
-}

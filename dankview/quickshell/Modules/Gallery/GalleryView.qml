@@ -12,9 +12,8 @@ Item {
 
     GalleryHeader {
         id: header
-        windowControls: root.windowControls
-        targetWindow: root.targetWindow
         anchors.top: parent.top
+        anchors.topMargin: 8
         anchors.left: parent.left
         anchors.right: parent.right
         z: 20
