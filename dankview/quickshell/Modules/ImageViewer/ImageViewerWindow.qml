@@ -401,7 +401,7 @@ FloatingWindow {
                 anchors.bottomMargin: ImageService.inspectorOpen ? 16 : -height - 30
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: Math.min(760, parent.width - 32)
-                height: Math.min(380, parent.height * 0.55)
+                height: Math.min(480, Math.max(380, parent.height * 0.60))
                 visible: anchors.bottomMargin > -height || ImageService.inspectorOpen
                 z: 95
 

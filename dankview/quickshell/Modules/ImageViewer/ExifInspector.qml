@@ -8,17 +8,17 @@ import qs.DankCommon.Widgets
 Rectangle {
     id: root
 
-    width: 720
-    height: 360
-    radius: 18
-    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.96)
-    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.3)
+    width: 760
+    height: 480
+    radius: 20
+    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.97)
+    border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.28)
     border.width: 1
 
     // Grab handle indicator for bottom sheet
     Rectangle {
         anchors.top: parent.top
-        anchors.topMargin: 7
+        anchors.topMargin: 8
         anchors.horizontalCenter: parent.horizontalCenter
         width: 36
         height: 4
@@ -29,9 +29,9 @@ Rectangle {
 
     component M3Card: Rectangle {
         Layout.fillWidth: true
-        radius: 12
+        radius: 14
         color: Theme.surfaceContainerHigh
-        border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.18)
+        border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.20)
         border.width: 1
     }
 
@@ -68,10 +68,11 @@ Rectangle {
         spacing: 12
 
         Text {
-            Layout.preferredWidth: 105
+            Layout.preferredWidth: 110
             text: label
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSmall
+            font.weight: Font.Medium
             color: Theme.surfaceVariantText
             elide: Text.ElideRight
         }
@@ -98,7 +99,7 @@ Rectangle {
         implicitWidth: chipRow.implicitWidth + 20
         radius: 8
         color: chipMouse.containsMouse ? Theme.surfaceContainerHighest : (Theme.surfaceContainerLow || Theme.surfaceContainerHigh)
-        border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.3)
+        border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.28)
         border.width: 1
 
         RowLayout {
@@ -138,7 +139,7 @@ Rectangle {
 
         implicitHeight: 24
         implicitWidth: badgeText.implicitWidth + 14
-        radius: 12
+        radius: 8
         color: bgColor
         border.color: borderColor
         border.width: borderColor !== "transparent" ? 1 : 0
@@ -148,7 +149,7 @@ Rectangle {
             anchors.centerIn: parent
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSmall - 1
-            font.weight: Font.DemiBold
+            font.weight: Font.Medium
             color: textColor
         }
     }
@@ -159,9 +160,10 @@ Rectangle {
 
         Layout.fillWidth: true
         implicitHeight: 48
-        radius: 8
+        radius: 10
         color: Theme.surfaceContainerLow || Theme.surfaceContainerHigh
-        border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.15)
+        border.color: Qt.rgba(Theme.outlineVariant.r, Theme.outlineVariant.g, Theme.outlineVariant.b, 0.16)
+        border.width: 1
 
         ColumnLayout {
             anchors.centerIn: parent
@@ -172,6 +174,7 @@ Rectangle {
                 text: label
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeSmall - 2
+                font.weight: Font.Normal
                 color: Theme.surfaceVariantText
             }
 
@@ -213,13 +216,13 @@ Rectangle {
 
             DankIcon {
                 name: "info"
-                size: 22
+                size: 20
                 color: Theme.primary
             }
 
             Text {
                 Layout.fillWidth: true
-                text: "Details"
+                text: "Image Details"
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeLarge
                 font.weight: Font.DemiBold
@@ -241,7 +244,7 @@ Rectangle {
             Layout.fillWidth: true
             height: 1
             color: Theme.outlineVariant
-            opacity: 0.25
+            opacity: 0.22
         }
 
         DankFlickable {
@@ -255,26 +258,26 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
-                anchors.margins: 14
-                spacing: 14
+                anchors.margins: 16
+                spacing: 16
 
                 // Hero File Card
                 M3Card {
-                    implicitHeight: heroCol.implicitHeight + 24
+                    implicitHeight: heroCol.implicitHeight + 28
 
                     ColumnLayout {
                         id: heroCol
                         anchors.fill: parent
-                        anchors.margins: 12
-                        spacing: 10
+                        anchors.margins: 14
+                        spacing: 12
 
                         RowLayout {
                             Layout.fillWidth: true
-                            spacing: 10
+                            spacing: 12
 
                             Rectangle {
-                                width: 40
-                                height: 40
+                                width: 42
+                                height: 42
                                 radius: 10
                                 color: Theme.primaryContainer
 
@@ -294,7 +297,7 @@ Rectangle {
                                     Layout.fillWidth: true
                                     text: ImageService.currentFileName || "Image"
                                     font.family: Theme.fontFamily
-                                    font.pixelSize: Theme.fontSizeMedium
+                                    font.pixelSize: Theme.fontSizeMedium + 1
                                     font.weight: Font.DemiBold
                                     color: Theme.surfaceText
                                     elide: Text.ElideMiddle
@@ -396,12 +399,12 @@ Rectangle {
                     }
 
                     M3Card {
-                        implicitHeight: attrCol.implicitHeight + 24
+                        implicitHeight: attrCol.implicitHeight + 28
 
                         ColumnLayout {
                             id: attrCol
                             anchors.fill: parent
-                            anchors.margins: 12
+                            anchors.margins: 14
                             spacing: 10
 
                             DetailRow {
@@ -445,12 +448,12 @@ Rectangle {
                     }
 
                     M3Card {
-                        implicitHeight: cameraCol.implicitHeight + 24
+                        implicitHeight: cameraCol.implicitHeight + 28
 
                         ColumnLayout {
                             id: cameraCol
                             anchors.fill: parent
-                            anchors.margins: 12
+                            anchors.margins: 14
                             spacing: 12
 
                             Text {
@@ -493,12 +496,12 @@ Rectangle {
                     }
 
                     M3Card {
-                        implicitHeight: locCol.implicitHeight + 24
+                        implicitHeight: locCol.implicitHeight + 28
 
                         ColumnLayout {
                             id: locCol
                             anchors.fill: parent
-                            anchors.margins: 12
+                            anchors.margins: 14
                             spacing: 10
 
                             DetailRow {
@@ -528,12 +531,12 @@ Rectangle {
                     }
 
                     M3Card {
-                        implicitHeight: gpsCol.implicitHeight + 24
+                        implicitHeight: gpsCol.implicitHeight + 28
 
                         ColumnLayout {
                             id: gpsCol
                             anchors.fill: parent
-                            anchors.margins: 12
+                            anchors.margins: 14
                             spacing: 12
 
                             DetailRow {
