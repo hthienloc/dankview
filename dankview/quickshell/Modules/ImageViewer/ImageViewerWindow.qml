@@ -321,11 +321,15 @@ FloatingWindow {
 
                 // Handle indicator line
                 Rectangle {
+                    id: bottomDockHandle
                     anchors.centerIn: parent
-                    width: 38
+                    width: bottomTabMouse.containsMouse ? 50 : 38
                     height: 4
                     radius: 2
                     color: bottomTabMouse.containsMouse ? Theme.primary : Theme.outlineVariant
+
+                    Behavior on width { NumberAnimation { duration: 150; easing.type: Theme.standardEasing } }
+                    Behavior on color { ColorAnimation { duration: 150 } }
                 }
 
                 MouseArea {
