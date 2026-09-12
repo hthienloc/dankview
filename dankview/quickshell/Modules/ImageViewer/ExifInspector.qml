@@ -406,48 +406,97 @@ Rectangle {
                     }
                 }
 
-                // Section 1: Image Attributes
-                ColumnLayout {
+                // Section 1 & 3: Image Attributes and Location side-by-side (2 columns)
+                RowLayout {
                     Layout.fillWidth: true
-                    spacing: 8
+                    spacing: 16
+                    Layout.alignment: Qt.AlignTop
 
-                    SectionHeader {
-                        title: "Attributes"
-                        iconName: "photo_size_select_actual"
+                    // Column 1: Image Attributes
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: 1
+                        Layout.alignment: Qt.AlignTop
+                        spacing: 8
+
+                        SectionHeader {
+                            title: "Attributes"
+                            iconName: "photo_size_select_actual"
+                        }
+
+                        M3Card {
+                            Layout.fillHeight: true
+                            implicitHeight: attrCol.implicitHeight + 28
+
+                            ColumnLayout {
+                                id: attrCol
+                                anchors.fill: parent
+                                anchors.margins: 14
+                                spacing: 10
+
+                                DetailRow {
+                                    label: "Dimensions"
+                                    value: ImageService.currentMeta.width > 0 ? (ImageService.currentMeta.width + " × " + ImageService.currentMeta.height + " px") : ""
+                                }
+                                DetailRow {
+                                    label: "Megapixels"
+                                    value: ImageService.currentMeta.megapixels || ""
+                                }
+                                DetailRow {
+                                    label: "Aspect Ratio"
+                                    value: ImageService.currentMeta.aspectRatio || ""
+                                }
+                                DetailRow {
+                                    label: "File Size"
+                                    value: ImageService.currentMeta.fileSizeText || ""
+                                }
+                                DetailRow {
+                                    label: "Format"
+                                    value: ImageService.currentMeta.format || ""
+                                }
+                                DetailRow {
+                                    label: "Modified"
+                                    value: ImageService.currentMeta.modTimeText || ""
+                                }
+                            }
+                        }
                     }
 
-                    M3Card {
-                        implicitHeight: attrCol.implicitHeight + 28
+                    // Column 2: Location
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: 1
+                        Layout.alignment: Qt.AlignTop
+                        spacing: 8
 
-                        ColumnLayout {
-                            id: attrCol
-                            anchors.fill: parent
-                            anchors.margins: 14
-                            spacing: 10
+                        SectionHeader {
+                            title: "Location"
+                            iconName: "folder"
+                        }
 
-                            DetailRow {
-                                label: "Dimensions"
-                                value: ImageService.currentMeta.width > 0 ? (ImageService.currentMeta.width + " × " + ImageService.currentMeta.height + " px") : ""
-                            }
-                            DetailRow {
-                                label: "Megapixels"
-                                value: ImageService.currentMeta.megapixels || ""
-                            }
-                            DetailRow {
-                                label: "Aspect Ratio"
-                                value: ImageService.currentMeta.aspectRatio || ""
-                            }
-                            DetailRow {
-                                label: "File Size"
-                                value: ImageService.currentMeta.fileSizeText || ""
-                            }
-                            DetailRow {
-                                label: "Format"
-                                value: ImageService.currentMeta.format || ""
-                            }
-                            DetailRow {
-                                label: "Modified"
-                                value: ImageService.currentMeta.modTimeText || ""
+                        M3Card {
+                            Layout.fillHeight: true
+                            implicitHeight: locCol.implicitHeight + 28
+
+                            ColumnLayout {
+                                id: locCol
+                                anchors.fill: parent
+                                anchors.margins: 14
+                                spacing: 10
+
+                                DetailRow {
+                                    label: "Folder"
+                                    value: ImageService.currentMeta.directory || ""
+                                    isMono: true
+                                }
+
+                                DetailRow {
+                                    label: "Full Path"
+                                    value: ImageService.currentFilePath
+                                    isMono: true
+                                }
                             }
                         }
                     }
@@ -498,40 +547,6 @@ Rectangle {
                             DetailRow {
                                 label: "Date Taken"
                                 value: ImageService.currentMeta.dateTaken || ""
-                            }
-                        }
-                    }
-                }
-
-                // Section 3: Location
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 8
-
-                    SectionHeader {
-                        title: "Location"
-                        iconName: "folder"
-                    }
-
-                    M3Card {
-                        implicitHeight: locCol.implicitHeight + 28
-
-                        ColumnLayout {
-                            id: locCol
-                            anchors.fill: parent
-                            anchors.margins: 14
-                            spacing: 10
-
-                            DetailRow {
-                                label: "Folder"
-                                value: ImageService.currentMeta.directory || ""
-                                isMono: true
-                            }
-
-                            DetailRow {
-                                label: "Full Path"
-                                value: ImageService.currentFilePath
-                                isMono: true
                             }
                         }
                     }
