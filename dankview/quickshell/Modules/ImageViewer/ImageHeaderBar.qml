@@ -35,15 +35,21 @@ Rectangle {
         anchors.rightMargin: 10
         spacing: 10
 
-        // Back to Gallery button (only when viewing an image from gallery)
+        // Leading Icon / Navigation button (always present to prevent layout shift)
         DankActionButton {
-            visible: !ImageService.galleryMode && ImageService.galleryData.allImages && ImageService.galleryData.allImages.length > 0
-            iconName: "arrow_back"
+            readonly property bool canGoBack: !ImageService.galleryMode && ImageService.galleryData.allImages && ImageService.galleryData.allImages.length > 0
+            iconName: ImageService.galleryMode ? "image" : (canGoBack ? "arrow_back" : "image")
             iconSize: 20
             buttonSize: 32
-            tooltipText: "Back to Gallery (Esc)"
+            enabled: canGoBack
+            iconColor: ImageService.galleryMode ? Theme.primary : Theme.surfaceText
+            tooltipText: canGoBack ? "Back to Gallery (Esc)" : ""
             tooltipSide: "bottom"
-            onClicked: ImageService.backToGallery()
+            onClicked: {
+                if (canGoBack) {
+                    ImageService.backToGallery();
+                }
+            }
         }
 
         Text {
