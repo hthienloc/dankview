@@ -21,9 +21,13 @@ Item {
     property var pendingCrop: null
 
     onVisibleChanged: {
-        if (!visible) {
+        if (visible) {
+            aspectRatio = "";
+            _reset();
+        } else {
             promptVisible = false;
             pendingCrop = null;
+            aspectRatio = "";
         }
     }
 
@@ -56,6 +60,9 @@ Item {
         cropY = imageY + imageH * 0.1;
         cropW = imageW * 0.8;
         cropH = imageH * 0.8;
+        if (aspectRatio !== "") {
+            _applyAspect();
+        }
     }
 
     function _clamp() {
