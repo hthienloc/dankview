@@ -1,6 +1,10 @@
 package fs
 
 import (
+	"crypto/md5"
+	"encoding/hex"
+	"encoding/json"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -12,6 +16,7 @@ import (
 // GalleryImage represents a single image with metadata for the gallery.
 type GalleryImage struct {
 	Path      string `json:"path"`
+	Thumbnail string `json:"thumbnail"`
 	Name      string `json:"name"`
 	ModTime   int64  `json:"modTime"`
 	DateGroup string `json:"dateGroup"`
@@ -55,6 +60,30 @@ func GetPicturesDir() string {
 	return ""
 }
 
+// resolveXdgThumbnail finds the Freedesktop cached thumbnail if available.
+func resolveXdgThumbnail(filePath string, thumbDir string) string {
+	if thumbDir == "" {
+		return ""
+	}
+	abs, err := filepath.Abs(filePath)
+	if err != nil {
+		return ""
+	}
+	// XDG format: "file://" + url.PathEscape(abs)
+	uri := "file://" + (&url.URL{Path: abs}).EscapedPath()
+	h := md5.Sum([]byte(uri))
+	hashStr := hex.EncodeToString(h[:])
+	fileName := hashStr + ".png"
+
+	for _, size := range []string{"large", "normal", "x-large"} {
+		cand := filepath.Join(thumbDir, size, fileName)
+		if fi, err := os.Stat(cand); err == nil && !fi.IsDir() && fi.Size() > 0 {
+			return cand
+		}
+	}
+	return ""
+}
+
 func computeDateGroup(t time.Time, today, yesterday time.Time) string {
 	fileDate := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
 	if !fileDate.Before(today) {
@@ -67,6 +96,98 @@ func computeDateGroup(t time.Time, today, yesterday time.Time) string {
 		return t.Format("January 2")
 	}
 	return t.Format("January 2, 2006")
+}
+
+type dsearchHit struct {
+	ID string `json:"id"`
+}
+
+type dsearchResult struct {
+	Hits []dsearchHit `json:"hits"`
+}
+
+// tryScanWithDsearch attempts to query danksearch index for instant results.
+func tryScanWithDsearch(absRoot string, thumbDir string, today, yesterday time.Time) ([]GalleryImage, map[string]*GalleryAlbum, map[string]bool, bool) {
+	dsearchBin, err := exec.LookPath("dsearch")
+	if err != nil {
+		return nil, nil, nil, false
+	}
+
+	cmd := exec.Command(dsearchBin, "search", "", "--folder", absRoot, "--limit", "10000", "--json")
+	out, err := cmd.Output()
+	if err != nil {
+		return nil, nil, nil, false
+	}
+
+	var res dsearchResult
+	if err := json.Unmarshal(out, &res); err != nil || len(res.Hits) == 0 {
+		return nil, nil, nil, false
+	}
+
+	var allImages []GalleryImage
+	albumMap := make(map[string]*GalleryAlbum)
+	categorySet := make(map[string]bool)
+
+	screenshotDir := filepath.Join(absRoot, "Screenshots")
+	albumMap[screenshotDir] = &GalleryAlbum{
+		Name:     "Screenshots",
+		Path:     screenshotDir,
+		IsPinned: true,
+		Previews: []string{},
+	}
+
+	for _, hit := range res.Hits {
+		p := hit.ID
+		if !IsSupportedImage(p) {
+			continue
+		}
+		fi, err := os.Stat(p)
+		if err != nil || fi.IsDir() {
+			continue
+		}
+
+		parentDir := filepath.Dir(p)
+		category := "Pictures"
+		if parentDir != absRoot {
+			category = filepath.Base(parentDir)
+			if _, exists := albumMap[parentDir]; !exists {
+				isPinned := strings.EqualFold(category, "Screenshots") || strings.EqualFold(category, "Wallpapers")
+				albumMap[parentDir] = &GalleryAlbum{
+					Name:     category,
+					Path:     parentDir,
+					IsPinned: isPinned,
+					Previews: []string{},
+				}
+			}
+		}
+
+		thumbPath := resolveXdgThumbnail(p, thumbDir)
+
+		img := GalleryImage{
+			Path:      p,
+			Thumbnail: thumbPath,
+			Name:      fi.Name(),
+			ModTime:   fi.ModTime().Unix(),
+			DateGroup: computeDateGroup(fi.ModTime(), today, yesterday),
+			Category:  category,
+		}
+
+		allImages = append(allImages, img)
+		categorySet[category] = true
+
+		if alb, ok := albumMap[parentDir]; ok {
+			alb.TotalCount++
+			if len(alb.Previews) < 4 {
+				alb.Previews = append(alb.Previews, p)
+			}
+		}
+	}
+
+	if len(allImages) == 0 {
+		return nil, nil, nil, false
+	}
+
+	return allImages, albumMap, categorySet, true
 }
 
 // ScanGallery scans rootDir and its subdirectories for images and organizes them into GalleryData.
@@ -88,17 +209,28 @@ func ScanGallery(rootDir string) (*GalleryData, error) {
 	albumMap := make(map[string]*GalleryAlbum)
 	categorySet := make(map[string]bool)
 
-	// Ensure Screenshots is tracked as pinned album if present or common
-	screenshotDir := filepath.Join(absRoot, "Screenshots")
-	albumMap[screenshotDir] = &GalleryAlbum{
-		Name:     "Screenshots",
-		Path:     screenshotDir,
-		IsPinned: true,
-		Previews: []string{},
+	thumbDir := ""
+	if cacheDir, err := os.UserCacheDir(); err == nil {
+		thumbDir = filepath.Join(cacheDir, "thumbnails")
 	}
 
-	// Walk max 2 levels deep
-	_ = filepath.Walk(absRoot, func(path string, info os.FileInfo, err error) error {
+	// Try danksearch (dsearch) first for instant indexing results
+	if dsearchImages, dsearchAlbums, dsearchCats, ok := tryScanWithDsearch(absRoot, thumbDir, today, yesterday); ok {
+		allImages = dsearchImages
+		albumMap = dsearchAlbums
+		categorySet = dsearchCats
+	} else {
+		// Fallback to filesystem traversal
+		screenshotDir := filepath.Join(absRoot, "Screenshots")
+		albumMap[screenshotDir] = &GalleryAlbum{
+			Name:     "Screenshots",
+			Path:     screenshotDir,
+			IsPinned: true,
+			Previews: []string{},
+		}
+
+		// Walk max 2 levels deep
+		_ = filepath.Walk(absRoot, func(path string, info os.FileInfo, err error) error {
 		if err != nil || info == nil {
 			return nil
 		}
@@ -137,8 +269,11 @@ func ScanGallery(rootDir string) (*GalleryData, error) {
 			category = filepath.Base(parentDir)
 		}
 
+		thumbPath := resolveXdgThumbnail(path, thumbDir)
+
 		img := GalleryImage{
 			Path:      path,
+			Thumbnail: thumbPath,
 			Name:      info.Name(),
 			ModTime:   info.ModTime().Unix(),
 			DateGroup: computeDateGroup(info.ModTime(), today, yesterday),
@@ -158,6 +293,7 @@ func ScanGallery(rootDir string) (*GalleryData, error) {
 
 		return nil
 	})
+	}
 
 	// Sort images newest first
 	sort.Slice(allImages, func(i, j int) bool {

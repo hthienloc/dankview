@@ -7,6 +7,7 @@ import qs.DankCommon.Widgets
 Item {
     id: root
 
+    property var flickable: null
     property var imageItem: null
     property real tileSize: 160
 
@@ -15,6 +16,15 @@ Item {
 
     readonly property bool isSelected: imageItem ? ImageService.isSelected(imageItem.path) : false
     readonly property bool isFav: imageItem ? ImageService.isFavorite(imageItem.path) : false
+
+    // Viewport visibility calculation to avoid loading off-screen images in large galleries
+    readonly property real itemContentY: flickable ? root.mapToItem(flickable.contentItem, 0, 0).y : 0
+    readonly property bool shouldLoad: {
+        if (!flickable) return true;
+        const topBound = flickable.contentY - 500;
+        const bottomBound = flickable.contentY + flickable.height + 500;
+        return itemContentY + height >= topBound && itemContentY <= bottomBound;
+    }
 
     Rectangle {
         id: card
@@ -34,9 +44,13 @@ Item {
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
             cache: true
-            source: root.imageItem ? ("file://" + root.imageItem.path) : ""
-            sourceSize.width: 320
-            sourceSize.height: 320
+            source: {
+                if (!root.imageItem || !root.shouldLoad) return "";
+                if (root.imageItem.thumbnail) return "file://" + root.imageItem.thumbnail;
+                return "file://" + root.imageItem.path;
+            }
+            sourceSize.width: 256
+            sourceSize.height: 256
         }
 
         // Dark gradient overlay for icons visibility on light photos

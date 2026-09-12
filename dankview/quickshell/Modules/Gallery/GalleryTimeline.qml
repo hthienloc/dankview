@@ -32,6 +32,7 @@ Item {
     readonly property real tileWidth: Math.floor((width - 40 - (columns - 1) * 10) / columns)
 
     DankFlickable {
+        id: flick
         anchors.fill: parent
         anchors.leftMargin: 20
         anchors.rightMargin: 20
@@ -130,6 +131,7 @@ Item {
                             model: modelData.images
 
                             delegate: GalleryThumbnail {
+                                flickable: flick
                                 imageItem: modelData
                                 tileSize: root.tileWidth
                             }
