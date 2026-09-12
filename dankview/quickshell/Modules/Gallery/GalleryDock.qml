@@ -203,12 +203,12 @@ Rectangle {
             opacity: 0.35
         }
 
-        // Action: Select All / Deselect
+        // Action: Select All / Deselect All
         DankActionButton {
-            iconName: "select_all"
+            iconName: ImageService.isAllSelected ? "deselect" : "select_all"
             iconSize: 18
             buttonSize: 34
-            tooltipText: "Select All (Ctrl+A)"
+            tooltipText: ImageService.isAllSelected ? "Deselect All (Ctrl+A)" : "Select All (Ctrl+A)"
             tooltipSide: "top"
             onClicked: ImageService.selectAll()
         }

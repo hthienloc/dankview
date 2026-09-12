@@ -82,6 +82,19 @@ Singleton {
 
     readonly property int gallerySelectedCount: Object.keys(gallerySelectedFiles).length
     readonly property var gallerySelectedList: Object.keys(gallerySelectedFiles)
+    readonly property bool isAllSelected: {
+        if (!galleryData || !galleryData.allImages || galleryData.allImages.length === 0) return false;
+        const cat = selectedCategory;
+        let count = 0;
+        for (let i = 0; i < galleryData.allImages.length; i++) {
+            const img = galleryData.allImages[i];
+            if (!cat || cat === "All" || img.category === cat) {
+                count++;
+                if (!gallerySelectedFiles[img.path]) return false;
+            }
+        }
+        return count > 0;
+    }
 
     function clearSelection() {
         gallerySelectedFiles = ({});
@@ -89,15 +102,36 @@ Singleton {
 
     function selectAll() {
         if (!galleryData || !galleryData.allImages) return;
-        const sel = {};
         const cat = selectedCategory;
+        const matching = [];
         for (let i = 0; i < galleryData.allImages.length; i++) {
             const img = galleryData.allImages[i];
             if (!cat || cat === "All" || img.category === cat) {
-                sel[img.path] = true;
+                matching.push(img.path);
             }
         }
-        gallerySelectedFiles = sel;
+        if (matching.length === 0) return;
+
+        // If all matching items are already selected, deselect them
+        let allSelected = matching.length <= gallerySelectedCount;
+        if (allSelected) {
+            for (let i = 0; i < matching.length; i++) {
+                if (!gallerySelectedFiles[matching[i]]) {
+                    allSelected = false;
+                    break;
+                }
+            }
+        }
+
+        if (allSelected) {
+            clearSelection();
+        } else {
+            const sel = {};
+            for (let i = 0; i < matching.length; i++) {
+                sel[matching[i]] = true;
+            }
+            gallerySelectedFiles = sel;
+        }
     }
 
     function toggleFavoriteSelected() {
